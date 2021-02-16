@@ -4,23 +4,48 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Info(
+ *      version="1.0.0",
+ *      title="Shopable",
+ *      description="Shopable API",
+ *      @OA\Contact(
+ *          email="hasan@uxblondon.com"
+ *      ),
+ *     @OA\License(
+ *         name="Apache 2.0",
+ *         url="http://www.apache.org/licenses/LICENSE-2.0.html"
+ *     )
+ * )
+ */
+
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+ * @OA\Get(
+ *      path="/products",
+ *      operationId="getProjectsList",
+ *      tags={"Projects"},
+ *      summary="Get list of projects",
+ *      description="Returns list of projects",
+ *      @OA\Response(
+ *          response=200,
+ *          description="successful operation"
+ *       ),
+ *       @OA\Response(response=400, description="Bad request"),
+ *       security={
+ *           {"api_key_security_example": {}}
+ *       }
+ *     )
+ *
+ * Returns list of projects
+ */
     public function index()
     {
         return response()->json(['all products' => array()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function create()
     {
         //

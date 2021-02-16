@@ -13,14 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::prefix('v1')->group(function () {
- //   Route::resource('products', 'ProductController');
-});
-
 Route::group([
 
     'middleware' => 'api',
@@ -32,6 +24,17 @@ Route::group([
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
+
+
+
+});
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'v1'
+
+], function ($router) {
 
     Route::resource('products', 'ProductController');
 

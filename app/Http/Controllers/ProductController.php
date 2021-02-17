@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
  *          email="hasan@uxblondon.com"
  *      ),
  *     @OA\License(
- *         name="Apache 2.0",
- *         url="http://www.apache.org/licenses/LICENSE-2.0.html"
+ *         name="MIT",
+ *         url="https://en.wikipedia.org/wiki/MIT_License"
  *     )
  * )
  */
@@ -32,7 +32,10 @@ class ProductController extends Controller
  *          response=200,
  *          description="successful operation"
  *       ),
- *       @OA\Response(response=400, description="Bad request"),
+ *       @OA\Response(
+ *          response=400, 
+ *          description="Bad request"
+ *        ),
  *       security={
  *           {"api_key_security_example": {}}
  *       }

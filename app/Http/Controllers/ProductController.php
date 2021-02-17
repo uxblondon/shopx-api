@@ -32,10 +32,14 @@ class ProductController extends Controller
  *          response=200,
  *          description="successful operation"
  *       ),
+<<<<<<< HEAD
  *       @OA\Response(
  *          response=400, 
  *          description="Bad request"
  *        ),
+=======
+ *       @OA\Response(response=400, description="Bad request"),
+>>>>>>> cad03ec31320dc3783e5358c2eb87a1cf18685f2
  *       security={
  *           {"api_key_security_example": {}}
  *       }

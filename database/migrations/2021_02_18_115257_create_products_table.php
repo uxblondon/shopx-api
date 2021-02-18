@@ -21,8 +21,9 @@ class CreateProductsTable extends Migration
             $table->string('title');
             $table->string('standfirst')->nullable();
             $table->string('feature_image')->nullable();
-            $table->text('description');
-            $table->string('sort_order');
+            $table->longText('description');
+            $table->integer('sort_order');
+            $table->string('status', 20);
 
             $table->string('meta_description');
             $table->string('meta_keywords');

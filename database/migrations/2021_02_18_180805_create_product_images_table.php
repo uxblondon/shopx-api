@@ -14,25 +14,20 @@ class CreateProductImagesTable extends Migration
     public function up()
     {
         Schema::create('product_images', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->bigInteger('product_id');
+            $table->bigInteger('product_id')->unsigned();
             $table->string('title')->nullable();
             $table->text('location');
             $table->timestamps();
-            // $table->foreign('product_id')
-            // ->references('id')
-            // ->on('products')
-            // ->onDelete('cascade');
         });
 
-        // Schema::table('product_images', function (Blueprint $table) {
-        //     $table->foreign('product_id')
-        //     ->references('id')
-        //     ->on('products')
-        //     ->onDelete('cascade');
-        // });
-
-
+        Schema::table('product_images', function (Blueprint $table) {
+            $table->foreign('product_id')
+            ->references('id')
+            ->on('products')
+            ->onDelete('cascade');
+        });
     }
 
     /**

@@ -14,6 +14,9 @@ class CreateProductsTable extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
+
+            $table->engine = 'InnoDB';
+
             $table->bigIncrements('id');
             $table->integer('categroy_id')->nullable();
             

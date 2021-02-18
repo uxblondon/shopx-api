@@ -14,8 +14,9 @@ class CreateProductVariantOptionsTable extends Migration
     public function up()
     {
         Schema::create('product_variant_options', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->bigInteger('product_variant_id');
+            $table->bigInteger('product_variant_id')->unsigned();
 
             $table->bigInteger('variant_1_id')->nullable();
             $table->string('variant_1_value')->nullable();
@@ -27,10 +28,14 @@ class CreateProductVariantOptionsTable extends Migration
             $table->string('variant_3_value')->nullable();
 
             $table->timestamps();
-            // $table->foreign('product_variant_id')
-            // ->references('id')
-            // ->on('product_variants')
-            // ->onDelete('cascade');
+            
+        });
+
+        Schema::table('product_variant_options', function (Blueprint $table) {
+            $table->foreign('product_variant_id')
+            ->references('id')
+            ->on('product_variants')
+            ->onDelete('cascade');
         });
     }
 

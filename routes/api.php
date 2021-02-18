@@ -29,12 +29,7 @@ Route::group([
 });
 
 Route::group([
-
     'middleware' => 'api',
-    'prefix' => 'v1'
-
 ], function ($router) {
-
-    Route::resource('products', 'v1\ProductController');
-
+    Route::resource('products', 'ProductController');
 });

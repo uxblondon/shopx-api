@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->string('slug');
             $table->string('title');
             $table->string('standfirst')->nullable();
-            $table->string('feature_image')->nullable();
+            $table->text('feature_image')->nullable();
             $table->longText('description');
             $table->integer('sort_order');
             $table->string('status', 20);

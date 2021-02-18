@@ -15,7 +15,20 @@ class CreateProductVariantsTable extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigIncrements('product_id');
+            $table->string('sku')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->decimal('weight', 4, 2)->default(0.0);
+            $table->string('dimensions')->nullable();
+
+            $table->bigIncrements('variant_1_id')->nullable();
+            $table->string('variant_1_value')->nullable();
+
             $table->timestamps();
+            $table->foreign('product_id')
+            ->references('id')
+            ->on('products')
+            ->onDelete('cascade');
         });
     }
 

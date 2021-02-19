@@ -47,7 +47,9 @@ class ProductController extends Controller
  */
     public function index()
     {
-        $products = Product::all();
+        $products = Product::join('product_variant_types', 'products.id', 'product_variant_types.product_id')
+        ->get(['products.id', 'products.title', 'product_variant_types.options']);
+
         return response()->json(['data' => $products]);
     }
 
@@ -56,7 +58,8 @@ class ProductController extends Controller
      */
     public function filter()
     {
-        $products = Product::all();
+        $products = Product::join('product_variant_types', 'products.id', 'product_variant_types.product_id')
+        ->get(['products.id', 'products.title', 'product_variant_types.options']);
         return response()->json(['data' => $products]);
     }
 

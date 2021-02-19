@@ -18,7 +18,7 @@ class CreateProductVariantTypesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('product_id')->unsigned();
             $table->string('name');
-            $table->json('options');
+            $table->text('options');
             $table->timestamps();
             
         });

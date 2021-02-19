@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 /**
@@ -32,14 +34,10 @@ class ProductController extends Controller
  *          response=200,
  *          description="successful operation"
  *       ),
-<<<<<<< HEAD
  *       @OA\Response(
  *          response=400, 
  *          description="Bad request"
  *        ),
-=======
- *       @OA\Response(response=400, description="Bad request"),
->>>>>>> cad03ec31320dc3783e5358c2eb87a1cf18685f2
  *       security={
  *           {"api_key_security_example": {}}
  *       }
@@ -49,7 +47,17 @@ class ProductController extends Controller
  */
     public function index()
     {
-        return response()->json(['all products' => array()]);
+        $products = Product::all();
+        return response()->json(['data' => $products]);
+    }
+
+    /**
+     * Filter products
+     */
+    public function filter()
+    {
+        $products = Product::all();
+        return response()->json(['data' => $products]);
     }
 
     

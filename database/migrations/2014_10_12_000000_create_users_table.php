@@ -14,8 +14,9 @@ class CreateUsersTable extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->integer('customer_id')->nullable();
+            $table->boolean('admin')->default(0); // determines ther user is customer or admin
             $table->string('name');
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();

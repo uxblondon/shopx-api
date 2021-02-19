@@ -20,16 +20,17 @@ class CreateProductsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('categroy_id')->nullable();
             
-            $table->string('slug');
             $table->string('title');
+            $table->string('slug');
             $table->string('standfirst')->nullable();
             $table->text('feature_image')->nullable();
             $table->longText('description');
-            $table->integer('sort_order');
-            $table->string('status', 20);
+            $table->integer('sort_order')->default(0);
+            $table->string('status', 20)->default('draft');
+            $table->dateTime('published_at')->nullable();
 
-            $table->string('meta_description');
-            $table->string('meta_keywords');
+            $table->string('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

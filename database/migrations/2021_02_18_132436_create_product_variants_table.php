@@ -21,6 +21,7 @@ class CreateProductVariantsTable extends Migration
             $table->decimal('price', 8, 2);
             $table->decimal('weight', 4, 2)->default(0.0);
             $table->string('dimensions')->nullable();
+            $table->boolean('available')->default(1);
             $table->timestamps();
         });
 

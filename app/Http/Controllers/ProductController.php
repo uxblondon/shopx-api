@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
+use DB;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 /**
  * @OA\Info(
  *      version="1.0.0",
- *      title="Shopable",
+ * f     title="Shopable",
  *      description="Shopable API",
  *      @OA\Contact(
  *          email="hasan@uxblondon.com"
@@ -47,8 +47,10 @@ class ProductController extends Controller
  */
     public function index()
     {
-        $products = Product::join('product_variant_types', 'products.id', 'product_variant_types.product_id')
-        ->get(['products.id', 'products.title', 'product_variant_types.options']);
+        $products = Product::join('product_variants', 'products.id', 'product_variants.product_id')
+        ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('min(product_variants.price) as price')])
+        ->groupBy('products.id')
+        ->get();
 
         return response()->json(['data' => $products]);
     }

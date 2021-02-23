@@ -30,17 +30,14 @@ class FilterProductRequest extends FormRequest
             'category_id' => 'numeric|nullable',
             'title' => 'nullable',
             'status' => [
-                'alpha',
                 'nullable',
                 Rule::in(['draft', 'live']),
             ],
             'sort_by' => [
-                'alpha',
                 'nullable',
                 Rule::in(['title', 'published_at', 'manual_sort_order']),
             ],
             'sort_order' => [
-                'alpha',
                 'nullable',
                 Rule::in(['asc', 'desc']),
             ],

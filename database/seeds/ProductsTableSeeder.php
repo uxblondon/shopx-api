@@ -6,6 +6,7 @@ use App\Models\ProductImage;
 use App\Models\ProductVariantType;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantOption;
+use App\Models\Category;
 
 class ProductsTableSeeder extends Seeder
 {
@@ -21,9 +22,11 @@ class ProductsTableSeeder extends Seeder
         // make product id started from 1
         DB::statement('ALTER TABLE products AUTO_INCREMENT = 1');
 
+        $categories = Category::pluck('id');
+
         for ($i=0; $i<10; $i++) {
             $product = array(
-            'category_id' => $fake->randomDigit,
+            'category_id' => $categories[rand(0, count($categories)-1)],
             'title' => $fake->text(20),
             'slug' => $fake->slug(),
             'feature_image' => $fake->imageUrl(640, 480),

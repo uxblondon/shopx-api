@@ -14,8 +14,28 @@ class CreateCategoriesTable extends Migration
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+
             $table->bigIncrements('id');
+
+            $table->string('title');
+            $table->string('slug');
+            $table->string('standfirst')->nullable();
+            $table->text('feature_image')->nullable();
+            $table->longText('description');
+            $table->text('tags')->nullable();
+            $table->integer('manual_sort_order')->default(0);
+            $table->string('status', 20)->default('draft');
+            $table->dateTime('published_at')->nullable();
+
+            $table->string('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
         });
     }
 

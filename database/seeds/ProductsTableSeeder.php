@@ -39,7 +39,7 @@ class ProductsTableSeeder extends Seeder
             for($pi = 0; $pi < rand(1,3); $pi++) {
                 $product_image = array(
                     'product_id' => $product->id,
-                    'title' => $fake->text(20),
+                    'description' => $fake->text(20),
                     'location' => $fake->imageUrl(640, 480),
                 );
 

@@ -48,4 +48,13 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(201)
         ->assertJson($product);
     }
+
+
+    public function test_valid_product()
+    {
+        
+        $response = $this->json('POST', '/api/products', []);
+
+        $response->assertStatus(422);
+    }
 }

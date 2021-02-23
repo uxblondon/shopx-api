@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductImage;

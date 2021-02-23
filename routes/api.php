@@ -13,23 +13,31 @@ use Illuminate\Http\Request;
 |
 */
 
+/* auth routes */
 Route::group([
-
-    'middleware' => 'api',
+    'middleware' => 'auth:api',
     'prefix' => 'auth',
-], function ($router) {
-
+], function () {
     Route::post('login', 'Auth\AuthController@login');
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'Auth\AuthController@me');
-
-
-
 });
 
+/* authenticated routes */
+Route::group([
+    'middleware' => 'auth:api',
+], function () {
+    Route::delete('products/{product_id}', 'ProductController@delete');
+    Route::put('products/{product_id}', 'ProductController@update');
+    Route::post('products', 'ProductController@store');
+});
+
+/* public routes */
 Route::group([
     'middleware' => 'api',
-], function ($router) {
-    Route::resource('products', 'ProductController');
+], function () {
+    Route::get('products/{product_id}', 'ProductController@show');
+    Route::get('products/filter', 'ProductController@filter');
+    Route::get('products', 'ProductController@index');
 });

@@ -13,7 +13,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+      //  $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -39,7 +39,8 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+       // auth()->user()
+        return response()->json(['test' => 'me']);
     }
 
     /**

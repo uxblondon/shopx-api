@@ -33,6 +33,10 @@ class StoreProductRequest extends FormRequest
         ];
     }
     
+    /**
+     * Throws the validation errors
+     * @return JSON 
+     */
     protected function failedValidation(Validator $validator)
     {
         $data = array(

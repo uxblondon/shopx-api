@@ -26,7 +26,7 @@ class CreateProductsTable extends Migration
             $table->text('feature_image')->nullable();
             $table->longText('description');
             $table->text('tags')->nullable();
-            $table->integer('sort_order')->default(0);
+            $table->integer('manual_sort_order')->default(0);
             $table->string('status', 20)->default('draft');
             $table->dateTime('published_at')->nullable();
 

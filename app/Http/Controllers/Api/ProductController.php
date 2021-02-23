@@ -6,6 +6,7 @@ use DB;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\FilterProductRequest;
 
 /**  @OA\Tag(
     *     name="Products",
@@ -33,7 +34,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::join('produc3t_variants', 'products.id', 'product_variants.product_id')
+        $products = Product::join('product_variants', 'products.id', 'product_variants.product_id')
         ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('min(product_variants.price) as price')])
         ->groupBy('products.id')
         ->get();
@@ -44,10 +45,8 @@ class ProductController extends Controller
     /**
      * @OA\Post(
      *      path="/api/products/filter",
-     *      operationId="Products",
      *      tags={"Products"},
      *      summary="Get list of filtered products",
-     *      description="Get list of filtered products",
      *      @OA\Parameter(
      *          name="id",
      *          description="Product id",
@@ -67,17 +66,42 @@ class ProductController extends Controller
      *        )
      *     )
      */
-    public function filter(Request $request)
+    public function filter(FilterProductRequest $request)
     {
-
-        $category_id
-        $title 
-        $status 
+        $category = trim($request->get('category_id'));
+        $title = trim($request->get('title'));
+        $status = $request->has('status') ? trim($request->get('status')) : 'published';
         
-        $sort 
-        $
+        if ($category != '') {
+            $conditions[] = ['products.category_id', '=', $category];
+        }
+
+        if ($title != '') {
+            $conditions[] = ['products.title', 'LIKE', '%'.$title.'%'];
+        }
+
+        $conditions[] = ['products.status', '=', $status];
+
+        $sort_by =  'date';
+        $sort =  'desc';
+        if ($request->has('sort')) {
+
+$sort_array = explode(' ', trim($request->get('sort')));
+
+$sort_by =  isset($sort_array[0]) ? trim($sort_array[0]) : 'published_at';
+        $sort =  isset($sort_array[1]) ? trim($sort_array[1]) : 'desc';
 
 
+        }
+        
+
+        // $fractal = new Manager();
+
+        // $paginator = Activity::join('organisations', 'organisations.id', 'activities.organisation_id')
+        //             ->where($conditions)
+        //             ->orderBy($this->order_by, $this->order)
+        //             ->select(['activities.*'])
+        //             ->paginate(20);
 
 
         $products = Product::join('product_variant_types', 'products.id', 'product_variant_types.product_id')

@@ -37,8 +37,7 @@
                     "Products"
                 ],
                 "summary": "Get list of filtered products",
-                "description": "Get list of filtered products",
-                "operationId": "Products",
+                "operationId": "App\\Http\\Controllers\\Api\\ProductController::filter",
                 "parameters": [
                     {
                         "name": "id",

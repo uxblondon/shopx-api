@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
+use App\Models\Category;
 
 class StoreProductRequest extends FormRequest
 {
@@ -26,13 +27,13 @@ class StoreProductRequest extends FormRequest
      */
     public function rules()
     {
+        $categories = Category::where('status', 'published')->pluck('id');
+
         return [
             'category_id' => [
                 'nullable',
                 'numeric',
-                Rule::exists('categories')->where(function ($query) {
-                    $query->where('status', 'published');
-                }),
+                Rule::in($categories),
             ],
             'title' => 'required',
             'standfirst' => 'nullable',

@@ -32,6 +32,7 @@ class CategoriesTableSeeder extends Seeder
                 'feature_image' => $fake->imageUrl(640, 480),
                 'standfirst' => $fake->text(100),
                 'description' => $fake->text(200),
+                'status' => 'published',
                 'created_by' => 1
             );
 

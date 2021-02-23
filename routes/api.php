@@ -18,10 +18,17 @@ Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'auth',
 ], function () {
-    Route::post('login', 'Auth\AuthController@login');
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'Auth\AuthController@me');
+});
+
+/* auth routes */
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth',
+], function () {
+    Route::post('login', 'Auth\AuthController@login');
 });
 
 /* authenticated routes */
@@ -37,6 +44,8 @@ Route::group([
 Route::group([
     'middleware' => 'api',
 ], function () {
+    
+
     Route::get('products/{product_id}', 'Api\ProductController@show');
     Route::post('products/filter', 'Api\ProductController@filter');
     Route::get('products', 'Api\ProductController@index');

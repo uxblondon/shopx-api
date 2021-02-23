@@ -26,10 +26,11 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         return [
+            'category_id' => ['nullable'],
             'title' => 'required',
-            'standfirst' => '',
-            'description' => '',
-            
+            'standfirst' => 'nullable',
+            'description' => 'required',
+            'tags' => 'nullable',
         ];
     }
     
@@ -40,7 +41,7 @@ class StoreProductRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         $data = array(
-            'status' => false,
+            'status' => 'error',
             'message' => 'Invalid Request',
             'errors' => $validator->errors()
         );

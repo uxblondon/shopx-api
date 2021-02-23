@@ -23,7 +23,7 @@ class ProductsTableSeeder extends Seeder
 
         for ($i=0; $i<10; $i++) {
             $product = array(
-            'categroy_id' => $fake->randomDigit,
+            'category_id' => $fake->randomDigit,
             'title' => $fake->text(20),
             'slug' => $fake->slug(),
             'feature_image' => $fake->imageUrl(640, 480),

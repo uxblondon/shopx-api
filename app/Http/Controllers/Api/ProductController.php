@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use DB;
+use Illuminate\Support\Str;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
@@ -118,7 +119,21 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        return Product::create($request->all());
+
+
+        $product_data = array(
+            'category_id' => $request->get('category_id'),
+            'title' => $request->get('title'),
+            'slug' => Str::slug($request->get('title')),
+            'standfirst' => $request->get('standfirst'),
+            'description' => $request->get('description'),
+            'tags' => $request->get('tags'),
+            'created_by' => auth()->user()->id
+        );
+
+        $product = Product::create($product_data);
+
+        return response()->json(['status' => 'success', 'data' => $product]);
     }
 
     /**

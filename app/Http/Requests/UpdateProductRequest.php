@@ -5,9 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 
-class StoreProductRequest extends FormRequest
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,13 +26,7 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_id' => [
-                'nullable',
-                'numeric',
-                Rule::exists('categories')->where(function ($query) {
-                    $query->where('status', 'published');
-                }),
-            ],
+            'category_id' => 'exists:App\User,id',
             'title' => 'required',
             'standfirst' => 'nullable',
             'description' => 'required',

@@ -16,11 +16,26 @@
         "/api/products": {
             "get": {
                 "tags": [
-                    "Products"
+                    "product"
                 ],
                 "summary": "Get list of all products",
                 "description": "Returns list of products",
                 "operationId": "GetProductList",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Store new product",
+                "operationId": "App\\Http\\Controllers\\Api\\ProductController::store",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -34,7 +49,7 @@
         "/api/products/filter": {
             "post": {
                 "tags": [
-                    "Products"
+                    "product"
                 ],
                 "summary": "Get list of filtered products",
                 "operationId": "App\\Http\\Controllers\\Api\\ProductController::filter",
@@ -62,11 +77,57 @@
         "/api/products/{product_id}": {
             "get": {
                 "tags": [
-                    "Products"
+                    "product"
                 ],
                 "summary": "Get list of filtered products",
                 "description": "Get list of filtered products",
                 "operationId": "Products",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Update specified product",
+                "operationId": "App\\Http\\Controllers\\Api\\ProductController::update",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Delete specified product",
+                "operationId": "App\\Http\\Controllers\\Api\\ProductController::destroy",
                 "parameters": [
                     {
                         "name": "product_id",
@@ -88,8 +149,8 @@
     },
     "tags": [
         {
-            "name": "Products",
-            "description": "API Endpoints of Products"
+            "name": "product",
+            "description": "All Endpoints of Product"
         }
     ]
 }

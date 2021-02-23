@@ -28,16 +28,16 @@ Route::group([
 Route::group([
     'middleware' => 'auth:api',
 ], function () {
-    Route::delete('products/{product_id}', 'ProductController@delete');
-    Route::put('products/{product_id}', 'ProductController@update');
-    Route::post('products', 'ProductController@store');
+    Route::delete('products/{product_id}', 'Api\ProductController@delete');
+    Route::put('products/{product_id}', 'Api\ProductController@update');
+    Route::post('products', 'Api\ProductController@store');
 });
 
 /* public routes */
 Route::group([
     'middleware' => 'api',
 ], function () {
-    Route::get('products/{product_id}', 'ProductController@show');
-    Route::get('products/filter', 'ProductController@filter');
-    Route::get('products', 'ProductController@index');
+    Route::get('products/{product_id}', 'Api\ProductController@show');
+    Route::post('products/filter', 'Api\ProductController@filter');
+    Route::get('products', 'Api\ProductController@index');
 });

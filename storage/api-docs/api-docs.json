@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Shopable",
-        "description": "Shopable API",
+        "title": "ShopX API",
+        "description": "A simple yet smart RESTful API for e-commerce solution",
         "contact": {
             "email": "hasan@uxblondon.com"
         },
@@ -16,25 +16,81 @@
         "/api/products": {
             "get": {
                 "tags": [
-                    "products"
+                    "Products"
                 ],
-                "summary": "Get list of products",
+                "summary": "Get list of all products",
                 "description": "Returns list of products",
                 "operationId": "GetProductList",
                 "responses": {
                     "200": {
-                        "description": "successful operation"
+                        "description": "Successful response"
                     },
                     "400": {
                         "description": "Bad request"
                     }
-                },
-                "security": [
+                }
+            }
+        },
+        "/api/products/filter": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get list of filtered products",
+                "description": "Get list of filtered products",
+                "operationId": "Products",
+                "parameters": [
                     {
-                        "api_key_security_example": []
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/products/{product_id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get list of filtered products",
+                "description": "Get list of filtered products",
+                "operationId": "Products",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Products",
+            "description": "API Endpoints of Products"
+        }
+    ]
 }

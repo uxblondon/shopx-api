@@ -4,38 +4,23 @@ namespace App\Http\Controllers;
 
 use DB;
 use App\Models\Product;
-use Illuminate\Http\Request;
-
-/**
- * @OA\Info(
- *      version="1.0.0",
- * f     title="Shopable",
- *      description="Shopable API",
- *      @OA\Contact(
- *          email="hasan@uxblondon.com"
- *      ),
- *     @OA\License(
- *         name="MIT",
- *         url="https://en.wikipedia.org/wiki/MIT_License"
- *     )
- * )
- */
+use App\Http\Requests\StoreProductRequest;
 
 class ProductController extends Controller
 {
     /**
  * @OA\Get(
- *      path="/products",
- *      operationId="getProjectsList",
- *      tags={"Projects"},
- *      summary="Get list of projects",
- *      description="Returns list of projects",
+ *      path="/api/products",
+ *      operationId="GetProductList",
+ *      tags={"products"},
+ *      summary="Get list of products",
+ *      description="Returns list of products",
  *      @OA\Response(
  *          response=200,
  *          description="successful operation"
  *       ),
  *       @OA\Response(
- *          response=400, 
+ *          response=400,
  *          description="Bad request"
  *        ),
  *       security={
@@ -65,11 +50,6 @@ class ProductController extends Controller
         return response()->json(['data' => $products]);
     }
 
-    
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -77,9 +57,9 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        //
+        return Product::create($request->all());
     }
 
     /**

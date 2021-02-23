@@ -7,20 +7,20 @@
             "email": "hasan@uxblondon.com"
         },
         "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            "name": "MIT",
+            "url": "https://en.wikipedia.org/wiki/MIT_License"
         },
         "version": "1.0.0"
     },
     "paths": {
-        "/products": {
+        "/api/products": {
             "get": {
                 "tags": [
-                    "Projects"
+                    "products"
                 ],
-                "summary": "Get list of projects",
-                "description": "Returns list of projects",
-                "operationId": "getProjectsList",
+                "summary": "Get list of products",
+                "description": "Returns list of products",
+                "operationId": "GetProductList",
                 "responses": {
                     "200": {
                         "description": "successful operation"

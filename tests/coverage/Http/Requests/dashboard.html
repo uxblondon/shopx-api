@@ -2,7 +2,7 @@
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <title>Dashboard for /Users/hasan/Sites/shopx-api/app/Http/Middleware</title>
+  <title>Dashboard for /Users/hasan/Sites/shopx-api/app/Http/Requests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="../../_css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="../../_css/nv.d3.min.css" rel="stylesheet" type="text/css">
@@ -18,7 +18,7 @@
        <ol class="breadcrumb">
          <li class="breadcrumb-item"><a href="../../index.html">/Users/hasan/Sites/shopx-api/app</a></li>
          <li class="breadcrumb-item"><a href="../index.html">Http</a></li>
-         <li class="breadcrumb-item"><a href="index.html">Middleware</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Requests</a></li>
          <li class="breadcrumb-item active">(Dashboard)</li>
 
        </ol>
@@ -59,8 +59,7 @@
         </tr>
        </thead>
        <tbody>
-       <tr><td><a href="Authenticate.php.html#7">App\Http\Middleware\Authenticate</a></td><td class="text-right">0%</td></tr>
-       <tr><td><a href="RedirectIfAuthenticated.php.html#9">App\Http\Middleware\RedirectIfAuthenticated</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StoreProductRequest.php.html#9">App\Http\Requests\StoreProductRequest</a></td><td class="text-right">0%</td></tr>
 
        </tbody>
       </table>
@@ -77,8 +76,6 @@
         </tr>
        </thead>
        <tbody>
-       <tr><td><a href="Authenticate.php.html#7">App\Http\Middleware\Authenticate</a></td><td class="text-right">6</td></tr>
-       <tr><td><a href="RedirectIfAuthenticated.php.html#9">App\Http\Middleware\RedirectIfAuthenticated</a></td><td class="text-right">6</td></tr>
 
        </tbody>
       </table>
@@ -116,8 +113,9 @@
         </tr>
        </thead>
        <tbody>
-       <tr><td><a href="Authenticate.php.html#15"><abbr title="App\Http\Middleware\Authenticate::redirectTo">redirectTo</abbr></a></td><td class="text-right">0%</td></tr>
-       <tr><td><a href="RedirectIfAuthenticated.php.html#19"><abbr title="App\Http\Middleware\RedirectIfAuthenticated::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StoreProductRequest.php.html#16"><abbr title="App\Http\Requests\StoreProductRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StoreProductRequest.php.html#26"><abbr title="App\Http\Requests\StoreProductRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="StoreProductRequest.php.html#36"><abbr title="App\Http\Requests\StoreProductRequest::failedValidation">failedValidation</abbr></a></td><td class="text-right">0%</td></tr>
 
        </tbody>
       </table>
@@ -134,8 +132,6 @@
         </tr>
        </thead>
        <tbody>
-       <tr><td><a href="Authenticate.php.html#15"><abbr title="App\Http\Middleware\Authenticate::redirectTo">redirectTo</abbr></a></td><td class="text-right">6</td></tr>
-       <tr><td><a href="RedirectIfAuthenticated.php.html#19"><abbr title="App\Http\Middleware\RedirectIfAuthenticated::handle">handle</abbr></a></td><td class="text-right">6</td></tr>
 
        </tbody>
       </table>
@@ -164,7 +160,7 @@ $(document).ready(function() {
       .yAxis.tickFormat(d3.format('d'));
 
     d3.select('#classCoverageDistribution svg')
-      .datum(getCoverageDistributionData([2,0,0,0,0,0,0,0,0,0,0,5], "Class Coverage"))
+      .datum(getCoverageDistributionData([1,0,0,0,0,0,0,0,0,0,0,0], "Class Coverage"))
       .transition().duration(500).call(chart);
 
     nv.utils.windowResize(chart.update);
@@ -182,7 +178,7 @@ $(document).ready(function() {
       .yAxis.tickFormat(d3.format('d'));
 
     d3.select('#methodCoverageDistribution svg')
-      .datum(getCoverageDistributionData([2,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .datum(getCoverageDistributionData([3,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
       .transition().duration(500).call(chart);
 
     nv.utils.windowResize(chart.update);
@@ -232,7 +228,7 @@ $(document).ready(function() {
     chart.yAxis.axisLabel('Cyclomatic Complexity');
 
     d3.select('#classComplexity svg')
-      .datum(getComplexityData([[0,2,"<a href=\"Authenticate.php.html#7\">App\\Http\\Middleware\\Authenticate<\/a>"],[100,0,"<a href=\"CheckForMaintenanceMode.php.html#7\">App\\Http\\Middleware\\CheckForMaintenanceMode<\/a>"],[100,0,"<a href=\"EncryptCookies.php.html#7\">App\\Http\\Middleware\\EncryptCookies<\/a>"],[0,2,"<a href=\"RedirectIfAuthenticated.php.html#9\">App\\Http\\Middleware\\RedirectIfAuthenticated<\/a>"],[100,0,"<a href=\"TrimStrings.php.html#7\">App\\Http\\Middleware\\TrimStrings<\/a>"],[100,0,"<a href=\"TrustProxies.php.html#8\">App\\Http\\Middleware\\TrustProxies<\/a>"],[100,0,"<a href=\"VerifyCsrfToken.php.html#7\">App\\Http\\Middleware\\VerifyCsrfToken<\/a>"]], 'Class Complexity'))
+      .datum(getComplexityData([[0,3,"<a href=\"StoreProductRequest.php.html#9\">App\\Http\\Requests\\StoreProductRequest<\/a>"]], 'Class Complexity'))
       .transition()
       .duration(500)
       .call(chart);
@@ -256,7 +252,7 @@ $(document).ready(function() {
     chart.yAxis.axisLabel('Method Complexity');
 
     d3.select('#methodComplexity svg')
-      .datum(getComplexityData([[0,2,"<a href=\"Authenticate.php.html#15\">App\\Http\\Middleware\\Authenticate::redirectTo<\/a>"],[0,2,"<a href=\"RedirectIfAuthenticated.php.html#19\">App\\Http\\Middleware\\RedirectIfAuthenticated::handle<\/a>"]], 'Method Complexity'))
+      .datum(getComplexityData([[0,1,"<a href=\"StoreProductRequest.php.html#16\">App\\Http\\Requests\\StoreProductRequest::authorize<\/a>"],[0,1,"<a href=\"StoreProductRequest.php.html#26\">App\\Http\\Requests\\StoreProductRequest::rules<\/a>"],[0,1,"<a href=\"StoreProductRequest.php.html#36\">App\\Http\\Requests\\StoreProductRequest::failedValidation<\/a>"]], 'Method Complexity'))
       .transition()
       .duration(500)
       .call(chart);

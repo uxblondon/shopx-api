@@ -23,15 +23,29 @@ class ProductControllerTest extends TestCase
             ->assertJsonStructure(
                 [
                     'data' => [
-                        '*' => []
+                        '*' => [
+                            'fasdf',
+                            'fasdfa'
+                        ]
                     ]
                 ]
             );
     }
 
-    public function test_create_product()
+    public function test_store_product()
     {
-        $this->json('get', 'api/products/create')
-            ->assertStatus(Response::HTTP_OK);
+        $product = array(
+            'categroy_id' => $this->faker->randomDigit,
+            'title' => $this->faker->text(20),
+            'slug' => $this->faker->slug(),
+            'feature_image' => $this->faker->imageUrl(640, 480),
+            'standfirst' => $this->faker->text(100),
+            'description' => $this->faker->text(200),
+            'created_by' => 1
+        );
+        $response = $this->json('POST', '/api/products', $product);
+
+        $response->assertStatus(201)
+        ->assertJson($product);
     }
 }

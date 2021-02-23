@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
+use App\Models\Category;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -25,12 +27,25 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules()
     {
+        $categories = Category::where('status', 'published')->pluck('id');
+
         return [
-            'category_id' => 'exists:App\User,id',
-            'title' => 'required',
+            'category_id' => [
+                'nullable',
+                'numeric',
+                Rule::in($categories),
+                'required',
+            ],
+            'title' => 'nullable|required',
             'standfirst' => 'nullable',
-            'description' => 'required',
+            'feature_image' => 'nullable|image',
+            'description' => 'nullable',
             'tags' => 'nullable',
+            'status' => [
+                Rule::in(['draft', 'published']),
+            ],
+            'meta_description' => 'nullable',
+            'meta_keywords' => 'nullable',
         ];
     }
     

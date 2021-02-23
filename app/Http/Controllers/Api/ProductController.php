@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\FilterProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 
 /**  @OA\Tag(
  *     name="product",
@@ -160,7 +161,9 @@ class ProductController extends Controller
      */
     public function show($product_id)
     {
-        return Product::find($product_id);
+        $product = Product::find($product_id);
+
+        return response()->json(['status' => 'success', 'data' => $product]);
     }
 
     /**
@@ -183,9 +186,58 @@ class ProductController extends Controller
      *       ),
      *     )
      */
-    public function update(Request $request, $product_id)
+    public function update(UpdateProductRequest $request, $product_id)
     {
-        //
+
+        $product_data = array();
+
+        if($request->has('category_id')) {
+            $product_data['category_id'] = $request->get('category_id');
+        }
+
+        if($request->has('title')) {
+            $product_data['title'] = $request->get('title');
+        }
+
+        if($request->has('standfirst')) {
+            $product_data['standfirst'] = $request->get('standfirst');
+        }
+
+        if($request->has('description')) {
+            $product_data['description'] = $request->get('description');
+        }
+
+        if($request->has('feature_image')) {
+            $product_data['feature_image'] = $request->get('feature_image');
+        }
+
+        if($request->has('tags')) {
+            $product_data['tags'] = $request->get('tags');
+        }
+
+        if($request->has('status')) {
+            $product_data['status'] = $request->get('status');
+        }
+
+        if($request->has('meta_description')) {
+            $product_data['meta_description'] = $request->get('meta_description');
+        }
+
+        if($request->has('meta_keywords')) {
+            $product_data['meta_keywords'] = $request->get('meta_keywords');
+        }
+
+        if(count($product_data)>0){
+            $update = Product::where('id', $product_id)->update($product_data);
+            if($update) {
+                $product = Product::find($product_id);
+                return response()->json(['status' => 'success', 'data' => $product]);
+            }
+
+            return response()->json(['status' => 'error', 'message' => 'Failed to update product.']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'No data provided', 'd' => $request->all()]);
     }
 
     /**

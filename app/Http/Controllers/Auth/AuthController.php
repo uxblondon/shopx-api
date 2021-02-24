@@ -4,14 +4,48 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 
+
+/**  @OA\Tag(
+ *     name="auth",
+ *     description="All Endpoints of Authentication"
+ * )
+ */
 class AuthController extends Controller
 {
     
 
     /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @OA\Post(
+     *      path="/api/auth/login",
+     *      tags={"auth"},
+     *      summary="Get access token for the API",
+     * @OA\Parameter(
+     *          name="email",
+     *          description="Email Address",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     * @OA\Parameter(
+     *          name="password",
+     *          description="Password",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *       @OA\Response(
+     *          response=400,
+     *          description="Bad request"
+     *        )
+     *     )
      */
     public function login()
     {
@@ -36,9 +70,19 @@ class AuthController extends Controller
     }
 
     /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @OA\Post(
+     *      path="/api/auth/logout",
+     *      tags={"auth"},
+     *      summary="Logout from the API",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *       @OA\Response(
+     *          response=400,
+     *          description="Bad request"
+     *        )
+     *     )
      */
     public function logout()
     {

@@ -35,7 +35,6 @@ Route::group([
 Route::group([
     'middleware' => 'auth:api',
 ], function () {
-
     Route::delete('categories/{category_id}', 'Api\CategoryController@destroy');
     Route::put('categories/{category_id}', 'Api\CategoryController@update');
     Route::post('categories', 'Api\CategoryController@store');

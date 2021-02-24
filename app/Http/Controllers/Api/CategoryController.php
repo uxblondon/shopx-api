@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Str;
+use App\Models\Product;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\FilterCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 
 /**  @OA\Tag(
  *     name="category",
@@ -36,8 +40,8 @@ class CategoryController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/products/filter",
-     *      tags={"product"},
+     *      path="/api/categories/filter",
+     *      tags={"category"},
      *      summary="Get list of filtered products",
      *      @OA\Parameter(
      *          name="id",
@@ -58,15 +62,15 @@ class CategoryController extends Controller
      *        )
      *     )
      */
-    public function filter(FilterProductRequest $request)
+    public function filter(FilterCategoryRequest $request)
     {
         $title = trim($request->get('title'));
         $status = $request->has('status') ? trim($request->get('status')) : 'published';
 
-        $conditions[] = ['products.status', '=', $status];
+        $conditions[] = ['categories.status', '=', $status];
 
         if ($title != '') {
-            $conditions[] = ['products.title', 'LIKE', '%' . $title . '%'];
+            $conditions[] = ['categories.title', 'LIKE', '%' . $title . '%'];
         }
 
         $sort_by =  'published_at';
@@ -86,8 +90,8 @@ class CategoryController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/products",
-     *      tags={"product"},
+     *      path="/api/categories",
+     *      tags={"category"},
      *      summary="Store new product",
      *      @OA\Response(
      *          response=200,
@@ -99,7 +103,7 @@ class CategoryController extends Controller
      *        )
      *     )
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreCategoryRequest $request)
     {
         $category_data = array(
             'title' => $request->get('title'),
@@ -110,16 +114,16 @@ class CategoryController extends Controller
             'created_by' => auth()->user()->id
         );
 
-        $category = Product::create($category_data);
+        $category = Category::create($category_data);
 
         return response()->json(['status' => 'success', 'data' => $category]);
     }
 
     /**
      * @OA\Get(
-     *      path="/api/products/{product_id}",
+     *      path="/api/categories/{product_id}",
      *      operationId="Products",
-     *      tags={"product"},
+     *      tags={"category"},
      *      summary="Get list of filtered products",
      *      description="Get list of filtered products",
      *      @OA\Parameter(
@@ -140,14 +144,15 @@ class CategoryController extends Controller
     public function show($category_id)
     {
         $category = Category::find($category_id);
+        $category->products = Product::where('category_id', $category_id)->get();
 
         return response()->json(['status' => 'success', 'data' => $category]);
     }
 
     /**
      * @OA\Put(
-     *      path="/api/products/{product_id}",
-     *      tags={"product"},
+     *      path="/api/categories/{product_id}",
+     *      tags={"category"},
      *      summary="Update specified product",
      *      @OA\Parameter(
      *          name="product_id",
@@ -164,7 +169,7 @@ class CategoryController extends Controller
      *       ),
      *     )
      */
-    public function update(UpdateProductRequest $request, $product_id)
+    public function update(UpdateCategoryRequest $request, $product_id)
     {
 
         $category_data = array();
@@ -202,9 +207,9 @@ class CategoryController extends Controller
         }
 
         if(count($category_data)>0){
-            $update = Product::where('id', $category_id)->update($category_data);
+            $update = Category::where('id', $category_id)->update($category_data);
             if($update) {
-                $category = Product::find($category_id);
+                $category = Category::find($category_id);
                 return response()->json(['status' => 'success', 'data' => $category]);
             }
 
@@ -216,8 +221,8 @@ class CategoryController extends Controller
 
     /**
      * @OA\Delete(
-     *      path="/api/products/{product_id}",
-     *      tags={"product"},
+     *      path="/api/categories/{product_id}",
+     *      tags={"category"},
      *      summary="Delete specified product",
      *      @OA\Parameter(
      *          name="product_id",
@@ -236,7 +241,7 @@ class CategoryController extends Controller
      */
     public function destroy($product_id)
     {
-        $product = Product::find($product_id);
+        $product = Category::find($product_id);
 
         if($product) {
             $product->delete();

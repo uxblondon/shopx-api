@@ -13,6 +13,138 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of all categories",
+                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::index",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Store new product",
+                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::store",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/categories/filter": {
+            "post": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of filtered products",
+                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::filter",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/categories/{product_id}": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of filtered products",
+                "description": "Get list of filtered products",
+                "operationId": "Products",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Update specified product",
+                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::update",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Delete specified product",
+                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::destroy",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
         "/api/products": {
             "get": {
                 "tags": [
@@ -148,6 +280,10 @@
         }
     },
     "tags": [
+        {
+            "name": "category",
+            "description": "All Endpoints of Category"
+        },
         {
             "name": "product",
             "description": "All Endpoints of Product"

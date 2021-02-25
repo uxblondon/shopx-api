@@ -12,6 +12,7 @@
         "darkaonline/l5-swagger": "6.*",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^2.0",
         "laravel/framework": "^6.20",
         "laravel/tinker": "^2.5",
         "tymon/jwt-auth": "^1.0"

@@ -20,7 +20,7 @@ Route::group([
 ], function () {
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
-    Route::post('me', 'Auth\AuthController@me');
+    Route::get('me', 'Auth\AuthController@me');
 });
 
 /* auth routes */

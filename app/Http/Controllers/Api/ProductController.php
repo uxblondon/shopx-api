@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+
 use DB;
 use Illuminate\Support\Str;
 use App\Models\Product;

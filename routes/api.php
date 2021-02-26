@@ -21,6 +21,12 @@ Route::group([
     Route::post('logout', 'Auth\AuthController@logout');
     Route::post('refresh', 'Auth\AuthController@refresh');
     Route::get('me', 'Auth\AuthController@me');
+
+    Route::put('users/{user_id}', 'Auth\UserController@update');
+    Route::post('users', 'Auth\UserController@store');
+    Route::get('users/{user_id}', 'Auth\UserController@show');
+    Route::get('users', 'Auth\UserController@index');
+
 });
 
 /* auth routes */
@@ -39,9 +45,33 @@ Route::group([
     Route::put('categories/{category_id}', 'Api\CategoryController@update');
     Route::post('categories', 'Api\CategoryController@store');
 
+    Route::delete('products/{product_id}/variant-types/{variant_type_id}', 'Api\ProductVariantTypeController@destroy');
+    Route::post('products/{product_id}/variant-types', 'Api\ProductVariantTypeController@store');
+
+    Route::delete('products/{product_id}/variants/{variant_id}', 'Api\ProductVariantController@destroy');
+    Route::put('products/{product_id}/variants/{variant_id}', 'Api\ProductVariantController@update');
+    Route::post('products/{product_id}/variants', 'Api\ProductVariantController@store');
+
+    Route::delete('products/{product_id}/images/{image_id}', 'Api\ProductImageController@destroy');
+    Route::put('products/{product_id}/images/{image_id}', 'Api\ProductImageController@update');
+    Route::post('products/{product_id}/images', 'Api\ProductImageController@store');
+
     Route::delete('products/{product_id}', 'Api\ProductController@destroy');
     Route::put('products/{product_id}', 'Api\ProductController@update');
     Route::post('products', 'Api\ProductController@store');
+
+    Route::delete('customers/{customer_id}/addresses/{address_id}', 'Api\CustomerController@destroy');
+    Route::put('customers/{customer_id}/addresses/{address_id}', 'Api\CustomerController@update');
+    Route::post('customers/{customer_id}/addresses', 'Api\CustomerController@store');
+    Route::get('customers/{customer_id}/addresses/{address_id}', 'Api\CustomerController@show');
+    Route::get('customers/{customer_id}/addresses', 'Api\CustomerController@index');
+
+    Route::delete('customers/{customer_id}', 'Api\CustomerController@destroy');
+    Route::put('customers/{customer_id}', 'Api\CustomerController@update');
+    Route::post('customers', 'Api\CustomerController@store');
+    Route::get('customers/{customer_id}', 'Api\CustomerController@show');
+    Route::post('customers/filter', 'Api\CustomerController@filter');
+    Route::get('customers', 'Api\CustomerController@index');
 });
 
 /* public routes */

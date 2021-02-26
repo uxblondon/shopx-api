@@ -168,7 +168,7 @@ class ProductController extends Controller
         if ($product) {
 
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
-            
+
             $variants['types'] = ProductVariantType::where('product_id', $product_id)
                 ->get(['id', 'name', 'options'])
                 ->toArray();
@@ -180,8 +180,12 @@ class ProductController extends Controller
                 ->where('product_variants.product_id', $product_id)
                 ->get([
                     'product_variants.id',
+                    'product_variants.sku',
                     'product_variants.price',
                     'product_variants.weight',
+                    'product_variants.dimensions',
+                    'product_variants.available',
+                    'product_variants.shipping_cost',
                     'variant_1.name as variant_1_name',
                     'variant_1.options as variant_1_options',
                     'product_variant_options.variant_1_value as variant_1_value',

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use DB;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\ProductVariantType;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\FilterProductRequest;
@@ -163,7 +165,40 @@ class ProductController extends Controller
     {
         $product = Product::find($product_id);
 
-        return response()->json(['status' => 'success', 'data' => $product]);
+        if ($product) {
+
+            $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
+            $variants['types'] = ProductVariantType::where('product_id', $product_id)
+                ->get(['id', 'name', 'options'])
+                ->toArray();
+
+            $variants['values'] = ProductVariant::leftJoin('product_variant_options', 'product_variants.id', 'product_variant_options.product_variant_id')
+                ->leftJoin('product_variant_types as variant_1', 'variant_1.id', 'product_variant_options.variant_1_id')
+                ->leftJoin('product_variant_types as variant_2', 'variant_2.id', 'product_variant_options.variant_2_id')
+                ->leftJoin('product_variant_types as variant_3', 'variant_3.id', 'product_variant_options.variant_3_id')
+                ->where('product_variants.product_id', $product_id)
+                ->get([
+                    'product_variants.id',
+                    'product_variants.price',
+                    'product_variants.weight',
+                    'variant_1.name as variant_1_name',
+                    'variant_1.options as variant_1_options',
+                    'product_variant_options.variant_1_value as variant_1_value',
+                    'variant_2.name as variant_2_name',
+                    'variant_2.options as variant_2_options',
+                    'product_variant_options.variant_2_value as variant_2_value',
+                    'variant_2.name as variant_3_name',
+                    'variant_3.options as variant_3_options',
+                    'product_variant_options.variant_3_value as variant_3_value',
+                ])
+                ->toArray();
+
+            $product->variants = $variants;
+
+            return response()->json(['status' => 'success', 'data' => $product]);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Product not found.']);
     }
 
     /**
@@ -191,45 +226,45 @@ class ProductController extends Controller
 
         $product_data = array();
 
-        if($request->has('category_id')) {
+        if ($request->has('category_id')) {
             $product_data['category_id'] = $request->get('category_id');
         }
 
-        if($request->has('title')) {
+        if ($request->has('title')) {
             $product_data['title'] = $request->get('title');
         }
 
-        if($request->has('standfirst')) {
+        if ($request->has('standfirst')) {
             $product_data['standfirst'] = $request->get('standfirst');
         }
 
-        if($request->has('description')) {
+        if ($request->has('description')) {
             $product_data['description'] = $request->get('description');
         }
 
-        if($request->has('feature_image')) {
+        if ($request->has('feature_image')) {
             $product_data['feature_image'] = $request->get('feature_image');
         }
 
-        if($request->has('tags')) {
+        if ($request->has('tags')) {
             $product_data['tags'] = $request->get('tags');
         }
 
-        if($request->has('status')) {
+        if ($request->has('status')) {
             $product_data['status'] = $request->get('status');
         }
 
-        if($request->has('meta_description')) {
+        if ($request->has('meta_description')) {
             $product_data['meta_description'] = $request->get('meta_description');
         }
 
-        if($request->has('meta_keywords')) {
+        if ($request->has('meta_keywords')) {
             $product_data['meta_keywords'] = $request->get('meta_keywords');
         }
 
-        if(count($product_data)>0){
+        if (count($product_data) > 0) {
             $update = Product::where('id', $product_id)->update($product_data);
-            if($update) {
+            if ($update) {
                 $product = Product::find($product_id);
                 return response()->json(['status' => 'success', 'data' => $product]);
             }
@@ -264,7 +299,7 @@ class ProductController extends Controller
     {
         $product = Product::find($product_id);
 
-        if($product) {
+        if ($product) {
             $product->delete();
             return response()->json(['status' => 'success', 'message' => 'Product successfully deleted.']);
         }

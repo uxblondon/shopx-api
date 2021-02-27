@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
+
 class UpdateUserRequest extends FormRequest
 {
     /**
@@ -16,7 +17,11 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        if (auth()->user()->admin === 1) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -26,13 +31,19 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
+        $user_id = FormRequest::segment(4);
         return [
-            'title' => 'required',
-            'standfirst' => 'nullable',
-            'description' => 'required',
+            'name' => ['string', 'max:255'],
+            'email' => [
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user_id),
+            ],
+            'password' => ['string', 'min:6'],
         ];
     }
-    
+
     /**
      * Throws the validation errors
      * @return JSON 
@@ -42,10 +53,9 @@ class UpdateUserRequest extends FormRequest
         $data = array(
             'status' => 'error',
             'message' => 'Invalid Request',
-            'errors' => $validator->errors()
+            'errors' => $validator->errors(),
         );
 
         throw new HttpResponseException(response()->json($data, 422));
     }
-
 }

@@ -19,17 +19,12 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $users = User::where('admin', 1)
+        ->orderBy('disabled', 'asc')
+        ->orderBy('name', 'asc')
+        ->get(['id', 'name', 'email', 'disabled']);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response()->json(['status' => 'success', 'data' => $users]);
     }
 
     /**
@@ -52,7 +47,6 @@ class UserController extends Controller
         if($user) {
             return response()->json(['status' => 'success', 'data' => $user]);
         }
-
         return response()->json(['status' => 'error', 'message' => 'Failed to create user.']);
     }
 
@@ -62,20 +56,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($user_id)
     {
-        //
-    }
+        $user = User::where('id', $user_id)->where('admin', 1)->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if($user) {
+            return response()->json(['status' => 'success', 'data' => $user]);
+        }
+        return response()->json(['status' => 'error', 'message' => 'User not found.']);
     }
 
     /**
@@ -85,19 +73,37 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $user_id)
     {
-        //
-    }
+        $user_data = array();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        if ($request->has('name')) {
+            $user_data['name'] = $request->get('name');
+        }
+
+        if ($request->has('email')) {
+            $user_data['email'] = $request->get('email');
+        }
+
+        if ($request->has('password')) {
+            $user_data['password'] = Hash::make($request->get('password'));
+        }
+
+        if ($request->has('disabled')) {
+            $user_data['disabled'] = $request->get('disabled');
+        }
+
+        if(count($user_data) > 0) {
+            $update = User::where('id', $user_id)->where('admin', 1)->update($user_data);
+
+        if($update) {
+            $user = User::find($user_id);
+            return response()->json(['status' => 'success', 'message' => 'User details successfully updated.', 'data' => $user]);
+        }
+        return response()->json(['status' => 'error', 'message' => 'Failed to create user.']);
+
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'No data provided.']);
     }
 }

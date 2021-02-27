@@ -22,7 +22,7 @@ class UserController extends Controller
         $users = User::where('admin', 1)
         ->orderBy('disabled', 'asc')
         ->orderBy('name', 'asc')
-        ->get(['id', 'name', 'email', 'disabled']);
+        ->get(['id', 'name', 'email', 'created_at', 'disabled']);
 
         return response()->json(['status' => 'success', 'data' => $users]);
     }

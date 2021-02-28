@@ -41,7 +41,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::join('product_variants', 'products.id', 'product_variants.product_id')
-            ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('min(product_variants.price) as price')])
+        ->leftJoin('categories', 'categories.id', 'products.category_id')
+            ->select(['products.id', 'categories.id as category_id', 'categories.title as category_title', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
             ->groupBy('products.id')
             ->get();
 

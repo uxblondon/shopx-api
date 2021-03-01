@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductVariantType;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
@@ -40,10 +41,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::join('product_variants', 'products.id', 'product_variants.product_id')
-        ->join('product_categories', 'product_categories.product_id', 'products.id')
-        ->join('categories', 'categories.id', 'product_categories.category_id')
-            ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_categories.category_id) as no_of_categories'), DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
+        $products = Product::leftJoin('product_variants', 'products.id', 'product_variants.product_id')
+            ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
             ->groupBy('products.id')
             ->get();
 
@@ -126,17 +125,35 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        // $product_data = array(
-        //     'title' => $request->get('title'),
-        //     'slug' => Str::slug($request->get('title')),
-        //     'standfirst' => $request->get('standfirst'),
-        //     'description' => $request->get('description'),
-        //     'created_by' => auth()->user()->id
-        // );
+        try {
 
-        // $product = Product::create($product_data);
+            $product_data = array(
+                'title' => $request->get('title'),
+                'slug' => Str::slug($request->get('title')),
+                'standfirst' => $request->get('standfirst'),
+                'description' => $request->get('description'),
+                'created_by' => auth()->user()->id
+            );
+    
+            $product = Product::create($product_data);
 
-        return response()->json(['status' => 'success',  'request' => $request->all()]);
+            $categories = $request->get('categories');
+
+            if(count($categories) > 0) {
+                foreach($categories as $category_id) {
+                    $product_category_data = array(
+                        'product_id' => $product->id,
+                        'category_id' => $category_id
+                    );
+
+                    ProductCategory::create($product_category_data);
+                }
+            }
+        } catch (Exception $e) {
+            return response()->json(['status' => 'error',  'message' => 'Failed to create the product.']);
+        }
+        
+        return response()->json(['status' => 'success', 'message' => 'Product successfully created.',  'data' => $product]);
     }
 
     /**

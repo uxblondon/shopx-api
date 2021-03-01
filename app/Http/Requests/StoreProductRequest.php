@@ -30,22 +30,15 @@ class StoreProductRequest extends FormRequest
         $categories = Category::where('status', 'published')->pluck('id');
 
         return [
-            'category_id' => [
-                'nullable',
+            'categories' => 'required|array|min:1',
+            'categories.*' => [
+                'required',
                 'numeric',
                 Rule::in($categories),
-                'required',
             ],
-            'title' => 'nullable|required',
+            'title' => 'required',
             'standfirst' => 'nullable',
-            'feature_image' => 'nullable|image',
-            'description' => 'nullable',
-            'tags' => 'nullable',
-            'status' => [
-                Rule::in(['draft', 'published']),
-            ],
-            'meta_description' => 'nullable',
-            'meta_keywords' => 'nullable',
+            'description' => 'required',
         ];
     }
     

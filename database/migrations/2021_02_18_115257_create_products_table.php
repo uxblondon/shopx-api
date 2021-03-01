@@ -18,14 +18,11 @@ class CreateProductsTable extends Migration
             $table->engine = 'InnoDB';
 
             $table->bigIncrements('id');
-            $table->integer('category_id')->nullable();
-            
             $table->string('title');
             $table->string('slug');
             $table->string('standfirst')->nullable();
             $table->text('feature_image')->nullable();
             $table->longText('description');
-            $table->text('tags')->nullable();
             $table->integer('manual_sort_order')->default(0);
             $table->string('status', 20)->default('draft');
             $table->dateTime('published_at')->nullable();

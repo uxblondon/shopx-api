@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Models\ProductVariantType;
 use App\Models\ProductVariant;
@@ -26,7 +27,6 @@ class ProductsTableSeeder extends Seeder
 
         for ($i=0; $i<10; $i++) {
             $product = array(
-            'category_id' => $categories[rand(0, count($categories)-1)],
             'title' => $fake->text(20),
             'slug' => $fake->slug(),
             'feature_image' => $fake->imageUrl(640, 480),
@@ -37,7 +37,17 @@ class ProductsTableSeeder extends Seeder
 
             $product = Product::create($product);
 
+            // product categories
+            for($pi = 0; $pi < rand(1,3); $pi++) {
+                $product_category = array(
+                    'product_id' => $product->id,
+                    'category_id' => $categories[rand(0, count($categories)-1)],
+                );
 
+                ProductCategory::create($product_category);
+            }
+
+            // product images 
             for($pi = 0; $pi < rand(1,3); $pi++) {
                 $product_image = array(
                     'product_id' => $product->id,

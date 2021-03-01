@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 use App\Models\Category;
 
-class StoreProductRequest extends FormRequest
+class FilterCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

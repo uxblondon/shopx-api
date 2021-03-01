@@ -41,8 +41,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::join('product_variants', 'products.id', 'product_variants.product_id')
-        ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->select(['products.id', 'categories.id as category_id', 'categories.title as category_title', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
+        ->join('product_categories', 'product_categories.product_id', 'products.id')
+        ->join('categories', 'categories.id', 'product_categories.category_id')
+            ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_categories.category_id) as no_of_categories'), DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
             ->groupBy('products.id')
             ->get();
 
@@ -125,21 +126,17 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        // $product_data = array(
+        //     'title' => $request->get('title'),
+        //     'slug' => Str::slug($request->get('title')),
+        //     'standfirst' => $request->get('standfirst'),
+        //     'description' => $request->get('description'),
+        //     'created_by' => auth()->user()->id
+        // );
 
+        // $product = Product::create($product_data);
 
-        $product_data = array(
-            'category_id' => $request->get('category_id'),
-            'title' => $request->get('title'),
-            'slug' => Str::slug($request->get('title')),
-            'standfirst' => $request->get('standfirst'),
-            'description' => $request->get('description'),
-            'tags' => $request->get('tags'),
-            'created_by' => auth()->user()->id
-        );
-
-        $product = Product::create($product_data);
-
-        return response()->json(['status' => 'success', 'data' => $product]);
+        return response()->json(['status' => 'success',  'request' => $request->all()]);
     }
 
     /**

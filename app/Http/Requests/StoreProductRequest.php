@@ -34,11 +34,18 @@ class StoreProductRequest extends FormRequest
                 'nullable',
                 'numeric',
                 Rule::in($categories),
+                'required',
             ],
-            'title' => 'required',
+            'title' => 'nullable|required',
             'standfirst' => 'nullable',
-            'description' => 'required',
+            'feature_image' => 'nullable|image',
+            'description' => 'nullable',
             'tags' => 'nullable',
+            'status' => [
+                Rule::in(['draft', 'published']),
+            ],
+            'meta_description' => 'nullable',
+            'meta_keywords' => 'nullable',
         ];
     }
     

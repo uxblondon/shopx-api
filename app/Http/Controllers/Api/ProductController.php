@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductImage;
 use App\Models\ProductVariantType;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
@@ -185,6 +186,8 @@ class ProductController extends Controller
             $product->categories = ProductCategory::where('product_id', $product->id)
             ->join('categories', 'categories.id', 'product_categories.category_id')
             ->get(['categories.id', 'categories.title']);
+
+            $product->feature_image = ProductImage::where('product_id', $product_id)->first();
 
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
 

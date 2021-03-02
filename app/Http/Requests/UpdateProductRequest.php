@@ -30,11 +30,10 @@ class UpdateProductRequest extends FormRequest
         $categories = Category::where('status', 'published')->pluck('id');
 
         return [
-            'category_id' => [
-                'nullable',
+            'categories' => 'array',
+            'categories.*.id' => [
                 'numeric',
                 Rule::in($categories),
-                'required',
             ],
             'title' => 'nullable|required',
             'standfirst' => 'nullable',

@@ -31,7 +31,7 @@ class StoreProductRequest extends FormRequest
 
         return [
             'categories' => 'required|array|min:1',
-            'categories.*' => [
+            'categories.*.id' => [
                 'required',
                 'numeric',
                 Rule::in($categories),

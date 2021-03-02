@@ -138,12 +138,11 @@ class ProductController extends Controller
             $product = Product::create($product_data);
 
             $categories = $request->get('categories');
-
             if(count($categories) > 0) {
-                foreach($categories as $category_id) {
+                foreach($categories as $category) {
                     $product_category_data = array(
                         'product_id' => $product->id,
-                        'category_id' => $category_id
+                        'category_id' => $category['id']
                     );
 
                     ProductCategory::create($product_category_data);
@@ -183,6 +182,9 @@ class ProductController extends Controller
         $product = Product::find($product_id);
 
         if ($product) {
+            $product->categories = ProductCategory::where('product_id', $product->id)
+            ->join('categories', 'categories.id', 'product_categories.category_id')
+            ->get(['categories.id', 'categories.title']);
 
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
 
@@ -246,55 +248,67 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, $product_id)
     {
 
+        try {
+
+        
+
+       
+
         $product_data = array();
 
-        if ($request->has('category_id')) {
-            $product_data['category_id'] = $request->get('category_id');
-        }
-
-        if ($request->has('title')) {
+        if ($request->has('title') && $request->get('title') != '') {
             $product_data['title'] = $request->get('title');
         }
 
-        if ($request->has('standfirst')) {
+        if ($request->has('standfirst') && $request->get('standfirst') != '') {
             $product_data['standfirst'] = $request->get('standfirst');
         }
 
-        if ($request->has('description')) {
+        if ($request->has('description') && $request->get('description') != '') {
             $product_data['description'] = $request->get('description');
         }
 
-        if ($request->has('feature_image')) {
+        if ($request->file('feature_image')) {
             $product_data['feature_image'] = $request->get('feature_image');
         }
 
-        if ($request->has('tags')) {
-            $product_data['tags'] = $request->get('tags');
-        }
-
-        if ($request->has('status')) {
+        if ($request->has('status') && $request->get('status') != '') {
             $product_data['status'] = $request->get('status');
         }
 
-        if ($request->has('meta_description')) {
+        if ($request->has('meta_description') && $request->get('meta_description') != '') {
             $product_data['meta_description'] = $request->get('meta_description');
         }
 
-        if ($request->has('meta_keywords')) {
+        if ($request->has('meta_keywords') && $request->get('meta_keywords') != '') {
             $product_data['meta_keywords'] = $request->get('meta_keywords');
         }
 
         if (count($product_data) > 0) {
-            $update = Product::where('id', $product_id)->update($product_data);
-            if ($update) {
-                $product = Product::find($product_id);
-                return response()->json(['status' => 'success', 'data' => $product]);
-            }
-
-            return response()->json(['status' => 'error', 'message' => 'Failed to update product.']);
+            Product::where('id', $product_id)->update($product_data);
         }
 
-        return response()->json(['status' => 'error', 'message' => 'No data provided', 'd' => $request->all()]);
+        if ($request->has('categories') && count($request->get('categories')) > 0) {
+            $categories = $request->get('categories');
+            ProductCategory::where('product_id', $product_id)->delete();
+            foreach($categories as $category) {
+                $product_category_data = array(
+                    'product_id' => $product_id,
+                    'category_id' => $category['id']
+                );
+                ProductCategory::create($product_category_data);
+            }
+        }
+
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Failed to update product.'.$e->getMessage()]);
+    }
+
+        
+
+    return response()->json(['status' => 'success', 'message' => 'Product details successfully updated.',]);
+
+        
     }
 
     /**

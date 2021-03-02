@@ -187,7 +187,9 @@ class ProductController extends Controller
             ->join('categories', 'categories.id', 'product_categories.category_id')
             ->get(['categories.id', 'categories.title']);
 
-            $product->feature_image = ProductImage::where('product_id', $product_id)->first();
+            $product->feature_image = ProductImage::where('product_id', $product_id)
+            ->where('feature_image', 1)
+            ->first();
 
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
 

@@ -27,7 +27,8 @@ class ProductImageController extends Controller
         $image_data = array(
             'product_id' => $product_id,
             'description' => $request->get('description'),
-            'location' => Storage::url($location)
+            'location' => Storage::url($location),
+            'feature_image' => $request->get('feature_image') ? 1 : 0,
         );
 
         $product_image = ProductImage::create($image_data);

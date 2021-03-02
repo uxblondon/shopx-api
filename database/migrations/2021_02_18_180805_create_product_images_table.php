@@ -19,6 +19,7 @@ class CreateProductImagesTable extends Migration
             $table->bigInteger('product_id')->unsigned();
             $table->string('description')->nullable();
             $table->text('location');
+            $table->boolean('feature_image')->default(0);
             $table->timestamps();
         });
 

@@ -41,7 +41,7 @@ class ProductImageController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Failed to upload product image.']);
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Product image updated successfully.', 'data' => $product_image]);
+        return response()->json(['status' => 'success', 'message' => 'Product image uploaded successfully.', 'data' => $product_image]);
     }
 
 
@@ -53,9 +53,44 @@ class ProductImageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $product_id, $image_id)
     {
-        //
+
+        try {
+            $image_data = array(
+                'description' => $request->get('description'),
+            );
+
+            if($request->file('image')) {
+                $image = $request->file('image');
+            $location = str_replace('', '', 'products/' . $product_id . '/' . $image->getClientOriginalName());
+            Storage::disk('s3')->put($location, file_get_contents($request->file('image')));
+            $image_data['location'] = Storage::url($location);
+
+
+            // remove previous file 
+            $previous_product_image = ProductImage::where('id', $image_id)
+            ->where('product_id', $product_id)
+            ->first();
+            if($previous_product_image) {
+                Storage::disk('s3')->delete($previous_product_image->location);
+            }
+            }
+
+            if ($request->has('feature_image')) {
+                $image_data['feature_image'] = $request->get('feature_image') ? 1 : 0;
+            }
+
+            ProductImage::where('id', $image_id)->where('product_id', $product_id)->update($image_data);
+
+            $new_product_image = ProductImage::where('id', $image_id)
+            ->where('product_id', $product_id)
+            ->first();
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to update product image.', 'e' => $e->getMessage()]);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Product image updated successfully.',  'data' => $new_product_image]);
     }
 
     /**

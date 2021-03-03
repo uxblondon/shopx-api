@@ -64,8 +64,19 @@ class ProductImageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($product_id, $image_id)
     {
-        //
+        try {
+            $product_image = ProductImage::where('id', $image_id)->where('product_id', $product_id)->first();
+
+            if($product_image) {
+                Storage::disk('s3')->delete($product_image->location);
+                $product_image->delete();
+            } 
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete product image.', 'e' => $e->getMessage()]);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Product image deleted successfully.']);
     }
 }

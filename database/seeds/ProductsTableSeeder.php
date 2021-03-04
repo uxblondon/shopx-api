@@ -127,7 +127,7 @@ class ProductsTableSeeder extends Seeder
                     'variant_3_value' => isset($product_variant_types[2])? trim(explode(',', $product_variant_types[2]['options'])[rand(0, count(explode(',', $product_variant_types[2]['options']))-1)]) : null,
                 );
 
-                $variant = ProductVariant::create($product_variant);
+                ProductVariant::create($product_variant);
             }
         }
     }

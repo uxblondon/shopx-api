@@ -43,7 +43,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::leftJoin('product_variants', 'products.id', 'product_variants.product_id')
-            ->select(['products.id', 'products.title', 'products.standfirst', 'products.feature_image', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
+            ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
             ->groupBy('products.id')
             ->get();
 
@@ -197,9 +197,18 @@ class ProductController extends Controller
 
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
 
-            $variants['types'] = ProductVariantType::where('product_id', $product_id)
-                ->get(['id', 'name', 'options'])
-                ->toArray();
+            $variant_types = ProductVariantType::where('product_id', $product_id)
+                ->orderBy('variant_no', 'asc')
+                ->get(['id', 'product_id', 'variant_no', 'name', 'options']);
+            
+            $product_variant_type = [];
+            if($variant_types->count() > 0) {
+                foreach($variant_types as $variant_type) {
+                    $product_variant_type[$variant_type['variant_no']] = $variant_type;
+                }
+            }
+
+            $variants['types'] = $product_variant_type;
 
             $variants['values'] = ProductVariant::leftJoin('product_variant_options', 'product_variants.id', 'product_variant_options.product_variant_id')
                 ->leftJoin('product_variant_types as variant_1', 'variant_1.id', 'product_variant_options.variant_1_id')

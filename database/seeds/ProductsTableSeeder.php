@@ -29,7 +29,6 @@ class ProductsTableSeeder extends Seeder
             $product = array(
             'title' => $fake->text(20),
             'slug' => $fake->slug(),
-            'feature_image' => $fake->imageUrl(640, 480),
             'standfirst' => $fake->text(100),
             'description' => $fake->text(200),
             'created_by' => 1
@@ -87,6 +86,7 @@ class ProductsTableSeeder extends Seeder
                 $option = $types[rand(0,4)];
                 $product_variant_type = array(
                     'product_id' => $product->id,
+                    'variant_no' => $vt+1,
                     'name' => $option['name'],
                     'options' => $option['options']
                 );

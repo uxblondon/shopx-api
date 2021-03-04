@@ -17,6 +17,7 @@ class CreateProductVariantTypesTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('product_id')->unsigned();
+            $table->integer('variant_no');
             $table->string('name');
             $table->text('options');
             $table->timestamps();

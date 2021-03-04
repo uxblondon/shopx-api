@@ -43,7 +43,8 @@ class ProductVariantTypeController extends Controller
         try {
             $product_variant_type_data = array(
                 'product_id' => $product_id,
-                'name' => $request->get('variant'),
+                'variant_no' => $request->get('variant_no'),
+                'name' => $request->get('name'),
                 'options' => implode(',', $request->get('options'))
             );
             $product_variant_type = ProductVariantType::create($product_variant_type_data);

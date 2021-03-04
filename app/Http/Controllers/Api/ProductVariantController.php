@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
+use App\Http\Requests\StoreProductVariantRequest;
+use App\Http\Requests\UpdateProductVariantRequest;
+
 class ProductVariantController extends Controller
 {
     /**
@@ -34,7 +37,7 @@ class ProductVariantController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreProductVariantRequest $request, $product_id)
     {
         //
     }
@@ -68,7 +71,7 @@ class ProductVariantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateProductVariantRequest $request, $product_id, $variant_id)
     {
         //
     }
@@ -79,7 +82,7 @@ class ProductVariantController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($product_id, $variant_id)
     {
         //
     }

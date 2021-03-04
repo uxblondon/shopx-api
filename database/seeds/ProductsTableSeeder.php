@@ -112,29 +112,22 @@ class ProductsTableSeeder extends Seeder
             }
 
             // product variants 
+            $product_variant_types = ProductVariantType::where('product_id', $product->id)->get(['id', 'options'])->toArray();
             for($pv = 0; $pv < rand(1,5); $pv++) {
                 $product_variant = array(
                     'product_id' => $product->id,
                     'sku' => $fake->ean8,
                     'price' => rand(9, 99),
                     'weight' => rand(5,50)/100,
+                    'variant_1_id' => isset($product_variant_types[0])? $product_variant_types[0]['id'] : null,
+                    'variant_1_value' => isset($product_variant_types[0])? trim(explode(',', $product_variant_types[0]['options'])[rand(0, count(explode(',', $product_variant_types[0]['options']))-1)]) : null,
+                    'variant_2_id' => isset($product_variant_types[1])? $product_variant_types[1]['id'] : null,
+                    'variant_2_value' => isset($product_variant_types[1])? trim(explode(',', $product_variant_types[1]['options'])[rand(0, count(explode(',', $product_variant_types[1]['options']))-1)]) : null,
+                    'variant_3_id' => isset($product_variant_types[2])? $product_variant_types[2]['id'] : null,
+                    'variant_3_value' => isset($product_variant_types[2])? trim(explode(',', $product_variant_types[2]['options'])[rand(0, count(explode(',', $product_variant_types[2]['options']))-1)]) : null,
                 );
 
                 $variant = ProductVariant::create($product_variant);
-                $product_variant_types = ProductVariantType::where('product_id', $product->id)->get(['id', 'options'])->toArray();
-                if(count($product_variant_types) > 0) {
-                    $product_variant_option = array(
-                        'product_variant_id' => $variant->id,
-                        'variant_1_id' => isset($product_variant_types[0])? $product_variant_types[0]['id'] : null,
-                        'variant_1_value' => isset($product_variant_types[0])? trim(explode(',', $product_variant_types[0]['options'])[rand(0, count(explode(',', $product_variant_types[0]['options']))-1)]) : null,
-                        'variant_2_id' => isset($product_variant_types[1])? $product_variant_types[1]['id'] : null,
-                        'variant_2_value' => isset($product_variant_types[1])? trim(explode(',', $product_variant_types[1]['options'])[rand(0, count(explode(',', $product_variant_types[1]['options']))-1)]) : null,
-                        'variant_3_id' => isset($product_variant_types[2])? $product_variant_types[2]['id'] : null,
-                        'variant_3_value' => isset($product_variant_types[2])? trim(explode(',', $product_variant_types[2]['options'])[rand(0, count(explode(',', $product_variant_types[2]['options']))-1)]) : null,
-                    );
-    
-                    ProductVariantOption::create($product_variant_option);
-                }
             }
         }
     }

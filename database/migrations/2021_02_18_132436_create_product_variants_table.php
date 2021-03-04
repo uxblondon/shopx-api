@@ -23,6 +23,14 @@ class CreateProductVariantsTable extends Migration
             $table->string('dimensions')->nullable();
             $table->boolean('available')->default(1);
             $table->decimal('shipping_cost', 4, 2)->default(0.0);
+
+            $table->bigInteger('variant_1_id')->nullable();
+            $table->string('variant_1_value')->nullable();
+            $table->bigInteger('variant_2_id')->nullable();
+            $table->string('variant_2_value')->nullable();
+            $table->bigInteger('variant_3_id')->nullable();
+            $table->string('variant_3_value')->nullable();
+            
             $table->timestamps();
         });
 

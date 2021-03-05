@@ -20,7 +20,12 @@ class CreateProductVariantTypesTable extends Migration
             $table->integer('variant_no');
             $table->string('name');
             $table->text('options');
+
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
             
         });
 

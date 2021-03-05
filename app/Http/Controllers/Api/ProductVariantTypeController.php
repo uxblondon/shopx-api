@@ -45,7 +45,8 @@ class ProductVariantTypeController extends Controller
                 'product_id' => $product_id,
                 'variant_no' => $request->get('variant_no'),
                 'name' => $request->get('name'),
-                'options' => implode(',', $request->get('options'))
+                'options' => implode(',', $request->get('options')),
+                'created_by' => auth()->user()->id,
             );
             $product_variant_type = ProductVariantType::create($product_variant_type_data);
         } catch (\Exception $e) {
@@ -114,8 +115,11 @@ class ProductVariantTypeController extends Controller
             }
 
             ProductVariant::where('product_id', $product_id)->update($variant_data);
-            $product_variant_type->delete();
             
+            $product_variant_type->deleted_by = auth()->user()->id;
+            $product_variant_type->deleted_at = date('Y-m-d H:i:s');
+            $product_variant_type->save();
+
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'e' => $product_variant_type_data, 'message' => 'Failed to store variant type.']);
         }

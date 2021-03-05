@@ -13,6 +13,10 @@ class UpdateProductVariantTypeRequest extends FormRequest
      */
     public function authorize()
     {
+        if (auth()->user()->admin === 1) {
+            return true;
+        }
+
         return false;
     }
 
@@ -24,7 +28,8 @@ class UpdateProductVariantTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required',
+            'options' => 'required',
         ];
     }
 }

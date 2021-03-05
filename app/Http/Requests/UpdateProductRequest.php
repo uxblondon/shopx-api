@@ -17,7 +17,11 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        if (auth()->user()->admin === 1) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

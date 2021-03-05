@@ -85,9 +85,28 @@ class ProductVariantTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProductVariantTypeRequest $request, $product_id, $product_variant_id)
+    public function update(UpdateProductVariantTypeRequest $request, $product_id, $variant_type_id)
     {
-        //
+        try {
+            $product_variant_type_data = array(
+                'name' => $request->get('name'),
+                'options' => $request->get('options'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => auth()->user()->id,
+            );
+            
+            ProductVariantType::where('id', $variant_type_id)
+            ->where('product_id', $product_id)
+            ->update($product_variant_type_data);
+
+            $variant_type = ProductVariantType::where('id', $variant_type_id)
+            ->where('product_id', $product_id)
+            ->first();
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store variant type.']);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Variant type successfully stored.', 'data' => $variant_type]);
     }
 
     /**

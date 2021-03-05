@@ -216,6 +216,7 @@ class ProductController extends Controller
                 ->where('product_variants.product_id', $product_id)
                 ->get([
                     'product_variants.id',
+                    'product_variants.product_id',
                     'product_variants.sku',
                     'product_variants.price',
                     'product_variants.weight',

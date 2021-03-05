@@ -107,6 +107,13 @@ class ProductVariantController extends Controller
      */
     public function destroy($product_id, $variant_id)
     {
-        //
+        try {
+           ProductVariant::where('id', $variant_id)
+           ->where('product_id', $product_id)->delete();
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete the variant type.']);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Variant successfully deleted.']);
+   
     }
 }

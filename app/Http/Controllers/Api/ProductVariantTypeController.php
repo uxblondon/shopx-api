@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductVariantTypeRequest;
 use App\Http\Requests\UpdateProductVariantTypeRequest;
 
+use App\Models\ProductVariant;
 use App\Models\ProductVariantType;
 
 class ProductVariantTypeController extends Controller
@@ -52,7 +53,7 @@ class ProductVariantTypeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'e' => $product_variant_type_data, 'message' => 'Failed to store variant type.']);
         }
-        return response()->json(['status' => 'error', 'message' => 'Variant type successfully stored.', 'data' => $product_variant_type]);
+        return response()->json(['status' => 'success', 'message' => 'Variant type successfully stored.', 'data' => $product_variant_type]);
     }
 
     /**
@@ -115,14 +116,16 @@ class ProductVariantTypeController extends Controller
             }
 
             ProductVariant::where('product_id', $product_id)->update($variant_data);
-            
-            $product_variant_type->deleted_by = auth()->user()->id;
-            $product_variant_type->deleted_at = date('Y-m-d H:i:s');
-            $product_variant_type->save();
+            ProductVariantType::where('id', $product_variant_type_id)
+            ->where('product_id', $product_id)
+            ->update([
+                'deleted_at' => date('Y-m-d H:i:s'),
+                'deleted_by' => auth()->user()->id,
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $product_variant_type_data, 'message' => 'Failed to store variant type.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete product variant type.']);
         }
-        return response()->json(['status' => 'error', 'message' => 'Variant type successfully stored.', 'data' => $product_variant_type]);
+        return response()->json(['status' => 'success', 'message' => 'Variant type deleted successfully.']);
     }
 }

@@ -46,6 +46,7 @@ Route::group([
     Route::post('categories', 'Api\CategoryController@store');
 
     Route::delete('products/{product_id}/variant-types/{variant_type_id}', 'Api\ProductVariantTypeController@destroy');
+    Route::put('products/{product_id}/variant-types/{variant_type_id}', 'Api\ProductVariantTypeController@update');
     Route::post('products/{product_id}/variant-types', 'Api\ProductVariantTypeController@store');
 
     Route::delete('products/{product_id}/variants/{variant_id}', 'Api\ProductVariantController@destroy');

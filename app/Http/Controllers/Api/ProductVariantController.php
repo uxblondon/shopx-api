@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-
+use App\Models\ProductVariant;
 use App\Http\Requests\StoreProductVariantRequest;
 use App\Http\Requests\UpdateProductVariantRequest;
 
@@ -58,7 +58,7 @@ class ProductVariantController extends Controller
     
             $product_variant = ProductVariant::create($product_variant_data);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to add product variant.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to add product variant.']);
         }
         
         return response()->json(['status' => 'success', 'message' => 'Product variant successfully added.', 'data' => $product_variant]);

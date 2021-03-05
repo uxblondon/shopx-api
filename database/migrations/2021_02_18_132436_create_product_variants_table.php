@@ -19,10 +19,10 @@ class CreateProductVariantsTable extends Migration
             $table->bigInteger('product_id')->unsigned();
             $table->string('sku')->nullable();
             $table->decimal('price', 8, 2);
-            $table->decimal('weight', 4, 2)->default(0.0);
+            $table->decimal('weight', 8, 2)->default(0.0);
             $table->string('dimensions')->nullable();
             $table->boolean('available')->default(1);
-            $table->decimal('shipping_cost', 4, 2)->default(0.0);
+            $table->decimal('shipping_cost', 8, 2)->default(0.0);
 
             $table->bigInteger('variant_1_id')->nullable();
             $table->string('variant_1_value')->nullable();

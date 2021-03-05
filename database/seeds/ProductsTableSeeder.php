@@ -88,7 +88,8 @@ class ProductsTableSeeder extends Seeder
                     'product_id' => $product->id,
                     'variant_no' => $vt+1,
                     'name' => $option['name'],
-                    'options' => $option['options']
+                    'options' => $option['options'],
+                    'created_by' => 1
                 );
 
                 ProductVariantType::create($product_variant_type);
@@ -125,6 +126,7 @@ class ProductsTableSeeder extends Seeder
                     'variant_2_value' => isset($product_variant_types[1])? trim(explode(',', $product_variant_types[1]['options'])[rand(0, count(explode(',', $product_variant_types[1]['options']))-1)]) : null,
                     'variant_3_id' => isset($product_variant_types[2])? $product_variant_types[2]['id'] : null,
                     'variant_3_value' => isset($product_variant_types[2])? trim(explode(',', $product_variant_types[2]['options'])[rand(0, count(explode(',', $product_variant_types[2]['options']))-1)]) : null,
+                    'created_by' => 1
                 );
 
                 ProductVariant::create($product_variant);

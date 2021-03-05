@@ -30,8 +30,12 @@ class CreateProductVariantsTable extends Migration
             $table->string('variant_2_value')->nullable();
             $table->bigInteger('variant_3_id')->nullable();
             $table->string('variant_3_value')->nullable();
-            
+
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
         });
 
         Schema::table('product_variants', function (Blueprint $table) {

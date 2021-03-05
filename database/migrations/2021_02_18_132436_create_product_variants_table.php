@@ -21,7 +21,7 @@ class CreateProductVariantsTable extends Migration
             $table->decimal('price', 8, 2);
             $table->decimal('weight', 8, 2)->default(0.0);
             $table->string('dimensions')->nullable();
-            $table->boolean('available')->default(1);
+            
             $table->decimal('shipping_cost', 8, 2)->default(0.0);
 
             $table->bigInteger('variant_1_id')->nullable();
@@ -30,6 +30,8 @@ class CreateProductVariantsTable extends Migration
             $table->string('variant_2_value')->nullable();
             $table->bigInteger('variant_3_id')->nullable();
             $table->string('variant_3_value')->nullable();
+
+            $table->boolean('available')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

@@ -94,8 +94,31 @@ class ProductVariantTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($product_id, $product_variant_id)
+    public function destroy($product_id, $product_variant_type_id)
     {
-        //
+        try {
+
+            $product_variant_type = ProductVariantType::where('id', $product_variant_type_id)
+            ->where('product_id', $product_id)->first();
+
+            $variant_data = [];
+            if($product_variant_type && $product_variant_type->variant_no === 1) {
+                $variant_data['variant_1_id'] = null;
+                $variant_data['variant_1_value'] = null;
+            } elseif($product_variant_type && $product_variant_type->variant_no === 2) {
+                $variant_data['variant_2_id'] = null;
+                $variant_data['variant_2_value'] = null;
+            } elseif($product_variant_type && $product_variant_type->variant_no === 3) {
+                $variant_data['variant_2_id'] = null;
+                $variant_data['variant_2_value'] = null;
+            }
+
+            ProductVariant::where('product_id', $product_id)->update($variant_data);
+            $product_variant_type->delete();
+            
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $product_variant_type_data, 'message' => 'Failed to store variant type.']);
+        }
+        return response()->json(['status' => 'error', 'message' => 'Variant type successfully stored.', 'data' => $product_variant_type]);
     }
 }

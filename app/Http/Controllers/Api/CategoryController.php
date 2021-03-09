@@ -115,7 +115,6 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->get('title')),
             'standfirst' => $request->get('standfirst'),
             'description' => $request->get('description'),
-            'tags' => $request->get('tags'),
             'created_by' => auth()->user()->id
         );
 

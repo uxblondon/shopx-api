@@ -35,7 +35,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::join('product_categories', 'categories.id', 'product_categories.category_id')
+        $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
         ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
             ->groupBy('categories.id')
             ->get();

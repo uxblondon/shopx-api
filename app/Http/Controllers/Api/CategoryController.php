@@ -185,53 +185,53 @@ class CategoryController extends Controller
      *       ),
      *     )
      */
-    public function update(UpdateCategoryRequest $request, $product_id)
+    public function update(UpdateCategoryRequest $request, $category_id)
     {
-        $category_data = array();
+        try {
+            $category_data = array();
+            $category_data['updated_at'] = date('Y-m-d H:i:s');
+            $category_data['updated_by'] = auth()->user()->id;
 
-        if ($request->has('category_id')) {
-            $category_data['category_id'] = $request->get('category_id');
-        }
-
-        if ($request->has('title')) {
-            $category_data['title'] = $request->get('title');
-        }
-
-        if ($request->has('standfirst')) {
-            $category_data['standfirst'] = $request->get('standfirst');
-        }
-
-        if ($request->has('description')) {
-            $category_data['description'] = $request->get('description');
-        }
-
-        if ($request->has('feature_image')) {
-            $category_data['feature_image'] = $request->get('feature_image');
-        }
-
-        if ($request->has('status')) {
-            $category_data['status'] = $request->get('status');
-        }
-
-        if ($request->has('meta_description')) {
-            $category_data['meta_description'] = $request->get('meta_description');
-        }
-
-        if ($request->has('meta_keywords')) {
-            $category_data['meta_keywords'] = $request->get('meta_keywords');
-        }
-
-        if (count($category_data)>0) {
-            $update = Category::where('id', $category_id)->update($category_data);
-            if ($update) {
-                $category = Category::find($category_id);
-                return response()->json(['status' => 'success', 'data' => $category]);
+            if ($request->has('title') && $request->get('title') != '') {
+                $category_data['title'] = $request->get('title');
             }
 
-            return response()->json(['status' => 'error', 'message' => 'Failed to update product.']);
+            if ($request->has('standfirst') && $request->get('standfirst') != '') {
+                $category_data['standfirst'] = $request->get('standfirst');
+            }
+
+            if ($request->has('description') && $request->get('description') != '') {
+                $category_data['description'] = $request->get('description');
+            }
+
+            if ($request->has('status') && $request->get('status') != '') {
+
+                if($request->get('status') === 'published') {
+                    $category_data['status'] = 'published';
+                    $category_data['published_at'] = date('Y-m-d H:i:s');
+
+                }
+
+                $category_data['status'] = $request->get('status');
+                $category_data['published_at'] = NULL;
+            }
+
+            if ($request->has('meta_description') && $request->get('meta_description') != '') {
+                $category_data['meta_description'] = $request->get('meta_description');
+            }
+
+            if ($request->has('meta_keywords') && $request->get('meta_keywords') != '') {
+                $category_data['meta_keywords'] = $request->get('meta_keywords');
+            }
+
+
+            Product::where('id', $category_id)->update($category_data);
+            
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to update product category.']);
         }
 
-        return response()->json(['status' => 'error', 'message' => 'No data provided', 'd' => $request->all()]);
+        return response()->json(['status' => 'success', 'message' => 'Product category successfully updated.',]);
     }
 
     /**

@@ -96,7 +96,32 @@ class ProductVariantController extends Controller
      */
     public function update(UpdateProductVariantRequest $request, $product_id, $variant_id)
     {
-        //
+        try {
+            $product_variant_data = array(
+                'sku' => $request->get('sku'),
+                'price' => $request->get('price'),
+                'weight' => $request->get('weight'),
+                'dimensions' => $request->get('dimensions'),
+                'shipping_cost' => $request->get('shipping_cost'),
+                'variant_1_id' => $request->get('variant_1_id'),
+                'variant_1_value' => $request->get('variant_1_value'),
+                'variant_2_id' => $request->get('variant_2_id'),
+                'variant_2_value' => $request->get('variant_2_value'),
+                'variant_3_id' => $request->get('variant_3_id'),
+                'variant_3_value' => $request->get('variant_3_value'),
+                'available' => $request->get('available') ? 1 : 0,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => auth()->user()->id,
+            );
+    
+            ProductVariant::where('id', $variant_id)->where('product_id', $product_id)
+            ->update($product_variant_data);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to add product variant.']);
+        }
+        
+        $product_variant = ProductVariant::find($variant_id);
+        return response()->json(['status' => 'success', 'message' => 'Product variant successfully added.', 'data' => $product_variant]);
     }
 
     /**

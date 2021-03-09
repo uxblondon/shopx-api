@@ -42,7 +42,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::leftJoin('product_variants', 'products.id', 'product_variants.product_id')
+        $products = Product::leftJoin('product_variants', function($join){
+            $join->on('products.id', 'product_variants.product_id')
+            ->whereNull('product_variants.deleted_at');
+        } )
             ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
             ->groupBy('products.id')
             ->get();
@@ -270,6 +273,8 @@ class ProductController extends Controller
     {
         try {
             $product_data = array();
+            $product_data['updated_at'] = date('Y-m-d H:i:s');
+            $product_data['updated_by'] = auth()->user()->id;
 
             if ($request->has('title') && $request->get('title') != '') {
                 $product_data['title'] = $request->get('title');
@@ -288,7 +293,15 @@ class ProductController extends Controller
             }
 
             if ($request->has('status') && $request->get('status') != '') {
+
+                if($request->get('status') === 'published') {
+                    $product_data['status'] = 'published';
+                    $product_data['published_at'] = date('Y-m-d H:i:s');
+
+                }
+
                 $product_data['status'] = $request->get('status');
+                $product_data['published_at'] = NULL;
             }
 
             if ($request->has('meta_description') && $request->get('meta_description') != '') {
@@ -299,11 +312,10 @@ class ProductController extends Controller
                 $product_data['meta_keywords'] = $request->get('meta_keywords');
             }
 
-            if (count($product_data) > 0) {
-                Product::where('id', $product_id)->update($product_data);
-            }
 
-            if ($request->has('categories') && count($request->get('categories')) > 0) {
+            $update_product = Product::where('id', $product_id)->update($product_data);
+            
+            if ($update_product && $request->has('categories') && count($request->get('categories')) > 0) {
                 $categories = $request->get('categories');
                 ProductCategory::where('product_id', $product_id)->delete();
                 foreach ($categories as $category) {

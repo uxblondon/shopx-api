@@ -53,7 +53,7 @@ class ProductVariantController extends Controller
                 'variant_2_value' => $request->get('variant_2_value'),
                 'variant_3_id' => $request->get('variant_3_id'),
                 'variant_3_value' => $request->get('variant_3_value'),
-                'available' => $request->get('available') ? 1 : 0,
+                'available' => $request->get('available'),
                 'created_by' => auth()->user()->id,
             );
     
@@ -109,7 +109,7 @@ class ProductVariantController extends Controller
                 'variant_2_value' => $request->get('variant_2_value'),
                 'variant_3_id' => $request->get('variant_3_id'),
                 'variant_3_value' => $request->get('variant_3_value'),
-                'available' => $request->get('available') ? 1 : 0,
+                'available' => $request->get('available'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => auth()->user()->id,
             );

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use DB;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Support\Str;
@@ -34,7 +35,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::join('product_categories', 'categories.id', 'product_categories.category_id')
+        ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
+            ->groupBy('categories.id')
+            ->get();
 
         return response()->json(['status' => 'success', 'data' => $categories]);
     }
@@ -145,8 +149,10 @@ class CategoryController extends Controller
     public function show($category_id)
     {
         $category = Category::find($category_id);
-        $category->products = Product::where('category_id', $category_id)->get();
-
+        if($category) {
+            $category->products = Product::where('category_id', $category_id)->get();
+        }
+        
         return response()->json(['status' => 'success', 'data' => $category]);
     }
 

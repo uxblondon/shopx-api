@@ -149,8 +149,17 @@ class CategoryController extends Controller
     public function show($category_id)
     {
         $category = Category::find($category_id);
-        if($category) {
-            $category->products = Product::where('category_id', $category_id)->get();
+
+        if ($category) {
+            $category->products = Product::Join('product_categories', function ($join) use ($category_id) {
+                $join->on('product_categories.product_id', 'products.id')
+                ->where('product_categories.category_id', $category_id);
+            })->leftJoin('product_variants', function ($join) {
+                $join->on('products.id', 'product_variants.product_id')
+                ->whereNull('product_variants.deleted_at');
+            })->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
+                ->groupBy('products.id')
+                ->get();
         }
         
         return response()->json(['status' => 'success', 'data' => $category]);
@@ -178,44 +187,43 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, $product_id)
     {
-
         $category_data = array();
 
-        if($request->has('category_id')) {
+        if ($request->has('category_id')) {
             $category_data['category_id'] = $request->get('category_id');
         }
 
-        if($request->has('title')) {
+        if ($request->has('title')) {
             $category_data['title'] = $request->get('title');
         }
 
-        if($request->has('standfirst')) {
+        if ($request->has('standfirst')) {
             $category_data['standfirst'] = $request->get('standfirst');
         }
 
-        if($request->has('description')) {
+        if ($request->has('description')) {
             $category_data['description'] = $request->get('description');
         }
 
-        if($request->has('feature_image')) {
+        if ($request->has('feature_image')) {
             $category_data['feature_image'] = $request->get('feature_image');
         }
 
-        if($request->has('status')) {
+        if ($request->has('status')) {
             $category_data['status'] = $request->get('status');
         }
 
-        if($request->has('meta_description')) {
+        if ($request->has('meta_description')) {
             $category_data['meta_description'] = $request->get('meta_description');
         }
 
-        if($request->has('meta_keywords')) {
+        if ($request->has('meta_keywords')) {
             $category_data['meta_keywords'] = $request->get('meta_keywords');
         }
 
-        if(count($category_data)>0){
+        if (count($category_data)>0) {
             $update = Category::where('id', $category_id)->update($category_data);
-            if($update) {
+            if ($update) {
                 $category = Category::find($category_id);
                 return response()->json(['status' => 'success', 'data' => $category]);
             }
@@ -250,7 +258,7 @@ class CategoryController extends Controller
     {
         $product = Category::find($product_id);
 
-        if($product) {
+        if ($product) {
             $product->delete();
             return response()->json(['status' => 'success', 'message' => 'Product successfully deleted.']);
         }

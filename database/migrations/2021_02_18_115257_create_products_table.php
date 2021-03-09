@@ -26,6 +26,8 @@ class CreateProductsTable extends Migration
             $table->string('status', 20)->default('draft');
             $table->dateTime('published_at')->nullable();
 
+            $table->boolean('featured')->default(0);
+
             $table->string('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();
 

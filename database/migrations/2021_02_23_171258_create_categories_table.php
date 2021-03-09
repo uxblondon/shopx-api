@@ -21,7 +21,6 @@ class CreateCategoriesTable extends Migration
             $table->string('title');
             $table->string('slug');
             $table->string('standfirst')->nullable();
-            $table->text('feature_image')->nullable();
             $table->longText('description');
 
             $table->integer('manual_sort_order')->default(0);

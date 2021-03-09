@@ -117,11 +117,11 @@ class ProductVariantController extends Controller
             ProductVariant::where('id', $variant_id)->where('product_id', $product_id)
             ->update($product_variant_data);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to add product variant.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update product variant.']);
         }
         
         $product_variant = ProductVariant::find($variant_id);
-        return response()->json(['status' => 'success', 'message' => 'Product variant successfully added.', 'data' => $product_variant]);
+        return response()->json(['status' => 'success', 'message' => 'Product variant successfully updated.', 'data' => $product_variant]);
     }
 
     /**

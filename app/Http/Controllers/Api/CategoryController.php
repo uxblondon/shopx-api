@@ -225,7 +225,7 @@ class CategoryController extends Controller
             }
 
 
-            Product::where('id', $category_id)->update($category_data);
+            Category::where('id', $category_id)->update($category_data);
             
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to update product category.']);

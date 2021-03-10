@@ -14,8 +14,16 @@ class CreateShippingDestinationsTable extends Migration
     public function up()
     {
         Schema::create('shipping_destinations', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+            $table->string('title');
+            $table->boolean('active')->default(0);
+            
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
         });
     }
 

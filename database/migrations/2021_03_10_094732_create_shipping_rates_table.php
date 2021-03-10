@@ -14,8 +14,27 @@ class CreateShippingRatesTable extends Migration
     public function up()
     {
         Schema::create('shipping_rates', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+            $table->bigInteger('shipping_destination_id')->unsigned();
+
+            $table->decimal('weight_from', 8, 2);
+            $table->decimal('weight_upto', 8, 2);
+            $table->decimal('price', 8, 2);
+
+            $table->boolean('active')->default(0);
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
+        });
+
+        Schema::table('shipping_rates', function (Blueprint $table) {
+            $table->foreign('shipping_destination_id')
+            ->references('id')
+            ->on('shipping_destinations')
+            ->onDelete('cascade');
         });
     }
 

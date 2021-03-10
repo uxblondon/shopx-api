@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use App\Models\ShippingZone;
 
 class ShippingZoneController extends Controller
 {
@@ -15,7 +16,9 @@ class ShippingZoneController extends Controller
      */
     public function index()
     {
-        //
+        $zones = ShippingZone::all();
+
+        return response()->json(['status' => 'success', 'data' => $zones]);
     }
 
     /**
@@ -25,7 +28,7 @@ class ShippingZoneController extends Controller
      */
     public function create()
     {
-        //
+       
     }
 
     /**

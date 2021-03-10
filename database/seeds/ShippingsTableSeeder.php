@@ -39,7 +39,7 @@ class ShippingsTableSeeder extends Seeder
 
             foreach ($ranges as $range) {
                 $shipping_rate_data = array(
-                    'shipping_destination_id' => $shipping_zone->id,
+                    'shipping_zone_id' => $shipping_zone->id,
                     'weight_from' => $range['from'],
                     'weight_upto' => $range['to'],
                     'rate' => $range['rate'],

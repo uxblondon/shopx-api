@@ -23,7 +23,7 @@ class ShippingsTableSeeder extends Seeder
         foreach ($zones as $zone) {
             $zone_data = array(
                 'title' => $zone,
-                'active' => 1,
+                'available' => 1,
                 'created_by' => 1
             );
 
@@ -43,7 +43,7 @@ class ShippingsTableSeeder extends Seeder
                     'weight_from' => $range['from'],
                     'weight_upto' => $range['to'],
                     'rate' => $range['rate'],
-                    'active' => 1,
+                    'available' => 1,
                     'created_by' => 1
                 );
 

@@ -17,7 +17,7 @@ class CreateShippingZonesTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('title');
-            $table->boolean('active')->default(0);
+            $table->boolean('available')->default(0);
             
             $table->timestamps();
             $table->softDeletes();

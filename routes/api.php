@@ -41,6 +41,19 @@ Route::group([
 Route::group([
     'middleware' => 'auth:api',
 ], function () {
+
+    Route::delete('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@destroy');
+    Route::put('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@update');
+    Route::get('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@show');
+    Route::post('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@store');
+    Route::get('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@index');
+
+    Route::delete('shipping-zones/{zone_id}', 'Api\ShippingZoneController@destroy');
+    Route::put('shipping-zones/{zone_id}', 'Api\ShippingZoneController@update');
+    Route::get('shipping-zones/{zone_id}', 'Api\ShippingZoneController@show');
+    Route::post('shipping-zones', 'Api\ShippingZoneController@store');
+    Route::get('shipping-zones', 'Api\ShippingZoneController@index');
+
     Route::delete('categories/{category_id}', 'Api\CategoryController@destroy');
     Route::put('categories/{category_id}', 'Api\CategoryController@update');
     Route::post('categories', 'Api\CategoryController@store');

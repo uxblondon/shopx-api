@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ShippingDestination extends Model
+class ShippingZone extends Model
 {
     use SoftDeletes;
     /**
@@ -13,7 +13,7 @@ class ShippingDestination extends Model
      *
      * @var string 
      */
-    protected $table = 'shipping_destinations';
+    protected $table = 'shipping_zones';
 
     /**
      * Indicates if the model should be timestamped.

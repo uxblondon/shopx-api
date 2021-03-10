@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\ShippingDestination;
+use App\Models\ShippingZone;
 use App\Models\ShippingRate;
 use Illuminate\Database\Seeder;
 
@@ -13,21 +13,21 @@ class ShippingsTableSeeder extends Seeder
      */
     public function run()
     {
-        $destinations = array(
+        $zones = array(
             'Collection',
             'UK',
             'EU',
             'Worldwide',
         );
 
-        foreach ($destinations as $destination) {
-            $destination_data = array(
-                'title' => $destination,
+        foreach ($zones as $zone) {
+            $zone_data = array(
+                'title' => $zone,
                 'active' => 1,
                 'created_by' => 1
             );
 
-            $shipping_destination = ShippingDestination::create($destination_data);
+            $shipping_zone = ShippingZone::create($zone_data);
 
             $ranges = array(
                 ['from' => 0, 'to' => 100, 'rate' => 0.66],
@@ -39,7 +39,7 @@ class ShippingsTableSeeder extends Seeder
 
             foreach ($ranges as $range) {
                 $shipping_rate_data = array(
-                    'shipping_destination_id' => $shipping_destination->id,
+                    'shipping_destination_id' => $shipping_zone->id,
                     'weight_from' => $range['from'],
                     'weight_upto' => $range['to'],
                     'rate' => $range['rate'],

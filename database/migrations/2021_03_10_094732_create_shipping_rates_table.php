@@ -16,7 +16,7 @@ class CreateShippingRatesTable extends Migration
         Schema::create('shipping_rates', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->bigInteger('shipping_destination_id')->unsigned();
+            $table->bigInteger('shipping_zone_id')->unsigned();
 
             $table->decimal('weight_from', 8, 2);
             $table->decimal('weight_upto', 8, 2);
@@ -31,9 +31,9 @@ class CreateShippingRatesTable extends Migration
         });
 
         Schema::table('shipping_rates', function (Blueprint $table) {
-            $table->foreign('shipping_destination_id')
+            $table->foreign('shipping_zone_id')
             ->references('id')
-            ->on('shipping_destinations')
+            ->on('shipping_zones')
             ->onDelete('cascade');
         });
     }

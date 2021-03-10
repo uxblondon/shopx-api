@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShippingDestinationsTable extends Migration
+class CreateShippingZonesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateShippingDestinationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('shipping_destinations', function (Blueprint $table) {
+        Schema::create('shipping_zones', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('title');
@@ -34,6 +34,6 @@ class CreateShippingDestinationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shipping_destinations');
+        Schema::dropIfExists('shipping_zones');
     }
 }

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class ShippingDestinationController extends Controller
+class ShippingZoneController extends Controller
 {
     /**
      * Display a listing of the resource.

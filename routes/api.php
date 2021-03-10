@@ -42,11 +42,11 @@ Route::group([
     'middleware' => 'auth:api',
 ], function () {
 
-    Route::delete('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@destroy');
-    Route::put('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@update');
-    Route::get('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@show');
-    Route::post('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@store');
-    Route::get('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@index');
+    Route::delete('shipping-rates/{rate_id}', 'Api\ShippingRateController@destroy');
+    Route::put('shipping-rates/{rate_id}', 'Api\ShippingRateController@update');
+    Route::get('shipping-rates/{rate_id}', 'Api\ShippingRateController@show');
+    Route::post('shipping-rates', 'Api\ShippingRateController@store');
+    Route::get('shipping-rates', 'Api\ShippingRateController@index');
 
     Route::delete('shipping-zones/{zone_id}', 'Api\ShippingZoneController@destroy');
     Route::put('shipping-zones/{zone_id}', 'Api\ShippingZoneController@update');

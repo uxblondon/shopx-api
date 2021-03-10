@@ -16,7 +16,7 @@ class ShippingZoneController extends Controller
      */
     public function index()
     {
-        $zones = ShippingZone::all();
+        $zones = ShippingZone::orderBy('available', 'desc')->orderBy('title')->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }

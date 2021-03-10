@@ -20,7 +20,7 @@ class CreateShippingRatesTable extends Migration
 
             $table->decimal('weight_from', 8, 2);
             $table->decimal('weight_upto', 8, 2);
-            $table->decimal('price', 8, 2);
+            $table->decimal('rate', 8, 2);
 
             $table->boolean('active')->default(0);
             $table->timestamps();

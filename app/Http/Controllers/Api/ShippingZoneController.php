@@ -53,6 +53,39 @@ class ShippingZoneController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function manageShippingCountries(Request $request, $shipping_zone_id)
+    {
+
+DB::beginTransaction();
+        try {
+
+            $shipping_zone_data = array(
+                'shipping_zone_id' => $shipping_zone_id,
+                'country_code' => $request->get('test'),
+                'created_by' => auth()->user()->id
+            );
+    
+            $shipping_zone = ShippingZone::create($shipping_zone_data);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone countries.']);
+        }
+
+
+        
+        DB::commit();
+        
+
+        return response()->json(['status' => 'success', 'data' => $shipping_zone]);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id

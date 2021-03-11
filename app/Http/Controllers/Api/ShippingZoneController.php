@@ -68,7 +68,7 @@ class ShippingZoneController extends Controller
         try {
             $countries = ShippingCountry::where('shipping_zone_id', $shipping_zone_id)
             ->orderBy('label', 'asc')
-            ->get(['code', 'label']);
+            ->get(['code', 'label'])->toArray();
 
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to get zone countries.']);
@@ -91,6 +91,8 @@ class ShippingZoneController extends Controller
         try {
             $countries = $request->get('shipping_countries');
 
+          //  print_r($countries);
+
             if (count($countries) > 0) {
                 // clear all countries of shipping zone 
                 DB::table('shipping_countries')->where('shipping_zone_id', $shipping_zone_id)->delete();
@@ -111,7 +113,7 @@ class ShippingZoneController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone countries.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone countries.']);
         }
 
         DB::commit();

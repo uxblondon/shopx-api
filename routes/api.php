@@ -52,6 +52,7 @@ Route::group([
     Route::put('shipping-zones/{zone_id}', 'Api\ShippingZoneController@update');
     Route::get('shipping-zones/{zone_id}', 'Api\ShippingZoneController@show');
     Route::post('shipping-zones', 'Api\ShippingZoneController@store');
+    Route::get('available-shipping-zones', 'Api\ShippingZoneController@available');
     Route::get('shipping-zones', 'Api\ShippingZoneController@index');
 
     Route::delete('categories/{category_id}', 'Api\CategoryController@destroy');

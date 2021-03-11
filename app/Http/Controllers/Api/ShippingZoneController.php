@@ -26,8 +26,11 @@ class ShippingZoneController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function available()
     {
+        $zones = ShippingZone::where('available', 1)->orderBy('available', 'desc')->orderBy('title')->get();
+
+        return response()->json(['status' => 'success', 'data' => $zones]);
     }
 
     /**

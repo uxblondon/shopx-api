@@ -58,15 +58,38 @@ class ShippingRateController extends Controller
      */
     public function store(Request $request)
     {
-        $shipping_rate_data = array(
-            'title' => $request->get('title'),
-            'available' => $request->get('available'),
-            'created_by' => auth()->user()->id
-        );
 
-        $shipping_rate = ShippingRate::create($shipping_rate_data);
+        try {
+            $shipping_rate_data = array(
+                'shipping_zone_id' => $request->get('shipping_zone'),
+                'weight_from' => $request->get('weight_from'),
+                'weight_upto' => $request->get('weight_upto'),
+                'rate' => $request->get('rate'),
+                'available' => $request->get('available'),
+                'created_by' => auth()->user()->id
+            );
+    
+            $shipping_rate = ShippingRate::create($shipping_rate_data);
 
-        return response()->json(['status' => 'success', 'data' => $shipping_rate]);
+            $data = array(
+                'shipping_rates.id',
+                'shipping_zones.id as shipping_zone_id',
+                'shipping_zones.title as shipping_zone_title',
+                'shipping_zones.available as shipping_zone_available',
+                'shipping_rates.weight_from',
+                'shipping_rates.weight_upto',
+                'shipping_rates.rate',
+                'shipping_rates.available',
+            );
+
+            $rate_data = ShippingRate::join('shipping_zones', 'shipping_zones.id', 'shipping_rates.shipping_zone_id')
+            ->where('shipping_rates.id', $shipping_rate->id)->first($data);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store shipping rate.']);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully stored.', 'data' => $rate_data]);
     }
 
     /**
@@ -127,11 +150,6 @@ class ShippingRateController extends Controller
     {
         try {
             ShippingRate::where('shipping_rate_id', $shipping_rate_id)->update([
-                'deleted_at' => date('Y-m-d H:i:s'),
-                'deleted_by' => auth()->user()->id,
-            ]);
-
-            ShippingRate::where('id', $shipping_rate_id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);

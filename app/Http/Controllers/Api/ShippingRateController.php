@@ -149,13 +149,13 @@ class ShippingRateController extends Controller
     public function destroy($shipping_rate_id)
     {
         try {
-            ShippingRate::where('shipping_rate_id', $shipping_rate_id)->update([
+            ShippingRate::where('id', $shipping_rate_id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping zone.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping rate.']);
         }
-        return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully deleted.']);
+        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully deleted.']);
     }
 }

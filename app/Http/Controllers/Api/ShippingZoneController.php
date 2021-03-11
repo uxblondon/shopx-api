@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use DB;
 use App\Http\Controllers\Controller;
 use App\Models\ShippingRate;
 use Illuminate\Http\Request;
 use App\Models\ShippingZone;
+use App\Models\ShippingCountry;
 
 class ShippingZoneController extends Controller
 {
@@ -52,6 +54,30 @@ class ShippingZoneController extends Controller
         return response()->json(['status' => 'success', 'data' => $shipping_zone]);
     }
 
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function countries($shipping_zone_id)
+    {
+
+        try {
+            $countries = ShippingCountry::where('shipping_zone_id', $shipping_zone_id)
+            ->orderBy('label', 'asc')
+            ->get(['code', 'label']);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to get zone countries.']);
+        }
+
+
+        return response()->json(['status' => 'success', 'data' => $countries]);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -61,28 +87,35 @@ class ShippingZoneController extends Controller
     public function manageShippingCountries(Request $request, $shipping_zone_id)
     {
 
-DB::beginTransaction();
+        DB::beginTransaction();
         try {
+            $countries = $request->get('shipping_countries');
 
-            $shipping_zone_data = array(
-                'shipping_zone_id' => $shipping_zone_id,
-                'country_code' => $request->get('test'),
-                'created_by' => auth()->user()->id
-            );
-    
-            $shipping_zone = ShippingZone::create($shipping_zone_data);
+            if (count($countries) > 0) {
+                // clear all countries of shipping zone 
+                DB::table('shipping_countries')->where('shipping_zone_id', $shipping_zone_id)->delete();
 
+                $shipping_countries = [];
+
+                foreach ($countries as $country) {
+                    $shipping_countries[] = array(
+                        'shipping_zone_id' => $shipping_zone_id,
+                        'code' => $country['code'],
+                        'label' => $country['label'],
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'created_by' => auth()->user()->id
+                    );
+                }
+
+                DB::table('shipping_countries')->insert($shipping_countries);
+            }
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone countries.']);
         }
 
-
-        
         DB::commit();
-        
-
-        return response()->json(['status' => 'success', 'data' => $shipping_zone]);
+        return response()->json(['status' => 'success', 'message' => 'Shipping zone countries successfully updated.']);
     }
 
     /**
@@ -151,7 +184,6 @@ DB::beginTransaction();
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping zone.']);
         }

@@ -125,19 +125,36 @@ class ShippingRateController extends Controller
     {
         try {
             $shipping_rate_data = array(
-                'title' => $request->get('title'),
+                'shipping_zone_id' => $request->get('shipping_zone'),
+                'weight_from' => $request->get('weight_from'),
+                'weight_upto' => $request->get('weight_upto'),
+                'rate' => $request->get('rate'),
                 'available' => $request->get('available'),
                 'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => auth()->user()->id,
+                'updated_by' => auth()->user()->id
+            );
+    
+            ShippingRate::where('id', $shipping_rate_id)->update($shipping_rate_data);
+
+            $data = array(
+                'shipping_rates.id',
+                'shipping_zones.id as shipping_zone_id',
+                'shipping_zones.title as shipping_zone_title',
+                'shipping_zones.available as shipping_zone_available',
+                'shipping_rates.weight_from',
+                'shipping_rates.weight_upto',
+                'shipping_rates.rate',
+                'shipping_rates.available',
             );
 
-            ShippingRate::where('id', $shipping_rate_id)->update($shipping_rate_data);
+            $rate_data = ShippingRate::join('shipping_zones', 'shipping_zones.id', 'shipping_rates.shipping_zone_id')
+            ->where('shipping_rates.id', $shipping_rate_id)->first($data);
+
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping rate.']);
         }
 
-        $shipping_rate = ShippingRate::find($shipping_rate_id);
-        return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully updated.', 'data' => $shipping_rate]);
+        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully updated.', 'data' => $rate_data]);
     }
 
     /**

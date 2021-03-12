@@ -16,7 +16,15 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = User::where('admin', 0)->get();
+        $customers = User::leftJoin('customer_addresses', function($join){
+            $join->on('customer_addresses.user_id', 'users.id')
+            ->where('customer_addresses.default', 1);
+        })->where('users.admin', 0)->get([
+            'users.id',
+            'users.name',
+            'users.email',
+            'customer_addresses.phone'
+        ]);
         return response()->json(['status' => 'success', 'data' => $customers]);
     }
 

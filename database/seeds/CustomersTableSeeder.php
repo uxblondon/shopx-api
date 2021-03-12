@@ -21,9 +21,10 @@ class CustomersTableSeeder extends Seeder
                 'email' => $fake->safeEmail,
                 'password' => bcrypt('password')
             );
-            
+
             $user = User::create($user_data);
 
+            $make_default = true;
             for($a = 0; $a < rand(1,3); $a++) {
                 $address_data = array(
                     'user_id' => $user->id,
@@ -32,9 +33,11 @@ class CustomersTableSeeder extends Seeder
                     'address_line_1' => $fake->streetName,
                     'city' => $fake->city,
                     'postcode' => $fake->postcode,
-                    'country_code' => 'GB'
+                    'country_code' => 'GB',
+                    'default' => $make_default ? 1 : 0
                 );
                 CustomerAddress::create($address_data);
+                $make_default = false;
             }
         }
     }

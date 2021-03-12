@@ -47,9 +47,11 @@ class CustomerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($customer_id)
     {
-        //
+        $customer = User::find($customer_id);
+
+        return response()->json(['status' => 'success', 'data' => $customer]);
     }
 
     /**

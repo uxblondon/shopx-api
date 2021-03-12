@@ -30,7 +30,15 @@ class UsersTableSeeder extends Seeder
                 'password' => bcrypt('password')
             );
 
-            User::create($user);
+            $user = User::create($user);
+
+            // add address 
+
+
+            // add orders 
+
+
+
         }
     }
 }

@@ -21,24 +21,6 @@ class UsersTableSeeder extends Seeder
 
         User::create($user);
 
-        $fake = Faker\Factory::create();
-
-        for($u = 0; $u < 10; $u++) {
-            $user = array(
-                'name' => $fake->name,
-                'email' => $fake->safeEmail,
-                'password' => bcrypt('password')
-            );
-
-            $user = User::create($user);
-
-            // add address 
-
-
-            // add orders 
-
-
-
-        }
+        
     }
 }

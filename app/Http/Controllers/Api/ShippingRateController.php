@@ -16,7 +16,7 @@ class ShippingRateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($zone_id)
+    public function index($shipping_zone_id)
     {
         try {
             $data = array(
@@ -30,10 +30,8 @@ class ShippingRateController extends Controller
                 'shipping_rates.available',
             );
 
-            $rates = ShippingRate::join('shipping_zones', function ($join) {
-                $join->on('shipping_zones.id', 'shipping_rates.shipping_zone_id')
-                    ->where('shipping_zones.available', 1);
-            })->get($data);
+            $rates = ShippingRate::where('shipping_zone_id', $shipping_zone_id)->get();
+
         } catch (\Exception $e) {
             return response()->json(['status' => 'success', 'e' => $e->getMessage()]);
         }

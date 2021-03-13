@@ -15,7 +15,16 @@ class CreateOrderDeliveryAddressesTable extends Migration
     {
         Schema::create('order_delivery_addresses', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('type');
+            $table->string('address_line_1');
+            $table->string('address_line_2')->nullable();
+            $table->string('city');
+            $table->string('county')->nullable();
+            $table->string('postcode');
+            $table->string('country_code');
+            $table->text('delivery_instructions')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

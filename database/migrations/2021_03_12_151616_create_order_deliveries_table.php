@@ -15,7 +15,12 @@ class CreateOrderDeliveriesTable extends Migration
     {
         Schema::create('order_deliveries', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigInteger('order_id')->unsigned();
+            $table->bigInteger('delivery_option_id')->unsigned();
+            $table->boolean('different_billing_address')->default(0);
+            $table->decimal('cost', 8, 2);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

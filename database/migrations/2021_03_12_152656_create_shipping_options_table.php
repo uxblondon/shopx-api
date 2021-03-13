@@ -15,7 +15,16 @@ class CreateShippingOptionsTable extends Migration
     {
         Schema::create('shipping_options', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
+            $table->integer('max_weight');
+            $table->boolean('collection')->default(0);
+            $table->boolean('available')->default(1);
+            $table->text('remark')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
         });
     }
 

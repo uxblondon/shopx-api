@@ -15,7 +15,14 @@ class CreateStoreInfosTable extends Migration
     {
         Schema::create('store_infos', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
+            $table->text('value')->nullable();
+            $table->boolean('hide')->default(0);
             $table->timestamps();
+            $table->softDeletes();
+            $table->integer('created_by');
+            $table->integer('updated_by')->nullable();
+            $table->integer('deleted_by')->nullable();
         });
     }
 

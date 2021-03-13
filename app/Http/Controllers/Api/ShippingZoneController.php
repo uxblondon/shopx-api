@@ -18,7 +18,12 @@ class ShippingZoneController extends Controller
      */
     public function index()
     {
-        $zones = ShippingZone::orderBy('available', 'desc')->orderBy('title')->get();
+        $zones = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
+        ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 'shipping_zones.available')
+        ->orderBy('available', 'desc')
+        ->orderBy('title')
+        ->groupBy('shipping_zones.id')
+        ->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }

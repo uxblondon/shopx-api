@@ -18,9 +18,15 @@ class CreateShippingRatesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('shipping_zone_id')->unsigned();
 
-            $table->decimal('weight_from', 8, 2);
-            $table->decimal('weight_upto', 8, 2);
-            $table->decimal('rate', 8, 2);
+            $table->string('based_on', 32);
+
+            $table->decimal('min_order_price', 8, 2)->nullable();
+            $table->decimal('max_order_price', 8, 2)->nullable();
+
+            $table->decimal('min_weight', 8, 2)->nullable();
+            $table->decimal('max_weight', 8, 2)->nullable();
+
+            $table->decimal('cost', 8, 2);
 
             $table->boolean('available')->default(0);
             $table->timestamps();

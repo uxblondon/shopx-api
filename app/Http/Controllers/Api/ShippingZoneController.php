@@ -19,11 +19,11 @@ class ShippingZoneController extends Controller
     public function index()
     {
         $zones = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
-        ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 'shipping_zones.available')
-        ->orderBy('available', 'desc')
-        ->orderBy('title')
-        ->groupBy('shipping_zones.id')
-        ->get();
+            ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 'shipping_zones.available')
+            ->orderBy('available', 'desc')
+            ->orderBy('title')
+            ->groupBy('shipping_zones.id')
+            ->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }
@@ -72,9 +72,8 @@ class ShippingZoneController extends Controller
 
         try {
             $countries = ShippingCountry::where('shipping_zone_id', $shipping_zone_id)
-            ->orderBy('label', 'asc')
-            ->get(['code', 'label'])->toArray();
-
+                ->orderBy('label', 'asc')
+                ->get(['code', 'label'])->toArray();
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to get zone countries.']);
         }
@@ -96,7 +95,7 @@ class ShippingZoneController extends Controller
         try {
             $countries = $request->get('shipping_countries');
 
-          //  print_r($countries);
+            //  print_r($countries);
 
             if (count($countries) > 0) {
                 // clear all countries of shipping zone 
@@ -169,7 +168,14 @@ class ShippingZoneController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone.']);
         }
 
-        $shipping_zone = ShippingZone::find($shipping_zone_id);
+        $shipping_zone = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
+            ->where('shipping_zones.id', $shipping_zone_id)
+            ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 'shipping_zones.available')
+            ->orderBy('available', 'desc')
+            ->orderBy('title')
+            ->groupBy('shipping_zones.id')
+            ->first();
+
         return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully updated.', 'data' => $shipping_zone]);
     }
 

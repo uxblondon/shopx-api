@@ -169,8 +169,9 @@ class ShippingZoneController extends Controller
         }
 
         $shipping_zone = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
+            ->leftJoin('shipping_rates.shipping_zone_id', 'shipping_zones.id')
             ->where('shipping_zones.id', $shipping_zone_id)
-            ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 'shipping_zones.available')
+            ->select('shipping_zones.id', 'shipping_zones.title', DB::raw('count(shipping_countries.id) as no_of_countries'), DB::raw('count(shipping_rates.id) as no_of_rates'), 'shipping_zones.available')
             ->orderBy('available', 'desc')
             ->orderBy('title')
             ->groupBy('shipping_zones.id')

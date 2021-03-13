@@ -17,6 +17,7 @@ class CreateOrderDeliveriesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('delivery_option_id')->unsigned();
+            $table->string('delivery_option_label');
             $table->boolean('different_billing_address')->default(0);
             $table->decimal('cost', 8, 2);
             $table->decimal('additional_cost', 8, 2)->default(0.0);

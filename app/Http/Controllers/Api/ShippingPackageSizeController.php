@@ -7,9 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\ShippingRate;
 use Illuminate\Http\Request;
 use App\Models\ShippingZone;
-use App\Models\ShippingCountry;
+use App\Models\ShippingPackageSize;
 
-class ShippingZoneController extends Controller
+class ShippingPackageSizeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,17 +18,7 @@ class ShippingZoneController extends Controller
      */
     public function index()
     {
-        $zones = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
-        ->leftJoin('shipping_rates', 'shipping_rates.shipping_zone_id', 'shipping_zones.id')    
-        ->select('shipping_zones.id', 
-            'shipping_zones.title', 
-            DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 
-            DB::raw('count(DISTINCT shipping_rates.id) as no_of_rates'), 
-            'shipping_zones.available')
-            ->orderBy('available', 'desc')
-            ->orderBy('title')
-            ->groupBy('shipping_zones.id')
-            ->get();
+        $zones = ShippingPackageSize::orderBy('min_weight', 'asc')->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }
@@ -53,15 +43,22 @@ class ShippingZoneController extends Controller
      */
     public function store(Request $request)
     {
-        $shipping_zone_data = array(
-            'title' => $request->get('title'),
+
+        $shipping_package_size_data = array(
+            'format' => $request->get('format'),
+            'length' => $request->get('length'),
+            'width' => $request->get('width'),
+            'height' => $request->get('height'),
+            'min_weight' => $request->get('min_weight'),
+            'max_weight' => $request->get('max_weight'),
+            'remark' => $request->get('remark'),
             'available' => $request->get('available'),
             'created_by' => auth()->user()->id
         );
 
-        $shipping_zone = ShippingZone::create($shipping_zone_data);
+        $shipping_package_size = ShippingPackageSize::create($shipping_package_size_data);
 
-        return response()->json(['status' => 'success', 'data' => $shipping_zone]);
+        return response()->json(['status' => 'success', 'message' => 'Package size stored successfully.', 'data' => $shipping_package_size]);
     }
 
 
@@ -162,35 +159,29 @@ class ShippingZoneController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $shipping_zone_id)
+    public function update(Request $request, $shipping_package_size_id)
     {
         try {
-            $shipping_zone_data = array(
-                'title' => $request->get('title'),
+            $shipping_package_size_data = array(
+                'format' => $request->get('format'),
+                'length' => $request->get('length'),
+                'width' => $request->get('width'),
+                'height' => $request->get('height'),
+                'min_weight' => $request->get('min_weight'),
+                'max_weight' => $request->get('max_weight'),
+                'remark' => $request->get('remark'),
                 'available' => $request->get('available'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'updated_by' => auth()->user()->id,
+                'created_by' => auth()->user()->id
             );
-
-            ShippingZone::where('id', $shipping_zone_id)->update($shipping_zone_data);
+    
+            ShippingPackageSize::where('id', $shipping_package_size_id)->update($shipping_package_size_data);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update package size.']);
         }
 
-        $shipping_zone = ShippingZone::leftJoin('shipping_countries', 'shipping_countries.shipping_zone_id', 'shipping_zones.id')
-            ->leftJoin('shipping_rates', 'shipping_rates.shipping_zone_id', 'shipping_zones.id')
-            ->where('shipping_zones.id', $shipping_zone_id)
-            ->select('shipping_zones.id', 
-            'shipping_zones.title', 
-            DB::raw('count(DISTINCT shipping_countries.id) as no_of_countries'), 
-            DB::raw('count(DISTINCT shipping_rates.id) as no_of_rates'), 
-            'shipping_zones.available')
-            ->orderBy('available', 'desc')
-            ->orderBy('title')
-            ->groupBy('shipping_zones.id')
-            ->first();
+        $shipping_package_size = ShippingPackageSize::where('id', $shipping_package_size_id)->first();
 
-        return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully updated.', 'data' => $shipping_zone]);
+        return response()->json(['status' => 'success', 'message' => 'Package size successfully updated.', 'data' => $shipping_package_size]);
     }
 
     /**

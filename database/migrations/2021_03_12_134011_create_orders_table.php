@@ -20,25 +20,11 @@ class CreateOrdersTable extends Migration
             $table->string('name', 100);
             $table->string('email', 150);
 
-            $table->string('billing_address_line_1', 150);
-            $table->string('billing_address_line_2', 150)->nullable();
-            $table->string('billing_city', 100);
-            $table->string('billing_county', 100)->nullable();
-            $table->string('billing_postcode', 30);
-            $table->string('billing_country', 50);
-
-            $table->string('shipping_address_line_1', 150)->nullable();
-            $table->string('shipping_address_line_2', 150);
-            $table->string('shipping_address_city', 100);
-            $table->string('shipping_address_county', 100);
-            $table->string('shipping_address_postcode', 30);
-            $table->string('shipping_address_country', 50);
-
             $table->timestamps();
             $table->softDeletes();
         });
 
-        Schema::table('customer_addresses', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
             $table->foreign('user_id')
             ->references('id')
             ->on('users')

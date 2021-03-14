@@ -51,6 +51,14 @@ Route::group([
     Route::put('shipping-zones/{zone_id}/countries', 'Api\ShippingZoneController@manageShippingCountries');
     Route::get('shipping-zones/{zone_id}/countries', 'Api\ShippingZoneController@countries');
 
+    Route::delete('shipping-package-sizes/{package_size_id}', 'Api\ShippingPackageSizeController@destroy');
+    Route::put('shipping-package-sizes/{package_size_id}', 'Api\ShippingPackageSizeController@update');
+    Route::get('shipping-package-sizes/{package_size_id}', 'Api\ShippingPackageSizeController@show');
+    Route::post('shipping-package-sizes', 'Api\ShippingPackageSizeController@store');
+    Route::get('available-shipping-package-sizes', 'Api\ShippingPackageSizeController@available');
+    Route::get('shipping-package-sizes', 'Api\ShippingPackageSizeController@index');
+    
+    
     Route::delete('shipping-zones/{zone_id}', 'Api\ShippingZoneController@destroy');
     Route::put('shipping-zones/{zone_id}', 'Api\ShippingZoneController@update');
     Route::get('shipping-zones/{zone_id}', 'Api\ShippingZoneController@show');

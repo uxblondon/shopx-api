@@ -190,21 +190,18 @@ class ShippingPackageSizeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($shipping_zone_id)
+    public function destroy($shipping_package_size_id)
     {
+        //TODO - conditions 
         try {
-            ShippingRate::where('shipping_zone_id', $shipping_zone_id)->update([
+            ShippingPackageSize::where('id', $shipping_package_size_id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);
 
-            ShippingZone::where('id', $shipping_zone_id)->update([
-                'deleted_at' => date('Y-m-d H:i:s'),
-                'deleted_by' => auth()->user()->id,
-            ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping zone.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete package size.']);
         }
-        return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully deleted.']);
+        return response()->json(['status' => 'success', 'message' => 'Package size successfully deleted.']);
     }
 }

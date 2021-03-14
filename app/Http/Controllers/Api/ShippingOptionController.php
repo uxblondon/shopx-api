@@ -45,21 +45,19 @@ class ShippingOptionController extends Controller
     public function store(Request $request)
     {
 
-        $shipping_package_size_data = array(
-            'format' => $request->get('format'),
-            'length' => $request->get('length'),
-            'width' => $request->get('width'),
-            'height' => $request->get('height'),
+        $shipping_option_data = array(
+            'name' => $request->get('name'),
             'min_weight' => $request->get('min_weight'),
             'max_weight' => $request->get('max_weight'),
             'remark' => $request->get('remark'),
+            'is_collection' => $request->get('is_collection'),
             'available' => $request->get('available'),
             'created_by' => auth()->user()->id
         );
 
-        $shipping_package_size = ShippingPackageSize::create($shipping_package_size_data);
+        $shipping_option = ShippingOption::create($shipping_option_data);
 
-        return response()->json(['status' => 'success', 'message' => 'Package size stored successfully.', 'data' => $shipping_package_size]);
+        return response()->json(['status' => 'success', 'message' => 'Package size stored successfully.', 'data' => $shipping_option]);
     }
 
 
@@ -160,29 +158,28 @@ class ShippingOptionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $shipping_package_size_id)
+    public function update(Request $request, $shipping_option_id)
     {
         try {
-            $shipping_package_size_data = array(
-                'format' => $request->get('format'),
-                'length' => $request->get('length'),
-                'width' => $request->get('width'),
-                'height' => $request->get('height'),
+            $shipping_option_data = array(
+                'name' => $request->get('name'),
                 'min_weight' => $request->get('min_weight'),
                 'max_weight' => $request->get('max_weight'),
                 'remark' => $request->get('remark'),
+                'is_collection' => $request->get('is_collection'),
                 'available' => $request->get('available'),
-                'created_by' => auth()->user()->id
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => auth()->user()->id
             );
     
-            ShippingPackageSize::where('id', $shipping_package_size_id)->update($shipping_package_size_data);
+            ShippingOption::where('id', $shipping_option_id)->update($shipping_option_data);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to update package size.']);
         }
 
-        $shipping_package_size = ShippingPackageSize::where('id', $shipping_package_size_id)->first();
+        $shipping_option = ShippingOption::where('id', $shipping_option_id)->first();
 
-        return response()->json(['status' => 'success', 'message' => 'Package size successfully updated.', 'data' => $shipping_package_size]);
+        return response()->json(['status' => 'success', 'message' => 'Package size successfully updated.', 'data' => $shipping_option]);
     }
 
     /**
@@ -191,11 +188,11 @@ class ShippingOptionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($shipping_package_size_id)
+    public function destroy($shipping_option_id)
     {
         //TODO - conditions 
         try {
-            ShippingPackageSize::where('id', $shipping_package_size_id)->update([
+            ShippingOption::where('id', $shipping_option_id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);

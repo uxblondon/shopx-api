@@ -21,8 +21,8 @@ class CreateShippingPackageSizesTable extends Migration
             $table->integer('width');
             $table->integer('height');
 
-            $table->integer('min_weight');
-            $table->integer('max_weight');
+            $table->decimal('min_weight', 8, 2)->nullable();
+            $table->decimal('max_weight', 8, 2)->nullable();
 
             $table->boolean('available')->default(1);
             $table->text('remark')->nullable();

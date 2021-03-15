@@ -31,9 +31,9 @@ class ShippingOptionController extends Controller
      */
     public function available()
     {
-        $zones = ShippingZone::where('available', 1)->orderBy('available', 'desc')->orderBy('title')->get();
+        $shipping_options = ShippingOption::where('available', 1)->orderBy('name')->get();
 
-        return response()->json(['status' => 'success', 'data' => $zones]);
+        return response()->json(['status' => 'success', 'data' => $shipping_options]);
     }
 
     /**

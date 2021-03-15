@@ -30,9 +30,9 @@ class ShippingPackageSizeController extends Controller
      */
     public function available()
     {
-        $zones = ShippingZone::where('available', 1)->orderBy('available', 'desc')->orderBy('title')->get();
+        $shipping_packages = ShippingPackageSize::where('available', 1)->orderBy('format')->get();
 
-        return response()->json(['status' => 'success', 'data' => $zones]);
+        return response()->json(['status' => 'success', 'data' => $shipping_packages]);
     }
 
     /**

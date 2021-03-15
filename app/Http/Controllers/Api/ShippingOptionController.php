@@ -174,7 +174,7 @@ class ShippingOptionController extends Controller
     
             ShippingOption::where('id', $shipping_option_id)->update($shipping_option_data);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to update package size.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update package size.']);
         }
 
         $shipping_option = ShippingOption::where('id', $shipping_option_id)->first();

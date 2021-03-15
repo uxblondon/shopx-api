@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
+use DB;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -16,26 +17,23 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = User::leftJoin('customer_addresses', function($join){
+        $customers = User::leftJoin('orders', 'orders.user_id', 'users.id')
+        ->leftJoin('customer_addresses', function($join){
             $join->on('customer_addresses.user_id', 'users.id')
             ->where('customer_addresses.default', 1);
-        })->where('users.admin', 0)->get([
+        })->where('users.admin', 0)
+        ->select([
             'users.id',
             'users.name',
             'users.email',
-            'customer_addresses.phone'
-        ]);
-        return response()->json(['status' => 'success', 'data' => $customers]);
-    }
+            'customer_addresses.phone',
+            DB::raw('count(DISTINCT orders.id) as no_of_orders')
+        ])
+        ->groupBy('users.id')
+        ->groupBy('customer_addresses.phone')
+        ->get();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response()->json(['status' => 'success', 'data' => $customers]);
     }
 
     /**

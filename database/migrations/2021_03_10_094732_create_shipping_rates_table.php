@@ -19,18 +19,14 @@ class CreateShippingRatesTable extends Migration
             $table->bigInteger('shipping_zone_id')->unsigned();
             $table->bigInteger('package_size_id')->unsigned();
             $table->bigInteger('shipping_option_id')->unsigned();
-
             $table->string('cost_based_on', 32);
-
             $table->decimal('min_value', 8, 2)->nullable();
             $table->decimal('max_value', 8, 2)->nullable();
-
             $table->decimal('min_weight', 8, 2)->nullable();
             $table->decimal('max_weight', 8, 2)->nullable();
-
             $table->decimal('cost', 8, 2);
-
             $table->boolean('available')->default(0);
+            $table->text('note')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->integer('created_by');

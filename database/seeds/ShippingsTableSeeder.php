@@ -15,8 +15,8 @@ class ShippingsTableSeeder extends Seeder
     {
         $zones = array(
             'Collection',
-            'UK',
-            'EU',
+            'Domestic',
+            'European Union',
             'Worldwide',
         );
 
@@ -49,6 +49,60 @@ class ShippingsTableSeeder extends Seeder
 
             //     ShippingRate::create($shipping_rate_data);
             // }
+
+            // Letter 100g 24 x 16.5 x 0.5 cm
+            // Large letter 750g 35.3 x 25 x 2.5 cm
+            //Small parcel 2k 45 x 35 x 16 cm
+            //Medium parcel 20kg 61 x 46 x 46 cm
+            //Medium tube 20kg 90 x 25 x 25 cm
+
+
+            // Royal Mail
+            // 1st Class
+            // More details
+            // 1 day delivery aim	Up to £20 for loss or damage	Not Tracked	
+            // 85p*
+            // 85p*
+            // Buy online
+            // Royal Mail
+            // 2nd Class
+            // More details
+            // 3 days delivery aim	Up to £20 for loss or damage	Not Tracked	
+            // 66p*
+            // 66p*
+            // Buy online
+            // Royal Mail
+            // Signed For® 1st Class
+            // More details
+            // 1 day delivery aim	Up to £50 for loss or damage	Proof of Delivery	
+            // £2.25*
+            // £2.25*
+            // Buy online
+            // Royal Mail
+            // Signed For® 2nd Class
+            // More details
+            // 3 days delivery aim	Up to £50 for loss or damage	Proof of Delivery	
+            // £2.06*
+            // £2.06*
+            // Buy online
+            // Royal Mail
+            // Special Delivery Guaranteed by 1pm®
+            // More details
+            // Guaranteed by 1pm next day	Up to £500 for loss or damage	Tracked	
+            // £6.85*
+            // £6.75*
+            // Buy online
+            // Royal Mail
+            // Special Delivery Guaranteed by 9am®
+            // More details
+            // Guaranteed by 9am next day	Up to £50 for loss or damage	Tracked	
+            // £22.26
+            // Only available at a Post Office®
+            // Parcelforce Worldwide
+            // express48
+
+
+
         }
     }
 }

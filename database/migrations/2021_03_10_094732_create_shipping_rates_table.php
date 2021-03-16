@@ -18,7 +18,7 @@ class CreateShippingRatesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('shipping_zone_id')->unsigned();
             $table->bigInteger('package_size_id')->unsigned();
-            $table->bigInteger('delivery_option_id')->unsigned();
+            $table->bigInteger('shipping_option_id')->unsigned();
 
             $table->string('cost_based_on', 32);
 

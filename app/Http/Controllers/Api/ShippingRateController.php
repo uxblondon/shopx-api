@@ -19,21 +19,28 @@ class ShippingRateController extends Controller
     public function index($shipping_zone_id)
     {
         try {
-            $data = array(
+            
+            $rates = ShippingRate::join('shipping_package_sizes', 'shipping_package_sizes.id', 'shipping_rates.package_size_id')
+            ->join('shipping_options', 'shipping_options.id', 'shipping_rates.shipping_option_id')
+            ->where('shipping_zone_id', $shipping_zone_id)
+            ->get([
                 'shipping_rates.id',
-                'shipping_zones.id as shipping_zone_id',
-                'shipping_zones.title as shipping_zone_title',
-                'shipping_zones.available as shipping_zone_available',
-                'shipping_rates.weight_from',
-                'shipping_rates.weight_upto',
-                'shipping_rates.rate',
+                'shipping_rates.shipping_zone_id',
+                'shipping_rates.package_size_id',
+                'shipping_package_sizes.format as package',
+                'shipping_rates.shipping_option_id',
+                'shipping_options.name as shipping_option',
+                'shipping_rates.cost_based_on',
+                'shipping_rates.min_value',
+                'shipping_rates.max_value',
+                'shipping_rates.min_weight',
+                'shipping_rates.max_weight',
+                'shipping_rates.cost',
                 'shipping_rates.available',
-            );
-
-            $rates = ShippingRate::where('shipping_zone_id', $shipping_zone_id)->get();
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'success', 'e' => $e->getMessage()]);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage()]);
         }
 
         return response()->json(['status' => 'success', 'data' => $rates]);
@@ -54,40 +61,50 @@ class ShippingRateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $shipping_zone_id)
     {
 
         try {
             $shipping_rate_data = array(
-                'shipping_zone_id' => $request->get('shipping_zone'),
-                'weight_from' => $request->get('weight_from'),
-                'weight_upto' => $request->get('weight_upto'),
-                'rate' => $request->get('rate'),
+                'shipping_zone_id' => $shipping_zone_id,
+                'package_size_id' => $request->get('package_size_id'),
+                'shipping_option_id' => $request->get('shipping_option_id'),
+                'cost_based_on' => $request->get('cost_based_on'),
+                'min_value' => $request->get('min_value'),
+                'max_value' => $request->get('max_value'),
+                'min_weight' => $request->get('min_weight'),
+                'max_weight' => $request->get('max_weight'),
+                'cost' => $request->get('cost'),
                 'available' => $request->get('available'),
                 'created_by' => auth()->user()->id
             );
     
-            $shipping_rate = ShippingRate::create($shipping_rate_data);
+            $rate = ShippingRate::create($shipping_rate_data);
 
-            $data = array(
+            $shipping_rate = ShippingRate::join('shipping_package_sizes', 'shipping_package_sizes.id', 'shipping_rates.package_size_id')
+            ->join('shipping_options', 'shipping_options.id', 'shipping_rates.shipping_option_id')
+            ->where('shipping_rates.id', $rate->id)
+            ->first([
                 'shipping_rates.id',
-                'shipping_zones.id as shipping_zone_id',
-                'shipping_zones.title as shipping_zone_title',
-                'shipping_zones.available as shipping_zone_available',
-                'shipping_rates.weight_from',
-                'shipping_rates.weight_upto',
-                'shipping_rates.rate',
+                'shipping_rates.shipping_zone_id',
+                'shipping_rates.package_size_id',
+                'shipping_package_sizes.format as package',
+                'shipping_rates.shipping_option_id',
+                'shipping_options.name as shipping_option',
+                'shipping_rates.cost_based_on',
+                'shipping_rates.min_value',
+                'shipping_rates.max_value',
+                'shipping_rates.min_weight',
+                'shipping_rates.max_weight',
+                'shipping_rates.cost',
                 'shipping_rates.available',
-            );
-
-            $rate_data = ShippingRate::join('shipping_zones', 'shipping_zones.id', 'shipping_rates.shipping_zone_id')
-            ->where('shipping_rates.id', $shipping_rate->id)->first($data);
+            ]);
 
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store shipping rate.']);
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully stored.', 'data' => $rate_data]);
+        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully stored.', 'data' => $shipping_rate]);
     }
 
     /**

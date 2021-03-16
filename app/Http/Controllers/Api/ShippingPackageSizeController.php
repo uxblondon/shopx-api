@@ -30,7 +30,9 @@ class ShippingPackageSizeController extends Controller
      */
     public function available()
     {
-        $shipping_packages = ShippingPackageSize::where('available', 1)->orderBy('format')->get();
+        $shipping_packages = ShippingPackageSize::where('available', 1)
+        ->orderBy('format')
+        ->get(['id', 'format', 'length', 'width', 'height', 'min_weight', 'max_weight']);
 
         return response()->json(['status' => 'success', 'data' => $shipping_packages]);
     }

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\ShippingZone;
 use App\Models\ShippingPackageSize;
 use App\Models\ShippingOption;
+use App\Models\ProductShippingOption;
 
 class ShippingOptionController extends Controller
 {
@@ -34,6 +35,46 @@ class ShippingOptionController extends Controller
         $shipping_options = ShippingOption::where('available', 1)->orderBy('provider')->orderBy('service')->get();
 
         return response()->json(['status' => 'success', 'data' => $shipping_options]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function manageProducts(Request $request, $shipping_option_id)
+    {
+        DB::beginTransaction();
+        try {
+            $products = $request->get('products');
+
+            //  print_r($products);
+            // clear all products of shipping zone 
+            DB::table('product_shipping_options')->where('shipping_option_id', $shipping_option_id)->delete();
+            if (count($products) > 0) {
+
+
+                $product_shipping_options = [];
+
+                foreach ($products as $product_id) {
+                    $product_shipping_options[] = array(
+                        'shipping_option_id' => $shipping_option_id,
+                        'product_id' => $product_id,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'created_by' => auth()->user()->id
+                    );
+                }
+
+                DB::table('product_shipping_options')->insert($product_shipping_options);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping option products.']);
+        }
+
+        DB::commit();
+        return response()->json(['status' => 'success', 'message' => 'Shipping option products successfully updated.']);
     }
 
     /**

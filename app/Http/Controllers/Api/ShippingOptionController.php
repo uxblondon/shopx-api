@@ -46,15 +46,29 @@ class ShippingOptionController extends Controller
     {
 
         $shipping_option_data = array(
-            'name' => $request->get('name'),
-            'min_weight' => $request->get('min_weight'),
-            'max_weight' => $request->get('max_weight'),
-            'remark' => $request->get('remark'),
+            'provider' => $request->get('provider'),
+            'service' => $request->get('service'),
+            'speed' => $request->get('speed'),
             'is_collection' => $request->get('is_collection'),
             'available' => $request->get('available'),
+            'note' => $request->get('note'),
             'created_by' => auth()->user()->id
         );
 
+        if($request->get('min_weight') != '') {
+            $shipping_option_data['min_weight'] = $request->get('min_weight');
+        }
+
+        if($request->get('max_weight') != '') {
+            $shipping_option_data['max_weight'] = $request->get('max_weight');
+        }
+
+        $has_tracking = $request->get('has_tracking');
+        if($has_tracking === 1) {
+            $shipping_option_data['has_tracking'] = 1;
+            $shipping_option_data['tracking_type'] = $request->get('tracking_type');
+        }
+        
         $shipping_option = ShippingOption::create($shipping_option_data);
 
         return response()->json(['status' => 'success', 'message' => 'Package size stored successfully.', 'data' => $shipping_option]);
@@ -162,15 +176,29 @@ class ShippingOptionController extends Controller
     {
         try {
             $shipping_option_data = array(
-                'name' => $request->get('name'),
-                'min_weight' => $request->get('min_weight'),
-                'max_weight' => $request->get('max_weight'),
-                'remark' => $request->get('remark'),
+                'provider' => $request->get('provider'),
+                'service' => $request->get('service'),
+                'speed' => $request->get('speed'),
                 'is_collection' => $request->get('is_collection'),
                 'available' => $request->get('available'),
+                'note' => $request->get('note'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => auth()->user()->id
             );
+    
+            if($request->get('min_weight') != '') {
+                $shipping_option_data['min_weight'] = $request->get('min_weight');
+            }
+    
+            if($request->get('max_weight') != '') {
+                $shipping_option_data['max_weight'] = $request->get('max_weight');
+            }
+    
+            $has_tracking = $request->get('has_tracking');
+            if($has_tracking === 1) {
+                $shipping_option_data['has_tracking'] = 1;
+                $shipping_option_data['tracking_type'] = $request->get('tracking_type');
+            }
     
             ShippingOption::where('id', $shipping_option_id)->update($shipping_option_data);
         } catch (\Exception $e) {

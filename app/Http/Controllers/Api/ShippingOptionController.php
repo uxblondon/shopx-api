@@ -96,7 +96,7 @@ class ShippingOptionController extends Controller
         }
 
         DB::commit();
-        return response()->json(['status' => 'success', 'message' => 'Shipping option products successfully updated.']);
+        return response()->json(['status' => 'success', 'p' => $products, 'message' => 'Shipping option products successfully updated.']);
     }
 
     /**

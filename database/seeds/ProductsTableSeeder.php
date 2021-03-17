@@ -18,6 +18,8 @@ class ProductsTableSeeder extends Seeder
      */
     public function run()
     {
+        $json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/products");
+        $data = json_decode($json);
         $fake = Faker\Factory::create();
 
         // make product id started from 1
@@ -25,12 +27,13 @@ class ProductsTableSeeder extends Seeder
 
         $categories = Category::pluck('id');
 
-        for ($i=0; $i<10; $i++) {
+        foreach($data->products as $product_item) {
             $product = array(
-            'title' => $fake->text(20),
+            'title' => $product_item->title,
             'slug' => $fake->slug(),
             'standfirst' => $fake->text(100),
             'description' => $fake->text(200),
+            'status' => 'published',
             'created_by' => 1
             );
 

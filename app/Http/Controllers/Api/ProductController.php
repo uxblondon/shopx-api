@@ -111,6 +111,12 @@ class ProductController extends Controller
         return response()->json(['status' => 'success', 'data' => $products, 'c' => $conditions]);
     }
 
+    public function available()
+    {
+        $products = Product::where('status', 'published')->orderBy('title')->get(['id', 'title']);
+        return response()->json(['status' => 'success', 'data' => $products]);
+    }
+
 
     /**
      * @OA\Post(

@@ -43,6 +43,28 @@ class ShippingOptionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function products($shipping_option_id)
+    {
+
+        try {
+            $products = ProductShippingOption::join('products', 'products.id', 'product_shipping_options.product_id')
+            ->where('shipping_option_id', $shipping_option_id)
+                ->orderBy('products.title', 'asc')
+                ->get(['products.id', 'product_shipping_options.shipping_option_id', 'products.title'])->toArray();
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to get option products.']);
+        }
+
+
+        return response()->json(['status' => 'success', 'data' => $products]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function manageProducts(Request $request, $shipping_option_id)
     {
         DB::beginTransaction();
@@ -117,68 +139,9 @@ class ShippingOptionController extends Controller
 
 
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function countries($shipping_zone_id)
-    {
+    
 
-        try {
-            $countries = ShippingCountry::where('shipping_zone_id', $shipping_zone_id)
-                ->orderBy('label', 'asc')
-                ->get(['code', 'label'])->toArray();
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to get zone countries.']);
-        }
-
-
-        return response()->json(['status' => 'success', 'data' => $countries]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function manageShippingCountries(Request $request, $shipping_zone_id)
-    {
-
-        DB::beginTransaction();
-        try {
-            $countries = $request->get('shipping_countries');
-
-            //  print_r($countries);
-
-            if (count($countries) > 0) {
-                // clear all countries of shipping zone 
-                DB::table('shipping_countries')->where('shipping_zone_id', $shipping_zone_id)->delete();
-
-                $shipping_countries = [];
-
-                foreach ($countries as $country) {
-                    $shipping_countries[] = array(
-                        'shipping_zone_id' => $shipping_zone_id,
-                        'code' => $country['code'],
-                        'label' => $country['label'],
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => auth()->user()->id
-                    );
-                }
-
-                DB::table('shipping_countries')->insert($shipping_countries);
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone countries.']);
-        }
-
-        DB::commit();
-        return response()->json(['status' => 'success', 'message' => 'Shipping zone countries successfully updated.']);
-    }
+    
 
     /**
      * Display the specified resource.
@@ -193,17 +156,6 @@ class ShippingOptionController extends Controller
         $shipping_zone->no_of_rates = ShippingRate::where('shipping_zone_id', $shipping_zone_id)->count();
 
         return response()->json(['status' => 'success', 'data' => $shipping_zone]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**

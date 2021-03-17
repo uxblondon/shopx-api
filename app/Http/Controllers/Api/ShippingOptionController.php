@@ -19,7 +19,7 @@ class ShippingOptionController extends Controller
      */
     public function index()
     {
-        $zones = ShippingOption::orderBy('name', 'asc')->get();
+        $zones = ShippingOption::orderBy('provider')->orderBy('service')->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }
@@ -31,7 +31,7 @@ class ShippingOptionController extends Controller
      */
     public function available()
     {
-        $shipping_options = ShippingOption::where('available', 1)->orderBy('name')->get();
+        $shipping_options = ShippingOption::where('available', 1)->orderBy('provider')->orderBy('service')->get();
 
         return response()->json(['status' => 'success', 'data' => $shipping_options]);
     }

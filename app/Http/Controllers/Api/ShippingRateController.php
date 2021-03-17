@@ -33,7 +33,9 @@ class ShippingRateController extends Controller
                 'shipping_rates.package_size_id',
                 'shipping_package_sizes.format as package',
                 'shipping_rates.shipping_option_id',
-                'shipping_options.name as shipping_option',
+                'shipping_options.provider as shipping_provider',
+                'shipping_options.service as shipping_service',
+                'shipping_options.speed as shipping_speed',
                 'shipping_rates.cost_based_on',
                 'shipping_rates.min_value',
                 'shipping_rates.max_value',
@@ -166,11 +168,11 @@ class ShippingRateController extends Controller
                 if($cost_based_on === 'basket_weight') {
                     $shipping_rate_data['min_weight'] = $request->get('min_weight');
                     $shipping_rate_data['max_weight'] = $request->get('max_weight');
-                    $shipping_rate_data['min_value'] = NULL;
-                    $shipping_rate_data['max_value'] = NULL;
+                   // $shipping_rate_data['min_value'] = NULL;
+                   // $shipping_rate_data['max_value'] = NULL;
                 } elseif ($cost_based_on === 'basket_value') {
-                    $shipping_rate_data['min_weight'] = NULL;
-                    $shipping_rate_data['max_weight'] = NULL;
+                  //  $shipping_rate_data['min_weight'] = NULL;
+                  //  $shipping_rate_data['max_weight'] = NULL;
                     $shipping_rate_data['min_value'] = $request->get('min_value');
                     $shipping_rate_data['max_value'] = $request->get('max_value');
                 } elseif($cost_based_on === 'basket_weight_and_value') {

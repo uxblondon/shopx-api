@@ -17,9 +17,9 @@ class CreateShippingPackageSizesTable extends Migration
             $table->bigIncrements('id');
             $table->string('format');
             
-            $table->integer('length');
-            $table->integer('width');
-            $table->integer('height');
+            $table->decimal('length', 8, 2);
+            $table->decimal('width', 8, 2);
+            $table->decimal('height', 8, 2);
 
             $table->decimal('min_weight', 8, 2)->nullable();
             $table->decimal('max_weight', 8, 2)->nullable();

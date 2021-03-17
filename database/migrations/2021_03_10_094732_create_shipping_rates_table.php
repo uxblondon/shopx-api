@@ -20,11 +20,13 @@ class CreateShippingRatesTable extends Migration
             $table->bigInteger('package_size_id')->unsigned();
             $table->bigInteger('shipping_option_id')->unsigned();
             $table->string('cost_based_on', 32);
-            $table->decimal('min_value', 8, 2)->nullable();
-            $table->decimal('max_value', 8, 2)->nullable();
-            $table->decimal('min_weight', 8, 2)->nullable();
-            $table->decimal('max_weight', 8, 2)->nullable();
+            $table->decimal('min_value', 8, 2)->default(0.0);
+            $table->decimal('max_value', 8, 2)->default(0.0);
+            $table->decimal('min_weight', 8, 2)->default(0.0);
+            $table->decimal('max_weight', 8, 2)->default(0.0);
             $table->decimal('cost', 8, 2);
+            $table->boolean('cover_damage')->default(0);
+            $table->decimal('max_cover_amount', 8, 2)->default(0.0);
             $table->boolean('available')->default(0);
             $table->text('note')->nullable();
             $table->timestamps();

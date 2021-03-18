@@ -14,6 +14,7 @@ class CreateOrderDeliveryAddressesTable extends Migration
     public function up()
     {
         Schema::create('order_delivery_addresses', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('type');
             $table->string('address_line_1');

@@ -42,6 +42,20 @@ class CreateShippingRatesTable extends Migration
             ->on('shipping_zones')
             ->onDelete('cascade');
         });
+
+        Schema::table('shipping_rates', function (Blueprint $table) {
+            $table->foreign('package_size_id')
+            ->references('id')
+            ->on('shipping_package_sizes')
+            ->onDelete('cascade');
+        });
+
+        Schema::table('shipping_rates', function (Blueprint $table) {
+            $table->foreign('shipping_option_id')
+            ->references('id')
+            ->on('shipping_options')
+            ->onDelete('cascade');
+        });
     }
 
     /**

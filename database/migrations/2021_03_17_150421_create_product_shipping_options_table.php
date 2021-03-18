@@ -14,6 +14,7 @@ class CreateProductShippingOptionsTable extends Migration
     public function up()
     {
         Schema::create('product_shipping_options', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('product_id')->unsigned();
             $table->bigInteger('shipping_option_id')->unsigned();

@@ -8,6 +8,7 @@ use App\Models\ShippingRate;
 use Illuminate\Http\Request;
 use App\Models\ShippingZone;
 use App\Models\ShippingCountry;
+use App\Models\ShippingZoneProduct;
 
 class ShippingZoneController extends Controller
 {
@@ -66,6 +67,68 @@ class ShippingZoneController extends Controller
         return response()->json(['status' => 'success', 'data' => $shipping_zone]);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function products($shipping_zone_id)
+    {
+
+        try {
+            $products = ShippingZoneProduct::join('products', 'products.id', 'shipping_zone_products.product_id')
+            ->where('shipping_zone_id', $shipping_zone_id)
+                ->orderBy('products.title', 'asc')
+                ->get(['products.id', 'shipping_zone_products.shipping_zone_id', 'products.title'])->toArray();
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to get shipping zone products.']);
+        }
+
+
+        return response()->json(['status' => 'success', 'data' => $products]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function manageProducts(Request $request, $shipping_zone_id)
+    {
+        DB::beginTransaction();
+        try {
+            $products = $request->get('products');
+
+            //  print_r($products);
+            // clear all products of shipping zone 
+            DB::table('shipping_zone_products')->where('shipping_zone_id', $shipping_zone_id)->delete();
+            if (count($products) > 0) {
+
+
+                $shipping_zone_products = [];
+
+                foreach ($products as $product_id) {
+                    $shipping_zone_products[] = array(
+                        'shipping_zone_id' => $shipping_zone_id,
+                        'product_id' => $product_id,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'created_by' => auth()->user()->id
+                    );
+                }
+
+                DB::table('shipping_zone_products')->insert($shipping_zone_products);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone products.']);
+        }
+
+        DB::commit();
+        return response()->json(['status' => 'success', 'message' => 'Shipping zone products successfully updated.']);
+    }
+
 
 
     /**
@@ -79,8 +142,8 @@ class ShippingZoneController extends Controller
 
         try {
             $countries = ShippingCountry::where('shipping_zone_id', $shipping_zone_id)
-                ->orderBy('label', 'asc')
-                ->get(['code', 'label'])->toArray();
+                ->orderBy('country_code', 'asc')
+                ->get(['country_code'])->toArray();
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to get zone countries.']);
         }
@@ -113,8 +176,7 @@ class ShippingZoneController extends Controller
                 foreach ($countries as $country) {
                     $shipping_countries[] = array(
                         'shipping_zone_id' => $shipping_zone_id,
-                        'code' => $country['code'],
-                        'label' => $country['label'],
+                        'country_code' => $country['code'],
                         'created_at' => date('Y-m-d H:i:s'),
                         'created_by' => auth()->user()->id
                     );

@@ -48,6 +48,9 @@ Route::group([
     Route::post('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@store');
     Route::get('shipping-zones/{zone_id}/rates', 'Api\ShippingRateController@index');
 
+    Route::put('shipping-zones/{zone_id}/products', 'Api\ShippingZoneController@manageProducts');
+    Route::get('shipping-zones/{zone_id}/products', 'Api\ShippingZoneController@products');
+
     Route::put('shipping-zones/{zone_id}/countries', 'Api\ShippingZoneController@manageShippingCountries');
     Route::get('shipping-zones/{zone_id}/countries', 'Api\ShippingZoneController@countries');
 

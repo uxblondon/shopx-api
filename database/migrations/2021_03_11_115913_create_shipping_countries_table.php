@@ -17,8 +17,7 @@ class CreateShippingCountriesTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('shipping_zone_id')->unsigned();
-            $table->string('code');
-            $table->string('label');
+            $table->string('country_code');
             $table->dateTime('created_at');
             $table->integer('created_by');
         });

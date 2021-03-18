@@ -14,6 +14,7 @@ class CreateShippingPackageSizesTable extends Migration
     public function up()
     {
         Schema::create('shipping_package_sizes', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('format');
             
@@ -25,7 +26,7 @@ class CreateShippingPackageSizesTable extends Migration
             $table->decimal('max_weight', 8, 2)->nullable();
 
             $table->boolean('available')->default(1);
-            $table->text('remark')->nullable();
+            $table->text('note')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->integer('created_by');

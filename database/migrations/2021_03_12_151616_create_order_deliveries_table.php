@@ -14,6 +14,7 @@ class CreateOrderDeliveriesTable extends Migration
     public function up()
     {
         Schema::create('order_deliveries', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('delivery_option_id')->unsigned();

@@ -14,6 +14,7 @@ class CreateOrderPaymentsTable extends Migration
     public function up()
     {
         Schema::create('order_payments', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned();
             $table->string('payment_type', 60)->nullable();

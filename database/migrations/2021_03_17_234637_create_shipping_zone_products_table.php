@@ -14,6 +14,7 @@ class CreateShippingZoneProductsTable extends Migration
     public function up()
     {
         Schema::create('shipping_zone_products', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('shipping_zone_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();

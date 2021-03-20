@@ -126,6 +126,7 @@ class ProductsTableSeeder extends Seeder
                     'length' => rand(9, 99),
                     'width' => rand(9, 99),
                     'height' => rand(9, 99),
+                    'stock' => rand(9, 99),
                     'variant_1_id' => isset($product_variant_types[0])? $product_variant_types[0]['id'] : null,
                     'variant_1_value' => isset($product_variant_types[0])? trim(explode(',', $product_variant_types[0]['options'])[rand(0, count(explode(',', $product_variant_types[0]['options']))-1)]) : null,
                     'variant_2_id' => isset($product_variant_types[1])? $product_variant_types[1]['id'] : null,

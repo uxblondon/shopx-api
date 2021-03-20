@@ -30,6 +30,8 @@ class CreateProductVariantsTable extends Migration
             $table->boolean('separated_shipping_required')->default(0);
             $table->decimal('additional_shipping_cost', 8, 2)->default(0.0);
 
+            $table->bigInteger('stock')->default(0);
+
             $table->bigInteger('variant_1_id')->nullable();
             $table->string('variant_1_value')->nullable();
             $table->bigInteger('variant_2_id')->nullable();
@@ -37,7 +39,7 @@ class CreateProductVariantsTable extends Migration
             $table->bigInteger('variant_3_id')->nullable();
             $table->string('variant_3_value')->nullable();
 
-            $table->boolean('available')->default(0);
+           
 
             $table->timestamps();
             $table->softDeletes();

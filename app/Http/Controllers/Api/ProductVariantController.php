@@ -104,14 +104,13 @@ class ProductVariantController extends Controller
                 'length' => $request->get('length'),
                 'width' => $request->get('width'),
                 'height' => $request->get('height'),
-                'shipping_cost' => $request->get('shipping_cost'),
                 'variant_1_id' => $request->get('variant_1_id'),
                 'variant_1_value' => $request->get('variant_1_value'),
                 'variant_2_id' => $request->get('variant_2_id'),
                 'variant_2_value' => $request->get('variant_2_value'),
                 'variant_3_id' => $request->get('variant_3_id'),
                 'variant_3_value' => $request->get('variant_3_value'),
-                'available' => $request->get('available'),
+                'stock' => $request->get('stock'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => auth()->user()->id,
             );
@@ -119,6 +118,8 @@ class ProductVariantController extends Controller
             $shipping_not_required =  $request->get('shipping_not_required');
             if($shipping_not_required === 0) {
                 $product_variant_data['shipping_not_required'] = 0;
+                $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
+                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
             }
     
             ProductVariant::where('id', $variant_id)->where('product_id', $product_id)

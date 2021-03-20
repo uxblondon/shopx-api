@@ -102,6 +102,8 @@ class ProductVariantController extends Controller
                 'price' => $request->get('price'),
                 'weight' => $request->get('weight'),
                 'dimensions' => $request->get('dimensions'),
+                'dimensions' => $request->get('dimensions'),
+                'dimensions' => $request->get('dimensions'),
                 'shipping_cost' => $request->get('shipping_cost'),
                 'variant_1_id' => $request->get('variant_1_id'),
                 'variant_1_value' => $request->get('variant_1_value'),
@@ -113,6 +115,11 @@ class ProductVariantController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updated_by' => auth()->user()->id,
             );
+
+            $shipping_not_required =  $request->get('shipping_not_required');
+            if($shipping_not_required === 0) {
+                $product_variant_data['shipping_not_required'] = 0;
+            }
     
             ProductVariant::where('id', $variant_id)->where('product_id', $product_id)
             ->update($product_variant_data);

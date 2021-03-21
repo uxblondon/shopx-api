@@ -46,7 +46,7 @@ class ProductController extends Controller
             $join->on('products.id', 'product_variants.product_id')
             ->whereNull('product_variants.deleted_at');
         } )
-            ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), 'products.status'])
+            ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), DB::raw('sum(product_variants.stock) as stock'), 'products.status'])
             ->groupBy('products.id')
             ->get();
 

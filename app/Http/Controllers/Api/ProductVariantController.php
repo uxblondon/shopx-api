@@ -42,20 +42,28 @@ class ProductVariantController extends Controller
         try {
             $product_variant_data = array(
                 'product_id' => $product_id,
-                'sku' => $request->get('sku'),
+                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : uniqid(),
                 'price' => $request->get('price'),
                 'weight' => $request->get('weight'),
-                'dimensions' => $request->get('dimensions'),
-                'shipping_cost' => $request->get('shipping_cost'),
+                'length' => $request->get('length'),
+                'width' => $request->get('width'),
+                'height' => $request->get('height'),
                 'variant_1_id' => $request->get('variant_1_id'),
                 'variant_1_value' => $request->get('variant_1_value'),
                 'variant_2_id' => $request->get('variant_2_id'),
                 'variant_2_value' => $request->get('variant_2_value'),
                 'variant_3_id' => $request->get('variant_3_id'),
                 'variant_3_value' => $request->get('variant_3_value'),
-                'available' => $request->get('available'),
+                'stock' => $request->get('stock'),
                 'created_by' => auth()->user()->id,
             );
+
+            $shipping_not_required =  $request->get('shipping_not_required');
+            if($shipping_not_required === 0) {
+                $product_variant_data['shipping_not_required'] = 0;
+                $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
+                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
+            }
     
             $product_variant = ProductVariant::create($product_variant_data);
         } catch (\Exception $e) {
@@ -98,7 +106,7 @@ class ProductVariantController extends Controller
     {
         try {
             $product_variant_data = array(
-                'sku' => $request->get('sku'),
+                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : uniqid(),
                 'price' => $request->get('price'),
                 'weight' => $request->get('weight'),
                 'length' => $request->get('length'),

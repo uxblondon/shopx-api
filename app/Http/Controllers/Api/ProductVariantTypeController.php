@@ -130,8 +130,8 @@ class ProductVariantTypeController extends Controller
                 $variant_data['variant_2_id'] = null;
                 $variant_data['variant_2_value'] = null;
             } elseif($product_variant_type && $product_variant_type->variant_no === 3) {
-                $variant_data['variant_2_id'] = null;
-                $variant_data['variant_2_value'] = null;
+                $variant_data['variant_3_id'] = null;
+                $variant_data['variant_3_value'] = null;
             }
 
             ProductVariant::where('product_id', $product_id)->update($variant_data);

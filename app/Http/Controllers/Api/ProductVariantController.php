@@ -40,14 +40,16 @@ class ProductVariantController extends Controller
     public function store(StoreProductVariantRequest $request, $product_id)
     {
         try {
+            $shipping_not_required =  $request->get('shipping_not_required');
             $product_variant_data = array(
                 'product_id' => $product_id,
-                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : uniqid(),
+                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : strtoupper(uniqid()),
                 'price' => $request->get('price'),
                 'weight' => $request->get('weight'),
                 'length' => $request->get('length'),
                 'width' => $request->get('width'),
                 'height' => $request->get('height'),
+                'shipping_not_required' => $shipping_not_required,
                 'variant_1_id' => $request->get('variant_1_id'),
                 'variant_1_value' => $request->get('variant_1_value'),
                 'variant_2_id' => $request->get('variant_2_id'),
@@ -58,9 +60,7 @@ class ProductVariantController extends Controller
                 'created_by' => auth()->user()->id,
             );
 
-            $shipping_not_required =  $request->get('shipping_not_required');
             if($shipping_not_required === 0) {
-                $product_variant_data['shipping_not_required'] = 0;
                 $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
                 $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
             }
@@ -105,13 +105,15 @@ class ProductVariantController extends Controller
     public function update(UpdateProductVariantRequest $request, $product_id, $variant_id)
     {
         try {
+            $shipping_not_required =  $request->get('shipping_not_required');
             $product_variant_data = array(
-                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : uniqid(),
+                'sku' => trim($request->get('sku')) !== '' ? $request->get('sku') : strtoupper(uniqid()),
                 'price' => $request->get('price'),
                 'weight' => $request->get('weight'),
                 'length' => $request->get('length'),
                 'width' => $request->get('width'),
                 'height' => $request->get('height'),
+                'shipping_not_required' => $shipping_not_required,
                 'variant_1_id' => $request->get('variant_1_id'),
                 'variant_1_value' => $request->get('variant_1_value'),
                 'variant_2_id' => $request->get('variant_2_id'),
@@ -123,9 +125,7 @@ class ProductVariantController extends Controller
                 'updated_by' => auth()->user()->id,
             );
 
-            $shipping_not_required =  $request->get('shipping_not_required');
             if($shipping_not_required === 0) {
-                $product_variant_data['shipping_not_required'] = 0;
                 $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
                 $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
             }

@@ -42,10 +42,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::leftJoin('product_variants', function($join){
+        $products = Product::leftJoin('product_variants', function ($join) {
             $join->on('products.id', 'product_variants.product_id')
-            ->whereNull('product_variants.deleted_at');
-        } )
+                ->whereNull('product_variants.deleted_at');
+        })
             ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), DB::raw('sum(product_variants.stock) as stock'), 'products.status'])
             ->groupBy('products.id')
             ->get();
@@ -207,21 +207,28 @@ class ProductController extends Controller
             $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
 
             $variant_types = ProductVariantType::where('product_id', $product_id)
+                ->whereNull('deleted_at')
                 ->orderBy('variant_no', 'asc')
                 ->get(['id', 'product_id', 'variant_no', 'name', 'options']);
-            
+
             $product_variant_type = [];
-            if($variant_types->count() > 0) {
-                foreach($variant_types as $variant_type) {
+            if ($variant_types->count() > 0) {
+                foreach ($variant_types as $variant_type) {
                     $product_variant_type[$variant_type['variant_no']] = $variant_type;
                 }
             }
 
             $variants['types'] = $product_variant_type;
 
-            $variants['values'] = ProductVariant::leftJoin('product_variant_types as variant_1', 'variant_1.id', 'product_variants.variant_1_id')
-                ->leftJoin('product_variant_types as variant_2', 'variant_2.id', 'product_variants.variant_2_id')
-                ->leftJoin('product_variant_types as variant_3', 'variant_3.id', 'product_variants.variant_3_id')
+            $variants['values'] = ProductVariant::leftJoin('product_variant_types as variant_1', function ($join) {
+                $join->on('variant_1.id', 'product_variants.variant_1_id')->whereNull('variant_1.deleted_at');
+            })
+                ->leftJoin('product_variant_types as variant_2', function ($join) {
+                    $join->on('variant_2.id', 'product_variants.variant_2_id')->whereNull('variant_2.deleted_at');
+                })
+                ->leftJoin('product_variant_types as variant_3', function ($join) {
+                    $join->on('variant_3.id', 'product_variants.variant_3_id')->whereNull('variant_3.deleted_at');
+                })
                 ->where('product_variants.product_id', $product_id)
                 ->get([
                     'product_variants.id',
@@ -304,10 +311,9 @@ class ProductController extends Controller
 
             if ($request->has('status') && $request->get('status') != '') {
 
-                if($request->get('status') === 'published') {
+                if ($request->get('status') === 'published') {
                     $product_data['status'] = 'published';
                     $product_data['published_at'] = date('Y-m-d H:i:s');
-
                 }
 
                 $product_data['status'] = $request->get('status');
@@ -324,7 +330,7 @@ class ProductController extends Controller
 
 
             $update_product = Product::where('id', $product_id)->update($product_data);
-            
+
             if ($update_product && $request->has('categories') && count($request->get('categories')) > 0) {
                 $categories = $request->get('categories');
                 ProductCategory::where('product_id', $product_id)->delete();

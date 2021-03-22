@@ -120,7 +120,7 @@ class ProductsTableSeeder extends Seeder
             for($pv = 0; $pv < rand(1,5); $pv++) {
                 $product_variant = array(
                     'product_id' => $product->id,
-                    'sku' => $fake->ean8,
+                    'sku' => strtoupper(uniqid()),
                     'price' => rand(9, 99),
                     'weight' => rand(5,50)/100,
                     'length' => rand(9, 99),

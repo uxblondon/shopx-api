@@ -31,6 +31,7 @@ class CreateProductVariantsTable extends Migration
             $table->decimal('additional_shipping_cost', 8, 2)->default(0.0);
 
             $table->bigInteger('stock')->default(0);
+            $table->boolean('track_inventory')->default(0);
 
             $table->bigInteger('variant_1_id')->nullable();
             $table->string('variant_1_value')->nullable();

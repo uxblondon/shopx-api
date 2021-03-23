@@ -17,13 +17,20 @@ class CreateOrderItemsTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned();
             $table->bigInteger('variant_id')->unsigned();
 
             $table->string('sku')->nullable();
             $table->decimal('price', 8, 2);
             $table->decimal('weight', 8, 2)->default(0.0);
-            $table->string('dimensions')->nullable();
-            $table->decimal('shipping_cost', 8, 2)->default(0.0);
+
+            $table->decimal('length', 8, 2);
+            $table->decimal('width', 8, 2);
+            $table->decimal('height', 8, 2);
+            
+            $table->boolean('shipping_not_required')->default(0);
+            $table->boolean('separated_shipping_required')->default(0);
+            $table->decimal('additional_shipping_cost', 8, 2)->default(0.0);
 
             $table->string('variant_1_name')->nullable();
             $table->string('variant_1_value')->nullable();

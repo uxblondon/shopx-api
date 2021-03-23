@@ -17,11 +17,13 @@ class CreateOrderDeliveriesTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('order_id')->unsigned();
-            $table->bigInteger('delivery_option_id')->unsigned();
-            $table->string('delivery_option_label');
+            $table->bigInteger('shipping_rate_id')->unsigned();
+            $table->text('shipping_label');
             $table->boolean('different_billing_address')->default(0);
             $table->decimal('cost', 8, 2);
             $table->decimal('additional_cost', 8, 2)->default(0.0);
+            $table->boolean('cover_damage')->default(0);
+            $table->decimal('max_cover_amount', 8, 2)->default(0.0);
             $table->timestamps();
             $table->softDeletes();
         });

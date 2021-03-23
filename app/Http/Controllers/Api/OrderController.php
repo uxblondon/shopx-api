@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
+use DB;
 use Illuminate\Http\Request;
 use App\Models\Order;
 
@@ -18,9 +19,12 @@ class OrderController extends Controller
     {
         $orders = Order::join('order_payments', 'order_payments.order_id', 'orders.id')
         ->join('order_items', 'order_items.order_id', 'orders.id')
+        ->select(['orders.id', 'orders.name', 'orders.email', DB::raw('count(order_items.id) as no_of_items'), 'orders.created_at', 'order_payments.payment_type', 'order_payments.amount'])
         ->orderBy('orders.created_at', 'desc')
+        ->groupBy('orders.id')
+        ->groupBy('order_payments.id')
         ->get();
-        
+
         return response()->json(['status' => 'success', 'data' => $orders]);
     }
 

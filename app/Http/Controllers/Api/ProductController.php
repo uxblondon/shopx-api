@@ -316,15 +316,15 @@ class ProductController extends Controller
                     'product_variants.variant_1_id',
                     'variant_1.name as variant_1_name',
                     'variant_1.options as variant_1_options',
-                    'product_variants..variant_1_value as variant_1_value',
+                    'product_variants.variant_1_value as variant_1_value',
                     'variant_2.id as variant_2_id',
                     'variant_2.name as variant_2_name',
                     'variant_2.options as variant_2_options',
-                    'product_variants..variant_2_value as variant_2_value',
+                    'product_variants.variant_2_value as variant_2_value',
                     'variant_3.id as variant_3_id',
                     'variant_3.name as variant_3_name',
                     'variant_3.options as variant_3_options',
-                    'product_variants..variant_3_value as variant_3_value',
+                    'product_variants.variant_3_value as variant_3_value',
                 ])
                 ->toArray();
 

@@ -11,6 +11,10 @@ use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Models\ProductVariantType;
 use App\Models\ProductVariant;
+
+use App\Models\ShippingZoneProduct;
+use App\Models\ProductShippingOption;
+
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\FilterProductRequest;
@@ -163,6 +167,72 @@ class ProductController extends Controller
         }
 
         return response()->json(['status' => 'success', 'message' => 'Product successfully created.',  'data' => $product]);
+    }
+
+    public function manageShipping(Request $request, $product_id)
+    {
+        DB::beginTransaction();
+        try {
+            DB::table('shipping_zone_products')->where('product_id', $product_id)->delete();
+            $shipping_zones = $request->get('shipping_zones');
+            if(count($shipping_zones)>0) {
+                $shipping_zone_data = [];
+                foreach($shipping_zones as $shipping_zone) {
+                        $shipping_zone_data[] = array(
+                            'shipping_zone_id' => $shipping_zone['id'],
+                            'product_id' => $product_id,
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'created_by' => auth()->user()->id
+                        );
+                }
+                DB::table('shipping_zone_products')->insert($shipping_zone_data);
+            }
+
+            DB::table('product_shipping_options')->where('product_id', $product_id)->delete();
+            $shipping_options = $request->get('shipping_options');
+            if (count($shipping_options) > 0) {
+                $product_shipping_options = [];
+                foreach ($shipping_options as $shipping_option) {
+                        $product_shipping_options[] = array(
+                            'product_id' => $product_id,
+                            'shipping_option_id' => $shipping_option['id'],
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'created_by' => auth()->user()->id
+                        );
+                }
+                DB::table('product_shipping_options')->insert($product_shipping_options);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update product shipping.']);
+        }
+
+        DB::commit();
+        return response()->json(['status' => 'success', 'message' => 'Product shipping successfully updated.']);
+    }
+
+
+
+    public function shipping($product_id)
+    {
+        $shipping_zones = ShippingZoneProduct::join('shipping_zones', function ($join) {
+            $join->on('shipping_zones.id', 'shipping_zone_products.shipping_zone_id')->where('shipping_zones.deleted_at');
+        })->where('shipping_zone_products.product_id', $product_id)
+        ->orderBy('shipping_zones.title')
+        ->get(['shipping_zones.id', 'shipping_zones.title'])
+        ->toArray();
+
+        $shipping_options = ProductShippingOption::join('shipping_options', function($join) {
+            $join->on('shipping_options.id', 'product_shipping_options.shipping_option_id')->where('shipping_options.deleted_at');
+        })->where('product_shipping_options.product_id', $product_id)
+        ->orderBy('provider')
+        ->get(['shipping_options.id', 'shipping_options.provider', 'shipping_options.service', 'shipping_options.speed'])
+        ->toArray();
+
+        return response()->json(['status' => 'success',  'data' => [
+            'zones' => $shipping_zones,
+            'options' => $shipping_options,
+        ]]);
     }
 
     /**

@@ -102,6 +102,15 @@ Route::group([
     Route::put('products/{product_id}', 'Api\ProductController@update');
     Route::post('products', 'Api\ProductController@store');
 
+
+    Route::delete('orders/{order_id}', 'Api\OrderController@destroy');
+    Route::put('orders/{order_id}', 'Api\OrderController@update');
+    Route::post('orders', 'Api\OrderController@store');
+    Route::get('orders/{order_id}', 'Api\OrderController@show');
+    Route::post('orders/filter', 'Api\OrderController@filter');
+    Route::get('orders', 'Api\OrderController@index');
+
+
     Route::delete('customers/{customer_id}/addresses/{address_id}', 'Api\CustomerController@destroy');
     Route::put('customers/{customer_id}/addresses/{address_id}', 'Api\CustomerController@update');
     Route::post('customers/{customer_id}/addresses', 'Api\CustomerController@store');

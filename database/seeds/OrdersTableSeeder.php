@@ -21,6 +21,66 @@ class OrdersTableSeeder extends Seeder
     {
         $fake = Faker\Factory::create();
         $payment_types = ['Paypal', 'Stripe'];
+        $countries = [
+            "AL",
+            "AD",
+            "AZ",
+            "AT",
+            "AM",
+            "BE",
+            "BA",
+            "BG",
+            "BY",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FO",
+            "FI",
+            "AX",
+            "FR",
+            "GE",
+            "DE",
+            "GI",
+            "GR",
+            "VA",
+            "HU",
+            "IS",
+            "IE",
+            "IT",
+            "KZ",
+            "LV",
+            "LI",
+            "LT",
+            "LU",
+            "MT",
+            "MC",
+            "MD",
+            "ME",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "RU",
+            "SM",
+            "RS",
+            "SK",
+            "SI",
+            "ES",
+            "SJ",
+            "SE",
+            "CH",
+            "TR",
+            "UA",
+            "MK",
+            "GB",
+            "GG",
+            "JE",
+            "IM",
+          ];
+        
 
         for ($u = 0; $u < 100; $u++) {
             $order_data = array(
@@ -93,6 +153,34 @@ class OrdersTableSeeder extends Seeder
             );
 
             $order_delivery = OrderDelivery::create($order_delivery_data);
+
+            $shipping_address_data = array(
+                'order_id' => $order->id,
+                'type' => 'shipping',
+                'name' => $order->name,
+                'phone' => $fake->phoneNumber,
+                'address_line_1' => $fake->streetName,
+                'city' => $fake->city,
+                'postcode' => $fake->postcode,
+                'country_code' => rand(0, count($countries)-1),
+            );
+
+            OrderDeliveryAddress::create($shipping_address_data);
+
+            if($order_delivery->different_billing_address === 1) {
+                $billing_address_data = array(
+                    'order_id' => $order->id,
+                    'type' => 'billing',
+                    'name' => $order->name,
+                    'phone' => $fake->phoneNumber,
+                    'address_line_1' => $fake->streetName,
+                    'city' => $fake->city,
+                    'postcode' => $fake->postcode,
+                    'country_code' => rand(0, count($countries)-1),
+                );
+    
+                OrderDeliveryAddress::create($billing_address_data);
+            }
         }
     }
 }

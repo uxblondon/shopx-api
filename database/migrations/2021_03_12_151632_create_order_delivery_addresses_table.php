@@ -16,7 +16,10 @@ class CreateOrderDeliveryAddressesTable extends Migration
         Schema::create('order_delivery_addresses', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+            $table->bigInteger('order_id')->unsigned();
             $table->string('type');
+            $table->string('name');
+            $table->string('phone')->nullable();
             $table->string('address_line_1');
             $table->string('address_line_2')->nullable();
             $table->string('city');

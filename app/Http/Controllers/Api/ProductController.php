@@ -50,8 +50,13 @@ class ProductController extends Controller
             $join->on('products.id', 'product_variants.product_id')
                 ->whereNull('product_variants.deleted_at');
         })
-            ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), DB::raw('sum(product_variants.stock) as stock'), 'products.status'])
+        ->leftJoin('product_images', function($join){
+            $join->on('product_images.product_id', 'products.id')
+            ->where('product_images.feature_image', 1);
+        })
+            ->select(['products.id', 'products.title', 'products.standfirst', DB::raw('count(product_variants.id) as no_of_variants'), DB::raw('min(product_variants.price) as price_from'), DB::raw('sum(product_variants.stock) as stock'), 'product_images.description as feature_image_description', 'product_images.location as feature_image_location', 'products.status'])
             ->groupBy('products.id')
+            ->groupBy('product_images.id')
             ->get();
 
         return response()->json(['status' => 'success', 'data' => $products]);

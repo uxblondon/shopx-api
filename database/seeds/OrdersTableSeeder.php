@@ -162,7 +162,7 @@ class OrdersTableSeeder extends Seeder
                 'address_line_1' => $fake->streetName,
                 'city' => $fake->city,
                 'postcode' => $fake->postcode,
-                'country_code' => rand(0, count($countries)-1),
+                'country_code' => $countries[rand(0, count($countries)-1)],
             );
 
             OrderDeliveryAddress::create($shipping_address_data);
@@ -176,7 +176,7 @@ class OrdersTableSeeder extends Seeder
                     'address_line_1' => $fake->streetName,
                     'city' => $fake->city,
                     'postcode' => $fake->postcode,
-                    'country_code' => rand(0, count($countries)-1),
+                    'country_code' => $countries[rand(0, count($countries)-1)],
                 );
     
                 OrderDeliveryAddress::create($billing_address_data);

@@ -378,8 +378,103 @@ class ShippingsTableSeeder extends Seeder
             DB::table('shipping_zone_products')->insert($shipping_zone_products);
 
 
-        }
+            // shipping rates 
+            $shipping_package_sizes = ShippingPackageSize::where('available', 1)->pluck('id');
+            $shipping_options = ShippingOption::where('available', 1)->pluck('id');
+            $shipping_rate_data = array(
+                [
+                    'shipping_zone_id' => $shipping_zone->id,
+                    'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+                    'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                    'cost_based_on' => 'basket_weight',
+                    'min_weight' => 0,
+                    'max_weight' => 100,
+                    'cost' => 8,
+                    'cover_damage' => 1,
+                    'max_cover_amount' => 250,
+                    'available' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => 1,
+                ],
+                [
+                    'shipping_zone_id' => $shipping_zone->id,
+                    'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+                    'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                    'cost_based_on' => 'basket_weight',
+                    'min_weight' => 101,
+                    'max_weight' => 250,
+                    'cost' => 12,
+                    'cover_damage' => 1,
+                    'max_cover_amount' => 500,
+                    'available' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => 1,
+                ],
+                [
+                    'shipping_zone_id' => $shipping_zone->id,
+                    'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+                    'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                    'cost_based_on' => 'basket_weight',
+                    'min_weight' => 251,
+                    'max_weight' => 1000,
+                    'cost' => 15,
+                    'cover_damage' => 1,
+                    'max_cover_amount' => 250,
+                    'available' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => 1,
+                ],
+                [
+                    'shipping_zone_id' => $shipping_zone->id,
+                    'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+                    'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                    'cost_based_on' => 'basket_weight',
+                    'min_weight' => 1001,
+                    'max_weight' => 2000,
+                    'cost' => 20,
+                    'cover_damage' => 1,
+                    'max_cover_amount' => 750,
+                    'available' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => 1,
+                ],
+                [
+                    'shipping_zone_id' => $shipping_zone->id,
+                    'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+                    'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                    'cost_based_on' => 'basket_weight',
+                    'min_weight' => 2001,
+                    'max_weight' => 20000,
+                    'cost' => 25,
+                    'cover_damage' => 1,
+                    'max_cover_amount' => 2500,
+                    'available' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => 1,
+                ],
+            );
 
-        
+
+            // for ($sh = 0; $sh <= 4; $sh++) {
+            //     $shipping_rate_data[] = array(
+            //         'shipping_zone_id' => $shipping_zone->id,
+            //         'package_size_id' => $shipping_package_sizes[rand(0, count($shipping_package_sizes) - 1)],
+            //         'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+            //         'cost_based_on' => 'basket_weight',
+            //         'min_value' => 0,
+            //         'max_value' => 20000,
+            //         'min_weight' => 0,
+            //         'max_weight' => 20000,
+            //         'cost' => 8,
+            //         'cover_damage' => 1,
+            //         'max_cover_amount' => 250,
+            //         'available' => 1,
+            //         'created_at' => date('Y-m-d H:i:s'),
+            //         'created_by' => 1,
+            //     );
+            // }
+
+            DB::table('shipping_rates')->insert($shipping_rate_data);
+        }
     }
 }

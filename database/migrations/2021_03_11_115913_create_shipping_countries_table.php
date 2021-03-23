@@ -18,7 +18,7 @@ class CreateShippingCountriesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('shipping_zone_id')->unsigned();
             $table->string('country_code');
-            $table->dateTime('created_at');
+            $table->timestamps();
             $table->integer('created_by');
         });
 

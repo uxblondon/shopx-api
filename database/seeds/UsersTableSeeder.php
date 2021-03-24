@@ -12,14 +12,35 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $user = array(
+        $users[] = array(
             'admin' => 1,
-            'name' => 'Admin',
-            'email' => 'admin@shopx.com',
-            'password' => bcrypt('password')
+            'name' => 'Hasan Tareque',
+            'email' => 'hasan@uxblondon.com',
+            'password' => bcrypt('password'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => 1,
         );
 
-        User::create($user);
+        $users[] = array(
+            'admin' => 1,
+            'name' => 'Paul Nanneley',
+            'email' => 'paul@uxblondon.com',
+            'password' => bcrypt('password'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => 1,
+        );
+
+        $users[] = array(
+            'admin' => 1,
+            'name' => 'Sean O\'Halloran',
+            'email' => 'sean@uxblondon.com',
+            'password' => bcrypt('password'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => 1,
+        );
+
+
+        DB::table('users')->insert($users);
         
     }
 }

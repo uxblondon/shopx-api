@@ -62,7 +62,7 @@ class ProductVariantController extends Controller
 
             if($shipping_not_required === 0) {
                 $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
-                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
+                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost') > 0 ? $request->get('additional_shipping_cost') : 0;
             }
     
             $product_variant = ProductVariant::create($product_variant_data);
@@ -127,7 +127,7 @@ class ProductVariantController extends Controller
 
             if($shipping_not_required === 0) {
                 $product_variant_data['separated_shipping_required'] = $request->get('separated_shipping_required');
-                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost');
+                $product_variant_data['additional_shipping_cost'] = $request->get('additional_shipping_cost') > 0 ? $request->get('additional_shipping_cost') : 0;
             }
     
             ProductVariant::where('id', $variant_id)->where('product_id', $product_id)

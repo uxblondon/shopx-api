@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use DB;
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\StoreAddress;
 use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Http\Requests\StoreCategoryRequest;
@@ -16,7 +16,7 @@ use App\Http\Requests\UpdateCategoryRequest;
  *     description="All Endpoints of Category"
  * )
  */
-class CategoryController extends Controller
+class StoreAddressController extends Controller
 {
     /**
      * @OA\Get(
@@ -41,6 +41,16 @@ class CategoryController extends Controller
             ->get();
 
         return response()->json(['status' => 'success', 'data' => $categories]);
+    }
+
+
+    public function availableCollectionAddresses()
+    {
+        $addresses = StoreAddress::where('type', 'collection')->where('active', 1)->get([
+            'id', 'address_line_1', 'address_line_2', 'city', 'county', 'country_code', 'remark'
+        ])->toArray();
+
+        return response()->json(['status' => 'success', 'data' => $addresses]);
     }
 
     /**

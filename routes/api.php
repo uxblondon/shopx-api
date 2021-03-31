@@ -42,6 +42,18 @@ Route::group([
     'middleware' => 'auth:api',
 ], function () {
 
+    Route::delete('store-addresses/{zone_id}', 'Api\StoreAddressController@destroy');
+    Route::put('store-addresses/{zone_id}', 'Api\StoreAddressController@update');
+    Route::get('store-addresses/{zone_id}', 'Api\StoreAddressController@show');
+    Route::post('store-addresses', 'Api\StoreAddressController@store');
+    Route::get('available-collection-addresses', 'Api\StoreAddressController@availableCollectionAddresses');
+    Route::get('available-store-addresses', 'Api\StoreAddressController@available');
+    Route::get('store-addresses', 'Api\StoreAddressController@index');
+
+
+
+
+
     Route::delete('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@destroy');
     Route::put('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@update');
     Route::get('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@show');

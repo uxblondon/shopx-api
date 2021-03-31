@@ -24,6 +24,7 @@ class CreateStoreAddressesTable extends Migration
             $table->string('postcode');
             $table->string('country_code');
             $table->text('remark')->nullable();
+            $table->boolean('active')->default(1);
             $table->timestamps();
             $table->softDeletes();
             $table->integer('created_by');

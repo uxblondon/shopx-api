@@ -23,7 +23,7 @@ class CreateShippingOptionsTable extends Migration
             $table->string('tracking_type')->nullable();
             $table->decimal('min_weight', 8, 2)->default(0.0);
             $table->decimal('max_weight', 8, 2)->default(0.0);        
-            $table->boolean('is_collection')->default(0);
+        //    $table->boolean('is_collection')->default(0);
             $table->boolean('available')->default(1);
             $table->text('note')->nullable();
             $table->timestamps();

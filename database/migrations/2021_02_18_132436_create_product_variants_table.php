@@ -28,6 +28,7 @@ class CreateProductVariantsTable extends Migration
             
             $table->boolean('shipping_not_required')->default(0);
             $table->boolean('separated_shipping_required')->default(0);
+            $table->boolean('collectable')->default(1);
             $table->decimal('additional_shipping_cost', 8, 2)->default(0.0);
 
             $table->bigInteger('stock')->default(0);

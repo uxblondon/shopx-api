@@ -18,8 +18,12 @@ class DeliveryOptionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($type, $address, $items)
+    public function options(Request $request)
     {
-        return response()->json(['status' => 'success', 'data' => array('test', 'test2')]);
+        return response()->json(['status' => 'success', 'data' => [
+            'option 1',
+            'option 2',
+            'option 3'
+        ]]);
     }
 }

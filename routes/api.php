@@ -42,6 +42,8 @@ Route::group([
     'middleware' => 'auth:api',
 ], function () {
 
+    
+
     Route::delete('store-addresses/{zone_id}', 'Api\StoreAddressController@destroy');
     Route::put('store-addresses/{zone_id}', 'Api\StoreAddressController@update');
     Route::get('store-addresses/{zone_id}', 'Api\StoreAddressController@show');
@@ -149,4 +151,6 @@ Route::group([
     Route::post('products/filter', 'Api\ProductController@filter');
     Route::get('products', 'Api\ProductController@index');
     Route::get('available-products', 'Api\ProductController@available');
+
+    Route::post('delivery-options', 'Api\DeliveryOptionController@options');
 });

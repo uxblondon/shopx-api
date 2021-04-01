@@ -47,7 +47,7 @@ class StoreAddressController extends Controller
     public function availableCollectionAddresses()
     {
         $addresses = StoreAddress::where('type', 'collection')->where('active', 1)->get([
-            'id', 'address_line_1', 'address_line_2', 'city', 'county', 'country_code', 'remark'
+            'id', 'address_line_1', 'address_line_2', 'city', 'county', 'postcode', 'country_code', 'remark'
         ])->toArray();
 
         return response()->json(['status' => 'success', 'data' => $addresses]);

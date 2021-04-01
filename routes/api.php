@@ -13,6 +13,27 @@ use Illuminate\Http\Request;
 |
 */
 
+/* public routes */
+Route::group([
+    'middleware' => 'api',
+], function () {
+    Route::get('categories/{category_id}', 'Api\CategoryController@show');
+    Route::post('categories/filter', 'Api\CategoryController@filter');
+    Route::get('categories', 'Api\CategoryController@index');
+
+    Route::get('products/{product_id}', 'Api\ProductController@show');
+    Route::post('products/filter', 'Api\ProductController@filter');
+    Route::get('products', 'Api\ProductController@index');
+    Route::get('available-products', 'Api\ProductController@available');
+
+    Route::post('delivery-options', 'Api\DeliveryOptionController@options');
+
+    Route::get('shipping-zones/shippable-countries', 'Api\ShippingZoneController@shippableCountries');
+    Route::get('available-collection-addresses', 'Api\StoreAddressController@availableCollectionAddresses');
+    Route::get('available-store-addresses', 'Api\StoreAddressController@available');
+    
+});
+
 /* auth routes */
 Route::group([
     'middleware' => 'auth:api',
@@ -42,14 +63,11 @@ Route::group([
     'middleware' => 'auth:api',
 ], function () {
 
-    
-
     Route::delete('store-addresses/{zone_id}', 'Api\StoreAddressController@destroy');
     Route::put('store-addresses/{zone_id}', 'Api\StoreAddressController@update');
     Route::get('store-addresses/{zone_id}', 'Api\StoreAddressController@show');
     Route::post('store-addresses', 'Api\StoreAddressController@store');
-    Route::get('available-collection-addresses', 'Api\StoreAddressController@availableCollectionAddresses');
-    Route::get('available-store-addresses', 'Api\StoreAddressController@available');
+    
     Route::get('store-addresses', 'Api\StoreAddressController@index');
 
 
@@ -139,18 +157,3 @@ Route::group([
     Route::get('customers', 'Api\CustomerController@index');
 });
 
-/* public routes */
-Route::group([
-    'middleware' => 'api',
-], function () {
-    Route::get('categories/{category_id}', 'Api\CategoryController@show');
-    Route::post('categories/filter', 'Api\CategoryController@filter');
-    Route::get('categories', 'Api\CategoryController@index');
-
-    Route::get('products/{product_id}', 'Api\ProductController@show');
-    Route::post('products/filter', 'Api\ProductController@filter');
-    Route::get('products', 'Api\ProductController@index');
-    Route::get('available-products', 'Api\ProductController@available');
-
-    Route::post('delivery-options', 'Api\DeliveryOptionController@options');
-});

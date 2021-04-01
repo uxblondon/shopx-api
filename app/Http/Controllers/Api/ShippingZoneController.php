@@ -130,6 +130,27 @@ class ShippingZoneController extends Controller
     }
 
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function shippableCountries()
+    {
+
+        try {
+            $countries = ShippingCountry::orderBy('country_code', 'asc')->distinct()
+                ->get(['country_code'])->pluck('country_code');
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Failed to shippable countries.']);
+        }
+
+
+        return response()->json(['status' => 'success', 'data' => $countries]);
+    }
+
+
 
     /**
      * Store a newly created resource in storage.

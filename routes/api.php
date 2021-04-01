@@ -27,6 +27,7 @@ Route::group([
     Route::get('available-products', 'Api\ProductController@available');
 
     Route::post('delivery-options', 'Api\DeliveryOptionController@options');
+    Route::post('collection-options', 'Api\CollectionOptionController@options');
 
     Route::get('shipping-zones/shippable-countries', 'Api\ShippingZoneController@shippableCountries');
     Route::get('available-collection-addresses', 'Api\StoreAddressController@availableCollectionAddresses');

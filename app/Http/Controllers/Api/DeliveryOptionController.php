@@ -114,6 +114,8 @@ class DeliveryOptionController extends Controller
         $total_value = 0;
         $total_weight = 0;
         $total_cbm = 0;
+        $total_additional_shipping_cost = 0;
+
         foreach ($items as $item) {
             $widths[] = $item['width'];
             $lengths[] = $item['length'];
@@ -121,6 +123,7 @@ class DeliveryOptionController extends Controller
             $total_value += $item['price'] * $item['quantity'];
             $total_weight += $item['weight'] * $item['quantity'];
             $total_cbm += ($item['width'] * $item['length'] * $item['height']) * $item['quantity'];
+            $total_additional_shipping_cost += $item['additional_shipping_cost'] * $item['quantity'];
         }
 
         if (count($items) > 0) {
@@ -145,6 +148,7 @@ class DeliveryOptionController extends Controller
 
                 if (count($options_by_basket_value) > 0) {
                     foreach ($options_by_basket_value as $option) {
+                        $option['additional_cost'] = $total_additional_shipping_cost;
                         $options[] = $option;
                     }
                 }
@@ -159,6 +163,7 @@ class DeliveryOptionController extends Controller
 
                 if (count($options_by_basket_weight) > 0) {
                     foreach ($options_by_basket_weight as $option) {
+                        $option['cost'] += $total_additional_shipping_cost;
                         $options[] = $option;
                     }
                 }

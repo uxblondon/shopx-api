@@ -336,6 +336,7 @@ class ProductController extends Controller
                     'product_variants.shipping_not_required',
                     'product_variants.separated_shipping_required',
                     'product_variants.additional_shipping_cost',
+                    'product_variants.collectable',
                     'product_variants.stock',
                     'product_variants.variant_1_id',
                     'variant_1.name as variant_1_name',

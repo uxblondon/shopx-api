@@ -15,7 +15,7 @@ class UsersTableSeeder extends Seeder
         $users[] = array(
             'admin' => 1,
             'name' => 'Hasan Tareque',
-            'email' => 'hasan@uxblondon.com',
+            'email' => 'admin@uxblondon.com',
             'password' => bcrypt('password'),
             'created_at' => date('Y-m-d H:i:s'),
             'created_by' => 1,

@@ -53,7 +53,7 @@ class ShippingPackageSizeController extends Controller
             'height' => $request->get('height'),
             'min_weight' => $request->get('min_weight'),
             'max_weight' => $request->get('max_weight'),
-            'remark' => $request->get('remark'),
+          //  'remark' => $request->get('remark'),
             'available' => $request->get('available'),
             'created_by' => auth()->user()->id
         );
@@ -171,7 +171,7 @@ class ShippingPackageSizeController extends Controller
                 'height' => $request->get('height'),
                 'min_weight' => $request->get('min_weight'),
                 'max_weight' => $request->get('max_weight'),
-                'remark' => $request->get('remark'),
+              //  'remark' => $request->get('remark'),
                 'available' => $request->get('available'),
                 'created_by' => auth()->user()->id
             );

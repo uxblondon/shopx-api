@@ -68,7 +68,7 @@ Route::group([
     Route::put('store-addresses/{zone_id}', 'Api\StoreAddressController@update');
     Route::get('store-addresses/{zone_id}', 'Api\StoreAddressController@show');
     Route::post('store-addresses', 'Api\StoreAddressController@store');
-    
+    Route::get('collection-addresses', 'Api\StoreAddressController@collectionAddresses');
     Route::get('store-addresses', 'Api\StoreAddressController@index');
 
 

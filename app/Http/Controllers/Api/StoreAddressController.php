@@ -43,6 +43,15 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'data' => $categories]);
     }
 
+    public function collectionAddresses()
+    {
+        $addresses = StoreAddress::where('type', 'collection')->get([
+            'id', 'address_line_1', 'address_line_2', 'city', 'county', 'postcode', 'country_code', 'remark'
+        ])->toArray();
+
+        return response()->json(['status' => 'success', 'data' => $addresses]);
+    }
+
 
     public function availableCollectionAddresses()
     {
@@ -118,19 +127,23 @@ class StoreAddressController extends Controller
      *        )
      *     )
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(Request $request)
     {
-        $category_data = array(
-            'title' => $request->get('title'),
-            'slug' => Str::slug($request->get('title')),
-            'standfirst' => $request->get('standfirst'),
-            'description' => $request->get('description'),
+        $address_data = array(
+            'type' => $request->get('title'),
+            'address_line_1' => $request->get('address_line_1'),
+            'address_line_2' => $request->get('address_line_2'),
+            'city' => $request->get('city'),
+            'county' => $request->get('county'),
+            'postcode' => $request->get('postcode'),
+            'country_code' => $request->get('country_code'),
+            'remark' => $request->get('remark'),
             'created_by' => auth()->user()->id
         );
 
-        $category = Category::create($category_data);
+        $address = StoreAddress::create($address_data);
 
-        return response()->json(['status' => 'success', 'data' => $category]);
+        return response()->json(['status' => 'success', 'data' => $address]);
     }
 
     /**

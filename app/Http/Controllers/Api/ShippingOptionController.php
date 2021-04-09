@@ -112,7 +112,6 @@ class ShippingOptionController extends Controller
             'provider' => $request->get('provider'),
             'service' => $request->get('service'),
             'speed' => $request->get('speed'),
-            'is_collection' => $request->get('is_collection'),
             'available' => $request->get('available'),
             'note' => $request->get('note'),
             'created_by' => auth()->user()->id
@@ -172,7 +171,6 @@ class ShippingOptionController extends Controller
                 'provider' => $request->get('provider'),
                 'service' => $request->get('service'),
                 'speed' => $request->get('speed'),
-                'is_collection' => $request->get('is_collection'),
                 'available' => $request->get('available'),
                 'note' => $request->get('note'),
                 'updated_at' => date('Y-m-d H:i:s'),

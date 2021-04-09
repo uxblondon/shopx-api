@@ -25,8 +25,8 @@ class CreateShippingRatesTable extends Migration
             $table->decimal('min_weight', 8, 2)->default(0.0);
             $table->decimal('max_weight', 8, 2)->default(0.0);
             $table->decimal('cost', 8, 2);
-            $table->boolean('cover_damage')->default(0);
-            $table->decimal('max_cover_amount', 8, 2)->default(0.0);
+          //  $table->boolean('cover_damage')->default(0);
+         //   $table->decimal('max_cover_amount', 8, 2)->default(0.0);
             $table->boolean('available')->default(0);
             $table->text('note')->nullable();
             $table->timestamps();

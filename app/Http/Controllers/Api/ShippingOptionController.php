@@ -32,7 +32,10 @@ class ShippingOptionController extends Controller
      */
     public function available()
     {
-        $shipping_options = ShippingOption::where('available', 1)->orderBy('provider')->orderBy('service')->get();
+        $shipping_options = ShippingOption::where('available', 1)
+        ->orderBy('provider')
+        ->orderBy('service')
+        ->get();
 
         return response()->json(['status' => 'success', 'data' => $shipping_options]);
     }
@@ -75,10 +78,7 @@ class ShippingOptionController extends Controller
             // clear all products of shipping zone 
             DB::table('product_shipping_options')->where('shipping_option_id', $shipping_option_id)->delete();
             if (count($products) > 0) {
-
-
                 $product_shipping_options = [];
-
                 foreach ($products as $product_id) {
                     $product_shipping_options[] = array(
                         'shipping_option_id' => $shipping_option_id,

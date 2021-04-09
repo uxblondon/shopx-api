@@ -40,8 +40,6 @@ class ShippingRateController extends Controller
                 'shipping_rates.min_weight',
                 'shipping_rates.max_weight',
                 'shipping_rates.cost',
-                'shipping_rates.cover_damage',
-                'shipping_rates.max_cover_amount',
                 'shipping_rates.available',
                 'shipping_rates.note',
             ]);
@@ -72,14 +70,12 @@ class ShippingRateController extends Controller
     {
         try {
             $cost_based_on = $request->get('cost_based_on');
-            $cover_damage = $request->get('cover_damage');
             $shipping_rate_data = array(
                 'shipping_zone_id' => $shipping_zone_id,
                 'package_size_id' => $request->get('package_size_id'),
                 'shipping_option_id' => $request->get('shipping_option_id'),
                 'cost_based_on' => $cost_based_on,
                 'cost' => $request->get('cost'),
-                'cover_damage' => $cover_damage,
                 'available' => $request->get('available'),
                 'note' => $request->get('note'),
                 'created_by' => auth()->user()->id
@@ -91,17 +87,8 @@ class ShippingRateController extends Controller
             } elseif ($cost_based_on === 'basket_value') {
                 $shipping_rate_data['min_value'] = $request->get('min_value');
                 $shipping_rate_data['max_value'] = $request->get('max_value');
-            } elseif($cost_based_on === 'basket_weight_and_value') {
-                $shipping_rate_data['min_value'] = $request->get('min_value');
-                $shipping_rate_data['max_value'] = $request->get('max_value');
-                $shipping_rate_data['min_weight'] = $request->get('min_weight');
-                $shipping_rate_data['max_weight'] = $request->get('max_weight');
-            }
+            } 
 
-            if($cover_damage === 1) {
-                $shipping_rate_data['max_cover_amount'] = $request->get('max_cover_amount');
-            }
-    
             $rate = ShippingRate::create($shipping_rate_data);
 
             $shipping_rate = ShippingRate::join('shipping_package_sizes', 'shipping_package_sizes.id', 'shipping_rates.package_size_id')
@@ -122,8 +109,6 @@ class ShippingRateController extends Controller
                 'shipping_rates.min_weight',
                 'shipping_rates.max_weight',
                 'shipping_rates.cost',
-                'shipping_rates.cover_damage',
-                'shipping_rates.max_cover_amount',
                 'shipping_rates.available',
                 'shipping_rates.note',
             ]);
@@ -168,13 +153,11 @@ class ShippingRateController extends Controller
     {
         try {
                 $cost_based_on = $request->get('cost_based_on');
-                $cover_damage = $request->get('cover_damage');
                 $shipping_rate_data = array(
                     'package_size_id' => $request->get('package_size_id'),
                     'shipping_option_id' => $request->get('shipping_option_id'),
                     'cost_based_on' => $cost_based_on,
                     'cost' => $request->get('cost'),
-                    'cover_damage' => $cover_damage,
                     'available' => $request->get('available'),
                     'note' => $request->get('note'),
                     'updated_at' => date('Y-m-d H:i:s'),
@@ -191,16 +174,7 @@ class ShippingRateController extends Controller
                   //  $shipping_rate_data['max_weight'] = NULL;
                     $shipping_rate_data['min_value'] = $request->get('min_value');
                     $shipping_rate_data['max_value'] = $request->get('max_value');
-                } elseif($cost_based_on === 'basket_weight_and_value') {
-                    $shipping_rate_data['min_value'] = $request->get('min_value');
-                    $shipping_rate_data['max_value'] = $request->get('max_value');
-                    $shipping_rate_data['min_weight'] = $request->get('min_weight');
-                    $shipping_rate_data['max_weight'] = $request->get('max_weight');
-                }
-
-                if($cover_damage === 1) {
-                    $shipping_rate_data['max_cover_amount'] = $request->get('max_cover_amount');
-                }
+                } 
         
                 ShippingRate::where('id', $shipping_rate_id)->where('shipping_zone_id', $shipping_zone_id)->update($shipping_rate_data);
     
@@ -222,8 +196,6 @@ class ShippingRateController extends Controller
                     'shipping_rates.min_weight',
                     'shipping_rates.max_weight',
                     'shipping_rates.cost',
-                    'shipping_rates.cover_damage',
-                    'shipping_rates.max_cover_amount',
                     'shipping_rates.available',
                     'shipping_rates.note',
                 ]);

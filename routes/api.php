@@ -30,7 +30,7 @@ Route::group([
     Route::post('collection-options', 'Api\CollectionOptionController@options');
 
     Route::get('shipping-zones/shippable-countries', 'Api\ShippingZoneController@shippableCountries');
-    Route::get('available-collection-addresses', 'Api\StoreAddressController@availableCollectionAddresses');
+    Route::get('active-collection-points', 'Api\CollectionPointController@activeCollectionPoints');
     Route::get('available-store-addresses', 'Api\StoreAddressController@available');
     
 });
@@ -72,8 +72,11 @@ Route::group([
     Route::get('store-addresses', 'Api\StoreAddressController@index');
 
 
-
-
+    Route::delete('collection-points/{collection_point_id}', 'Api\CollectionPointController@destroy');
+    Route::put('collection-points/{collection_point_id}', 'Api\CollectionPointController@update');
+    Route::get('collection-points/{collection_point_id}', 'Api\CollectionPointController@show');
+    Route::post('collection-points', 'Api\CollectionPointController@store');
+    Route::get('collection-points', 'Api\CollectionPointController@index');
 
     Route::delete('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@destroy');
     Route::put('shipping-zones/{zone_id}/rates/{rate_id}', 'Api\ShippingRateController@update');

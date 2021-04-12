@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\StoreAddress;
+use App\Models\CollectionPoint;
+use App\Models\CollectionRate;
 
 class CollectionTableSeeder extends Seeder
 {
@@ -15,15 +16,15 @@ class CollectionTableSeeder extends Seeder
         $fake = Faker\Factory::create();
 
         for ($a = 0; $a < 3; $a++) {
-            $address_data = array(
-                'type' => 'collection',
+            $collection_point_data = array(
+                'name' => $fake->name,
                 'address_line_1' => $fake->streetName,
                 'city' => $fake->city,
                 'postcode' => $fake->postcode,
                 'country_code' => 'GB',
                 'created_by' => 1,
             );
-            StoreAddress::create($address_data);
+            CollectionPoint::create($collection_point_data);
         }
     }
 }

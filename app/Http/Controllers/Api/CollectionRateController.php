@@ -14,9 +14,20 @@ class CollectionRateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($collection_point_id)
     {
-        //
+        try {
+            
+            $rates = CollectionRate::where('collection_rates.collection_point_id', $collection_point_id)
+            ->orderBy('collection_rates.cost')
+            ->get()
+            ->toArray();
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage()]);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $rates]);
     }
 
     /**
@@ -26,7 +37,6 @@ class CollectionRateController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -35,9 +45,25 @@ class CollectionRateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $collection_point_id)
     {
-        //
+        try {
+            $collection_rate_data = array(
+                'collection_point_id' => $collection_point_id,
+                'speed' => $request->get('speed'),
+                'cost' => $request->get('cost'),
+                'available' => $request->get('available'),
+                'note' => $request->get('note'),
+                'created_by' => auth()->user()->id
+            );
+
+            $rate = CollectionRate::create($collection_rate_data);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store collection rate.']);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Collection rate successfully stored.', 'data' => $rate]);
     }
 
     /**
@@ -69,9 +95,30 @@ class CollectionRateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $collection_point_id, $collection_rate_id)
     {
-        //
+        try {
+                
+                $collection_rate_data = array(
+                    'speed' => $request->get('speed'),
+                    'cost' => $request->get('cost'),
+                    'available' => $request->get('available'),
+                    'note' => $request->get('note'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'updated_by' => auth()->user()->id
+                );
+    
+               
+        
+                CollectionRate::where('id', $collection_rate_id)->update($collection_rate_data);
+    
+                $rate = CollectionRate::where('id', $collection_rate_id)->first();
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update collection rate.']);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Collection rate successfully updated.', 'data' => $rate]);
     }
 
     /**
@@ -80,8 +127,16 @@ class CollectionRateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($collection_point_id, $shipping_rate_id)
     {
-        //
+        try {
+            CollectionRate::where('id', $shipping_rate_id)->where('shipping_zone_id', $collection_point_id)->update([
+                'deleted_at' => date('Y-m-d H:i:s'),
+                'deleted_by' => auth()->user()->id,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping rate.']);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully deleted.']);
     }
 }

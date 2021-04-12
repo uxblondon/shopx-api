@@ -10,6 +10,7 @@ use App\Models\ShippingZone;
 use App\Models\ShippingPackageSize;
 use App\Models\ShippingOption;
 use App\Models\ProductShippingOption;
+use App\Models\CollectionRate;
 
 class CollectionOptionController extends Controller
 {
@@ -20,10 +21,10 @@ class CollectionOptionController extends Controller
      */
     public function options(Request $request)
     {
-        return response()->json(['status' => 'success', 'data' => [
-            'collection option 1',
-            'collection option 2',
-            'collection option 3'
-        ]]);
+        $collection_point_id = $request->get('collection_point_id');
+
+        $collection_rates = CollectionRate::where('collection_point_id', $collection_point_id)->orderBy('cost')->get()->toArray();
+
+        return response()->json(['status' => 'success', 'data' => $collection_rates]);
     }
 }

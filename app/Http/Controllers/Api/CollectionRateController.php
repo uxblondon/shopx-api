@@ -127,16 +127,16 @@ class CollectionRateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($collection_point_id, $shipping_rate_id)
+    public function destroy($collection_point_id, $collection_rate_id)
     {
         try {
-            CollectionRate::where('id', $shipping_rate_id)->where('shipping_zone_id', $collection_point_id)->update([
+            CollectionRate::where('id', $collection_rate_id)->where('collection_point_id', $collection_point_id)->update([
                 'deleted_at' => date('Y-m-d H:i:s'),
                 'deleted_by' => auth()->user()->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping rate.']);
+            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete collection rate.']);
         }
-        return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully deleted.']);
+        return response()->json(['status' => 'success', 'message' => 'Collection rate successfully deleted.']);
     }
 }

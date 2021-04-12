@@ -71,6 +71,12 @@ Route::group([
     Route::get('collection-addresses', 'Api\StoreAddressController@collectionAddresses');
     Route::get('store-addresses', 'Api\StoreAddressController@index');
 
+    Route::delete('collection-points/{collection_point_id}/rates/{rate_id}', 'Api\CollectionRateController@destroy');
+    Route::put('collection-points/{collection_point_id}/rates/{rate_id}', 'Api\CollectionRateController@update');
+    Route::get('collection-points/{collection_point_id}/rates/{rate_id}', 'Api\CollectionRateController@show');
+    Route::post('collection-points/{collection_point_id}/rates', 'Api\CollectionRateController@store');
+    Route::get('collection-points/{collection_point_id}/rates', 'Api\CollectionRateController@index');
+
 
     Route::delete('collection-points/{collection_point_id}', 'Api\CollectionPointController@destroy');
     Route::put('collection-points/{collection_point_id}', 'Api\CollectionPointController@update');

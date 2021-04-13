@@ -32,6 +32,8 @@ Route::group([
     Route::get('shipping-zones/shippable-countries', 'Api\ShippingZoneController@shippableCountries');
     Route::get('active-collection-points', 'Api\CollectionPointController@activeCollectionPoints');
     Route::get('available-store-addresses', 'Api\StoreAddressController@available');
+
+    Route::get('stripe/secret', 'Api\StripeController@secret');
     
 });
 

@@ -26,6 +26,11 @@ Route::group([
     Route::get('products', 'Api\ProductController@index');
     Route::get('available-products', 'Api\ProductController@available');
 
+
+    Route::post('orders', 'Api\OrderController@store');
+
+
+
     Route::post('delivery-options', 'Api\DeliveryOptionController@options');
     Route::post('collection-options', 'Api\CollectionOptionController@options');
 
@@ -33,7 +38,11 @@ Route::group([
     Route::get('active-collection-points', 'Api\CollectionPointController@activeCollectionPoints');
     Route::get('available-store-addresses', 'Api\StoreAddressController@available');
 
-    Route::get('stripe/secret', 'Api\StripeController@secret');
+    Route::post('stripe/secret', 'Api\StripeController@secret');
+
+    Route::get('orders/sequence', 'Api\OrderController@sequence');
+
+   
     
 });
 
@@ -149,7 +158,7 @@ Route::group([
 
     Route::delete('orders/{order_id}', 'Api\OrderController@destroy');
     Route::put('orders/{order_id}', 'Api\OrderController@update');
-    Route::post('orders', 'Api\OrderController@store');
+  //  Route::post('orders', 'Api\OrderController@store');
     Route::get('orders/{order_id}', 'Api\OrderController@show');
     Route::post('orders/filter', 'Api\OrderController@filter');
     Route::get('orders', 'Api\OrderController@index');

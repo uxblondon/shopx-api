@@ -19,16 +19,15 @@ class StripeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function secret()
+    public function secret(Request $request)
     {
         try {
             \Stripe\Stripe::setApiKey('sk_test_uK2XwHhWYAhvR1Oh6QN0gmww00vlzitu5m');
 
             $intent = \Stripe\PaymentIntent::create([
-              'amount' => 1099,
+              'description' => $request->get('order_ref'),
+              'amount' => $request->get('amount'),
               'currency' => 'gbp',
-              // Verify your integration in this guide by including this parameter
-              'metadata' => ['integration_check' => 'accept_a_payment'],
             ]);
         } catch(\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);

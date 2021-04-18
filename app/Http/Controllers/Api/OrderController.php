@@ -29,6 +29,21 @@ class OrderController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function ref()
+    {
+        
+            $no_of_orders = Order::where('created_at', '>=', date('Y-m-d').' 00:00:00')->where('created_at', '<=', date('Y-m-d').' 59:59:59')->count();
+            $sequence = date('ymd').str_pad($no_of_orders+1, 5, '0', STR_PAD_LEFT);
+      
+       
+        return $sequence;
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -46,7 +61,13 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $customer = $request->get('customer');
+        $order = array(
+            'ref' => $this->ref(),
+            'name' => $customer['name'],
+        );
+
+        return $order;
     }
 
     /**

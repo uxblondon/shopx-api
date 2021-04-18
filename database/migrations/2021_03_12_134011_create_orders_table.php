@@ -17,10 +17,10 @@ class CreateOrdersTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned()->nullable();
-            
-            $table->string('name', 100);
+            $table->string('ref', 30);
+            $table->string('name', 150);
             $table->string('email', 150);
-
+            $table->string('status', 25)->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -84,6 +84,7 @@ class OrdersTableSeeder extends Seeder
 
         for ($u = 0; $u < 100; $u++) {
             $order_data = array(
+                'ref' => rand(999, 1000),
                 'name' => $fake->name,
                 'email' => $fake->safeEmail,
                 'created_at' => date('Y-m-d H:i:s')

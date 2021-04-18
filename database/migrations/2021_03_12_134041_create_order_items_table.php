@@ -19,14 +19,11 @@ class CreateOrderItemsTable extends Migration
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
             $table->bigInteger('variant_id')->unsigned();
-
-            $table->string('sku')->nullable();
-            $table->decimal('price', 8, 2);
-            $table->decimal('weight', 8, 2)->default(0.0);
-
-            $table->decimal('length', 8, 2);
+          
             $table->decimal('width', 8, 2);
+            $table->decimal('length', 8, 2);
             $table->decimal('height', 8, 2);
+            $table->decimal('weight', 8, 2)->default(0.0);
             
             $table->boolean('shipping_not_required')->default(0);
             $table->boolean('separated_shipping_required')->default(0);
@@ -38,6 +35,8 @@ class CreateOrderItemsTable extends Migration
             $table->string('variant_2_value')->nullable();
             $table->string('variant_3_name')->nullable();
             $table->string('variant_3_value')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->integer('quantity');
 
             $table->timestamps();
             $table->softDeletes();

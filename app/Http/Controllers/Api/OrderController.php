@@ -139,8 +139,8 @@ class OrderController extends Controller
                     'cost' => $delivery_option['cost'],
                 );
 
-                $order_delivery = OrderDelivery::create($order);
-
+                $order_delivery = OrderDelivery::create($order_delivery_data);
+                
                 $order_delivery_address['order_delivery_id'] = $order_delivery->id;
                 
                 

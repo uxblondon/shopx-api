@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderDelivery;
+use App\Models\OrderDeliveryItem;
 
 class OrderController extends Controller
 {
@@ -66,10 +67,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
 
-        } catch(\Exception $e) {
-
-        }
-        $customer = $request->get('customer');
+            $customer = $request->get('customer');
         $basket_items = $request->get('basket_items');
         $shipping = $request->get('shipping');
         $payment = $request->get('payment');
@@ -122,7 +120,6 @@ class OrderController extends Controller
                 'county' => $delivery_address['county'],
                 'postcode' => $delivery_address['postcode'],
                 'country_code' => $delivery_address['country'],
-                'note' => $delivery_address['note']
             );
 
             $deliveries = $shipping['deliveries'];
@@ -144,27 +141,32 @@ class OrderController extends Controller
 
                 $order_delivery_address['order_delivery_id'] = $order_delivery->id;
                 
-                
-
-                
-
                 $delivery_items = [];
                 $items = $delivery['items'];
                 foreach($items as $item) {
                     //find order item id 
                     // order_id variant_id product_id 
+                    $order_item = OrderItem::where('order_id', $order->id)
+                    ->where('product_id', $item['product_id'])
+                    ->where('variant_id', $item['id'])
+                    ->first();
 
-                    $delivery_items[] = array(
-                        'delivery_id' => '',
-                        'order_item_id' => '',
+                    if(!$order_item) {
+                        DB::rollBack();
+                        return response()->json(['status' => 'error', 'message' => 'Delivery item not found in order items.']);
+                    } 
+
+                    $delivery_item_data = array(
+                        'order_delivery_id' => $order_delivery->id,
+                        'order_item_id' => $order_item->id
                     );
+
+                    OrderDeliveryItem::create($delivery_item_data);
                 }
             }
 
 
         } elseif($shipping['method'] === 'collection') {
-
-
 
             $order_address = array(
                 'type' => 'collection',
@@ -188,6 +190,15 @@ class OrderController extends Controller
             );
 
         }
+
+        } catch(\Exception $e) {
+
+            DB::rollBack();
+        }
+
+        DB::commit();
+
+        
 
 
 

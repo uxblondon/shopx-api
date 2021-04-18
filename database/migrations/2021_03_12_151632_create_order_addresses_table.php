@@ -20,13 +20,13 @@ class CreateOrderAddressesTable extends Migration
             $table->bigInteger('order_delivery_id')->nullable();
             $table->string('type');
             $table->string('name');
-            $table->string('phone')->nullable();
             $table->string('address_line_1');
             $table->string('address_line_2')->nullable();
             $table->string('city');
             $table->string('county')->nullable();
             $table->string('postcode');
             $table->string('country_code');
+            $table->string('phone')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

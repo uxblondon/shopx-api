@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use DB;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\OrderDelivery;
 
 class OrderController extends Controller
@@ -140,7 +141,7 @@ class OrderController extends Controller
                 );
 
                 $order_delivery = OrderDelivery::create($order_delivery_data);
-                
+
                 $order_delivery_address['order_delivery_id'] = $order_delivery->id;
                 
                 

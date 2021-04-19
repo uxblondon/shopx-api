@@ -31,7 +31,7 @@ class CreateOrderDeliveryItemsTable extends Migration
         Schema::table('order_delivery_items', function (Blueprint $table) {
             $table->foreign('order_delivery_id')
             ->references('id')
-            ->on('orders')
+            ->on('order_deliveries')
             ->onDelete('cascade');
         });
     }

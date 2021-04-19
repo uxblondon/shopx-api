@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OrderDeliveryAddress extends Model
+class OrderAddress extends Model
 {
     use SoftDeletes;
 
@@ -14,7 +14,7 @@ class OrderDeliveryAddress extends Model
      *
      * @var string
      */
-    protected $table = 'order_delivery_addresses';
+    protected $table = 'order_addresses';
 
     /**
      * Indicates if the model should be timestamped.

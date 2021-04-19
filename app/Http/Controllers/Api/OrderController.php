@@ -10,6 +10,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderDelivery;
 use App\Models\OrderDeliveryItem;
+use App\Models\OrderAddress;
+use App\Models\OrderPayment;
 
 class OrderController extends Controller
 {
@@ -40,7 +42,7 @@ class OrderController extends Controller
     {
         
             $no_of_orders = Order::where('created_at', '>=', date('Y-m-d').' 00:00:00')->where('created_at', '<=', date('Y-m-d').' 59:59:59')->count();
-            $sequence = date('ymd').str_pad($no_of_orders+1, 5, '0', STR_PAD_LEFT).strtoupper($shipping_method[0]).$no_of_items;
+            $sequence = 'TH'.date('ymd').str_pad($no_of_orders+1, 5, '0', STR_PAD_LEFT).strtoupper($shipping_method[0]).$no_of_items;
       
        
         return $sequence;
@@ -106,11 +108,13 @@ class OrderController extends Controller
             OrderItem::create($order_item);
         }
 
+        // shipping 
+
         if($shipping['method'] === 'delivery') {
 
             $delivery_address = $shipping['delivery_address'];
 
-            $order_delivery_address = array(
+            $order_address_data = array(
                 'order_id' => $order->id,
                 'type' => 'delivery',
                 'name' => $delivery_address['name'],
@@ -139,9 +143,9 @@ class OrderController extends Controller
 
                 $order_delivery = OrderDelivery::create($order_delivery_data);
 
-                $order_delivery_address['order_delivery_id'] = $order_delivery->id;
+                $order_address_data['order_delivery_id'] = $order_delivery->id;
+                OrderAddress::create($order_address_data);
                 
-                $delivery_items = [];
                 $items = $delivery['items'];
                 foreach($items as $item) {
                     //find order item id 
@@ -168,44 +172,51 @@ class OrderController extends Controller
 
         } elseif($shipping['method'] === 'collection') {
 
-            $order_address = array(
-                'type' => 'collection',
-                'name' => '',
-                'address_line_1' => '',
-                'address_line_2' => '',
-                'city' => '',
-                'county' => '',
-                'postcode' => '',
-                'country_code' => '',
-                'note' => ''
-            );
-
-            $order_delivery = array(
+            $collection_option = $shipping['collection_option'];
+            $order_collection_data = array(
+                'order_id' => $order->id,
                 'method' => 'collection',
-                'order_address_id' => 'test',
-                'provider' => '',
-                'service' => '',
-                'speed' => '',
-                'cost' => '',
+                'provider' => 'Trinity House',
+                'service' => 'Order Collection',
+                'speed' => $collection_option['speed'],
+                'cost' => $collection_option['cost'],
             );
+            OrderDelivery::create($order_collection_data);
 
+            $collection_address = $shipping['collection_address'];
+            $collection_address_data = array(
+                'order_id' => $order->id,
+                'type' => 'collection',
+                'name' => $collection_address['name'],
+                'address_line_1' => $collection_address['address_line_1'],
+                'address_line_2' => $collection_address['address_line_2'],
+                'city' => $collection_address['city'],
+                'county' => $collection_address['county'],
+                'postcode' => $collection_address['postcode'],
+                'country_code' => $collection_address['country_code'],
+            );
+            OrderAddress::create($collection_address_data);
         }
 
-        } catch(\Exception $e) {
+        // payment 
+        $order_payment_data = array(
+            'order_id' => $order->id,
+            'payment_type' => $payment['type'],
+            'amount' => $payment['amount'],
+        );
+        OrderPayment::create($order_payment_data);
 
+        } catch(\Exception $e) {
             DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Failed to save the order.'.$e->getMessage()]);
         }
 
         DB::commit();
-
-        
-
-
-
-        return $shipping;
+        return response()->json(['status' => 'success', 'request' => $request->all(), 'data' => $order, 'message' => 'Order created successfully.']);
 
        // return $request->all();
     }
+
 
     /**
      * Display the specified resource.

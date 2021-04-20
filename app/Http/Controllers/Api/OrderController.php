@@ -41,9 +41,14 @@ class OrderController extends Controller
     public function ref($shipping_method, $no_of_items)
     {
 
-        $no_of_orders = Order::where('created_at', '>=', date('Y-m-d') . ' 00:00:00')->where('created_at', '<=', date('Y-m-d') . ' 59:59:59')->count();
-        $sequence = 'TH' . date('ymd') . str_pad($no_of_orders + 1, 5, '0', STR_PAD_LEFT) . strtoupper($shipping_method[0]) . $no_of_items;
+        $last_order = Order::orderBy('id', 'desc')->first(['id']);
 
+        $order_no = 1;
+        if (isset($last_order->id)) {
+            $order_no = $last_order->id;
+        }
+
+        $sequence = 'TH' . date('ymd') . str_pad($order_no, 6, '0', STR_PAD_LEFT) . strtoupper($shipping_method[0]) . $no_of_items;
 
         return $sequence;
     }
@@ -80,7 +85,7 @@ class OrderController extends Controller
                 'email' => $customer['email'],
             );
 
-            if($payment['type'] === 'paypal') {
+            if ($payment['type'] === 'paypal') {
                 $order_data['status'] = 'confirmed';
             }
 

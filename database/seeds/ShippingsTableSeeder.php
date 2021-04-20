@@ -400,7 +400,7 @@ class ShippingsTableSeeder extends Seeder
                     [
                         'shipping_zone_id' => $shipping_zone->id,
                         'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                        'shipping_option_id' => $shipping_options[$key],
                         'cost_based_on' => 'basket_weight',
                         'min_weight' => 101,
                         'max_weight' => 250,
@@ -412,7 +412,7 @@ class ShippingsTableSeeder extends Seeder
                     [
                         'shipping_zone_id' => $shipping_zone->id,
                         'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                        'shipping_option_id' => $shipping_options[$key],
                         'cost_based_on' => 'basket_weight',
                         'min_weight' => 251,
                         'max_weight' => 1000,
@@ -424,7 +424,7 @@ class ShippingsTableSeeder extends Seeder
                     [
                         'shipping_zone_id' => $shipping_zone->id,
                         'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                        'shipping_option_id' => $shipping_options[$key],
                         'cost_based_on' => 'basket_weight',
                         'min_weight' => 1001,
                         'max_weight' => 2000,
@@ -436,7 +436,7 @@ class ShippingsTableSeeder extends Seeder
                     [
                         'shipping_zone_id' => $shipping_zone->id,
                         'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                        'shipping_option_id' => $shipping_options[$key],
                         'cost_based_on' => 'basket_weight',
                         'min_weight' => 2001,
                         'max_weight' => 20000,

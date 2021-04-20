@@ -138,17 +138,20 @@ class DeliveryOptionController extends Controller
 
                 $shipping_zones = ShippingCountry::where('country_code', $this->address['country'])->distinct()->pluck('shipping_zone_id');
 
-                // check compared with the basket value 
+                //check compared with the basket value 
                 $options_by_basket_value = ShippingRate::join('shipping_options', 'shipping_options.id', 'shipping_rates.shipping_option_id')
                     ->where('shipping_rates.package_size_id', $size['id'])
+                    ->where('cost_based_on', 'basket_value')
                     ->whereIn('shipping_rates.shipping_zone_id', $shipping_zones)
                     ->where('shipping_rates.min_value', '<=', $total_value)
                     ->where('shipping_rates.max_value', '>=', $total_value)
                     ->get()->toArray();
 
+                  
+
                 if (count($options_by_basket_value) > 0) {
                     foreach ($options_by_basket_value as $option) {
-                        $option['additional_cost'] = $total_additional_shipping_cost;
+                        $option['cost'] += $total_additional_shipping_cost;
                         $options[] = $option;
                     }
                 }
@@ -156,6 +159,7 @@ class DeliveryOptionController extends Controller
                 // check the compared with basket weight
                 $options_by_basket_weight = ShippingRate::join('shipping_options', 'shipping_options.id', 'shipping_rates.shipping_option_id')
                     ->where('shipping_rates.package_size_id', $size['id'])
+                    ->where('cost_based_on', 'basket_weight')
                     ->whereIn('shipping_rates.shipping_zone_id', $shipping_zones)
                     ->where('shipping_rates.min_weight', '<=', $total_weight)
                     ->where('shipping_rates.max_weight', '>=', $total_weight)

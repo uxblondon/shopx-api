@@ -382,13 +382,13 @@ class ShippingsTableSeeder extends Seeder
             $shipping_options = ShippingOption::where('available', 1)->pluck('id');
 
 
-            foreach($shipping_package_sizes as $shipping_package_size) {
+            foreach($shipping_package_sizes as $key => $shipping_package_size) {
 
                 $shipping_rate_data = array(
                     [
                         'shipping_zone_id' => $shipping_zone->id,
                         'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[rand(0, count($shipping_options) - 1)],
+                        'shipping_option_id' => $shipping_options[$key],
                         'cost_based_on' => 'basket_weight',
                         'min_weight' => 0,
                         'max_weight' => 100,

@@ -31,6 +31,13 @@ class CreateOrderAddressesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Schema::table('order_addresses', function (Blueprint $table) {
+            $table->foreign('order_id')
+            ->references('id')
+            ->on('orders')
+            ->onDelete('cascade');
+        });
     }
 
     /**

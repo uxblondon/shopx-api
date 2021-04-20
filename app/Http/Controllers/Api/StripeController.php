@@ -4,13 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use DB;
 use App\Http\Controllers\Controller;
-use App\Models\ShippingRate;
 use Illuminate\Http\Request;
-use App\Models\ShippingZone;
-use App\Models\ShippingPackageSize;
-use App\Models\ShippingOption;
-use App\Models\ProductShippingOption;
-use App\Models\ShippingCountry;
+use App\Models\OrderPayment;
+use App\Models\Order;
 
 class StripeController extends Controller
 {
@@ -28,6 +24,9 @@ class StripeController extends Controller
                 'description' => $request->get('order_ref'),
                 'amount' => $request->get('amount'),
                 'currency' => 'gbp',
+                'metadata' => [
+                    'order_id' => $request->get('order_id'),
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'r' => $request->all(), 'message' => $e->getMessage()]);
@@ -44,7 +43,12 @@ class StripeController extends Controller
                 'payment_status' => $request->get('payment_status')
             );
 
-            OrderPayment::where('order_id', $order_id)->update($payment_data);
+            $payment = OrderPayment::where('order_id', $order_id)->update($payment_data);
+
+            if($payment && $request->get('payment_status') === 'succeeded') {
+                Order::where('id', $order_id)->update(['status' => 'confirmed']);
+            }
+
         } catch (\Exception $e) {
 
             return response()->json(['status' => 'error', 'r' => $request->all(), 'message' => $e->getMessage()]);

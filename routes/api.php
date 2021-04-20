@@ -38,7 +38,10 @@ Route::group([
     Route::get('active-collection-points', 'Api\CollectionPointController@activeCollectionPoints');
     Route::get('available-store-addresses', 'Api\StoreAddressController@available');
 
-    Route::post('stripe/payment', 'Api\StripeController@payment');
+    Route::post('stripe/payment-intend', 'Api\StripeController@paymentIntend');
+    Route::post('stripe/{order_id}/payment', 'Api\StripeController@payment');
+
+    Route::post('orders/{order_id}/ref/{order_ref}/remove', 'Api\OrderController@removePending');
 
     Route::get('orders/sequence', 'Api\OrderController@sequence');
 

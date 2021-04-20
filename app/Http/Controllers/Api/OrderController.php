@@ -181,7 +181,7 @@ class OrderController extends Controller
                 'speed' => $collection_option['speed'],
                 'cost' => $collection_option['cost'],
             );
-            OrderDelivery::create($order_collection_data);
+            $order_delivery = OrderDelivery::create($order_collection_data);
 
             $collection_address = $shipping['collection_address'];
             $collection_address_data = array(
@@ -195,6 +195,7 @@ class OrderController extends Controller
                 'postcode' => $collection_address['postcode'],
                 'country_code' => $collection_address['country_code'],
             );
+            $collection_address_data['order_delivery_id'] = $order_delivery->id;
             OrderAddress::create($collection_address_data);
         }
 
@@ -250,6 +251,17 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+
+    public function removePending($order_id, $order_ref)
+    {
+        return Order::where('orders.status', 'pending')
+        ->join('order_payments', 'orders.id', 'order_payments.order_id')
+        ->where('orders.id', $order_id)
+        ->where('orders.ref', $order_ref)
+        ->whereNull('order_payments.payment_id')
+        ->whereNull('order_payments.payment_status')
+        ->forceDelete();
     }
 
     /**

@@ -27,6 +27,7 @@ class CreateOrderAddressesTable extends Migration
             $table->string('postcode');
             $table->string('country_code');
             $table->string('phone')->nullable();
+            $table->string('email')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
             $table->softDeletes();

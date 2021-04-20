@@ -77,8 +77,12 @@ class OrderController extends Controller
             $order_data = array(
                 'ref' => $this->ref($shipping['method'], count($basket_items)),
                 'name' => $customer['name'],
-                'email' => $customer['email']
+                'email' => $customer['email'],
             );
+
+            if($payment['type'] === 'paypal') {
+                $order_data['status'] = 'confirmed';
+            }
 
             $order = Order::create($order_data);
 

@@ -140,7 +140,6 @@ class OrderController extends Controller
                 foreach ($deliveries as $delivery) {
 
                     $delivery_option = $delivery['option'];
-
                     $order_delivery_data = array(
                         'order_id' => $order->id,
                         'method' => 'delivery',
@@ -205,6 +204,21 @@ class OrderController extends Controller
             }
 
             // payment 
+            $billing_address = $payment['billing_address'];
+            $billing_address_data = array(
+                'order_id' => $order->id,
+                'type' => 'billing',
+                'name' => $billing_address['name'],
+                'address_line_1' => $billing_address['address_line_1'],
+                'address_line_2' => $billing_address['address_line_2'],
+                'city' => $billing_address['city'],
+                'county' => $billing_address['county'],
+                'postcode' => $billing_address['postcode'],
+                'country_code' => $billing_address['country'],
+                
+            );
+            
+
             if ($payment['type'] === 'stripe') {
                 $order_payment_data = array(
                     'order_id' => $order->id,
@@ -212,6 +226,8 @@ class OrderController extends Controller
                     'amount' => $payment['amount'],
                 );
                 OrderPayment::create($order_payment_data);
+                OrderAddress::create($billing_address_data);
+
             } elseif ($payment['type'] === 'paypal') {
                 $order_payment_data = array(
                     'order_id' => $order->id,
@@ -221,6 +237,9 @@ class OrderController extends Controller
                     'payment_status' => $payment['payment_status'],
                 );
                 OrderPayment::create($order_payment_data);
+
+                $billing_address_data['email'] = $billing_address['email'];
+                OrderAddress::create($billing_address_data);
             }
         } catch (\Exception $e) {
             DB::rollBack();

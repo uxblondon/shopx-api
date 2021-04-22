@@ -14,8 +14,27 @@ class CreateOrderBillingsTable extends Migration
     public function up()
     {
         Schema::create('order_billings', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+            $table->bigInteger('order_id')->unsigned();
+            $table->string('name');
+            $table->string('address_line_1')->nullable();
+            $table->string('address_line_2')->nullable();
+            $table->string('city')->nullable();
+            $table->string('county')->nullable();
+            $table->string('postcode')->nullable();
+            $table->string('country_code');
+            $table->string('email')->nullable();
+            $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::table('order_billings', function (Blueprint $table) {
+            $table->foreign('order_id')
+            ->references('id')
+            ->on('orders')
+            ->onDelete('cascade');
         });
     }
 

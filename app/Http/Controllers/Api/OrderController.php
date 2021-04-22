@@ -91,7 +91,6 @@ class OrderController extends Controller
 
             $order = Order::create($order_data);
 
-            $order_items = [];
             foreach ($basket_items as $item) {
                 $order_item = array(
                     'order_id' => $order->id,
@@ -185,6 +184,8 @@ class OrderController extends Controller
                     'speed' => $collection_option['speed'],
                     'cost' => $collection_option['cost'],
                 );
+
+                
                 $order_delivery = OrderDelivery::create($order_collection_data);
 
                 $collection_address = $shipping['collection_address'];
@@ -215,9 +216,9 @@ class OrderController extends Controller
                 'county' => $billing_address['county'],
                 'postcode' => $billing_address['postcode'],
                 'country_code' => $billing_address['country'],
-                
+
             );
-            
+
 
             if ($payment['type'] === 'stripe') {
                 $order_payment_data = array(
@@ -227,7 +228,6 @@ class OrderController extends Controller
                 );
                 OrderPayment::create($order_payment_data);
                 OrderAddress::create($billing_address_data);
-
             } elseif ($payment['type'] === 'paypal') {
                 $order_payment_data = array(
                     'order_id' => $order->id,
@@ -257,9 +257,49 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($order_id)
     {
-        //
+        $order = Order::find($order_id);
+        if ($order) {
+            $order->items = OrderItem::where('order_id', $order->id)->get();
+
+            $deliveries = OrderDelivery::where('order_id', $order->id)->get();
+
+            $order_deliveries = [];
+            foreach ($deliveries as $delivery) {
+                if ($delivery->method === 'delivery') {
+
+                    $delivery->address = OrderAddress::where('order_id', $order->id)
+                    ->where('order_delivery_id', $delivery->id)
+                    ->where('type', 'delivery')
+                    ->first();
+
+                    $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
+                        ->where('order_delivery_items.order_delivery_id', $delivery->id)
+                        ->get();
+
+                } elseif ($delivery->method === 'collection') {
+
+                    $delivery->address = OrderAddress::where('order_id', $order->id)
+                    ->where('order_delivery_id', $delivery->id)
+                    ->where('type', 'collection')
+                    ->first();
+
+                    $delivery->items = $order->items;
+                }
+
+                $order_deliveries[] = $delivery;
+            }
+            $order->deliveries = $order_deliveries;
+
+            $payment = OrderPayment::where('order_id', $order->id)->first();
+            if($payment) {
+                $payment->billing_details = OrderAddress::where('order_id', $order->id)
+                ->where('type', 'billing')
+                ->first();
+            }
+        }
+
     }
 
     /**

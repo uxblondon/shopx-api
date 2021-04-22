@@ -12,6 +12,7 @@ use App\Models\OrderDelivery;
 use App\Models\OrderDeliveryItem;
 use App\Models\OrderAddress;
 use App\Models\OrderPayment;
+use App\Models\OrderBilling;
 
 class OrderController extends Controller
 {
@@ -117,7 +118,6 @@ class OrderController extends Controller
             }
 
             // shipping 
-
             if ($shipping['method'] === 'delivery') {
 
                 $delivery_address = $shipping['delivery_address'];
@@ -185,7 +185,7 @@ class OrderController extends Controller
                     'cost' => $collection_option['cost'],
                 );
 
-                
+
                 $order_delivery = OrderDelivery::create($order_collection_data);
 
                 $collection_address = $shipping['collection_address'];
@@ -205,42 +205,28 @@ class OrderController extends Controller
             }
 
             // payment 
-            $billing_address = $payment['billing_address'];
-            $billing_address_data = array(
+            $billing = $payment['billing'];
+            $billing_data = array(
                 'order_id' => $order->id,
-                'type' => 'billing',
-                'name' => $billing_address['name'],
-                'address_line_1' => $billing_address['address_line_1'],
-                'address_line_2' => $billing_address['address_line_2'],
-                'city' => $billing_address['city'],
-                'county' => $billing_address['county'],
-                'postcode' => $billing_address['postcode'],
-                'country_code' => $billing_address['country'],
-
+                'name' => $billing['name'],
+                'address_line_1' => $billing['address_line_1'],
+                'address_line_2' => $billing['address_line_2'],
+                'city' => $billing['city'],
+                'county' => $billing['county'],
+                'postcode' => $billing['postcode'],
+                'country_code' => $billing['country'],
+                'email' => isset($billing['email']) ? $billing['email'] : '',
             );
+            OrderBilling::create($billing_data);
 
-
-            if ($payment['type'] === 'stripe') {
-                $order_payment_data = array(
-                    'order_id' => $order->id,
-                    'payment_type' => $payment['type'],
-                    'amount' => $payment['amount'],
-                );
-                OrderPayment::create($order_payment_data);
-                OrderAddress::create($billing_address_data);
-            } elseif ($payment['type'] === 'paypal') {
-                $order_payment_data = array(
-                    'order_id' => $order->id,
-                    'payment_type' => $payment['type'],
-                    'amount' => $payment['amount'],
-                    'payment_id' => $payment['payment_id'],
-                    'payment_status' => $payment['payment_status'],
-                );
-                OrderPayment::create($order_payment_data);
-
-                $billing_address_data['email'] = $billing_address['email'];
-                OrderAddress::create($billing_address_data);
-            }
+            $order_payment_data = array(
+                'order_id' => $order->id,
+                'payment_type' => $payment['type'],
+                'amount' => $payment['amount'],
+                'payment_id' => isset($payment['payment_id']) ? $payment['payment_id'] : '',
+                'payment_status' => isset($payment['payment_status']) ? $payment['payment_status'] : '',
+            );
+            OrderPayment::create($order_payment_data);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Failed to save the order.' . $e->getMessage()]);
@@ -270,20 +256,19 @@ class OrderController extends Controller
                 if ($delivery->method === 'delivery') {
 
                     $delivery->address = OrderAddress::where('order_id', $order->id)
-                    ->where('order_delivery_id', $delivery->id)
-                    ->where('type', 'delivery')
-                    ->first();
+                        ->where('order_delivery_id', $delivery->id)
+                        ->where('type', 'delivery')
+                        ->first();
 
                     $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
                         ->where('order_delivery_items.order_delivery_id', $delivery->id)
                         ->get();
-
                 } elseif ($delivery->method === 'collection') {
 
                     $delivery->address = OrderAddress::where('order_id', $order->id)
-                    ->where('order_delivery_id', $delivery->id)
-                    ->where('type', 'collection')
-                    ->first();
+                        ->where('order_delivery_id', $delivery->id)
+                        ->where('type', 'collection')
+                        ->first();
 
                     $delivery->items = $order->items;
                 }
@@ -293,13 +278,12 @@ class OrderController extends Controller
             $order->deliveries = $order_deliveries;
 
             $payment = OrderPayment::where('order_id', $order->id)->first();
-            if($payment) {
+            if ($payment) {
                 $payment->billing_details = OrderAddress::where('order_id', $order->id)
-                ->where('type', 'billing')
-                ->first();
+                    ->where('type', 'billing')
+                    ->first();
             }
         }
-
     }
 
     /**

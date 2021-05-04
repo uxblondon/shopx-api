@@ -283,7 +283,10 @@ class OrderController extends Controller
                     ->where('type', 'billing')
                     ->first();
             }
+            $order->payment = $payment;
+            return response()->json(['status' => 'success', 'data' => $order]);
         }
+        return response()->json(['status' => 'error', 'message' => 'Order not found.']);
     }
 
     /**

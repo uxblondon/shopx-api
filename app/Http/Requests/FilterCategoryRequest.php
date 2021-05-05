@@ -31,7 +31,7 @@ class FilterCategoryRequest extends FormRequest
             'title' => 'nullable',
             'status' => [
                 'nullable',
-                Rule::in(['draft', 'live']),
+                Rule::in(['draft', 'published']),
             ],
             'sort_by' => [
                 'nullable',

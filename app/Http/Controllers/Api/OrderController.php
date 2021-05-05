@@ -279,9 +279,7 @@ class OrderController extends Controller
 
             $payment = OrderPayment::where('order_id', $order->id)->first();
             if ($payment) {
-                $payment->billing_details = OrderAddress::where('order_id', $order->id)
-                    ->where('type', 'billing')
-                    ->first();
+                $payment->billing_details = OrderBilling::where('order_id', $order->id)->first();
             }
             $order->payment = $payment;
             return response()->json(['status' => 'success', 'data' => $order]);

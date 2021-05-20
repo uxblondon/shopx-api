@@ -35,11 +35,11 @@ class UpdateProductRequest extends FormRequest
 
         return [
             'categories' => 'required|array|min:1',
-            'categories.*.id' => [
-                'required',
-                'numeric',
-                Rule::in($categories),
-            ],
+            // 'categories.*.id' => [
+            //     'required',
+            //     'numeric',
+            //     Rule::in($categories),
+            // ],
             'title' => 'nullable|required',
             'standfirst' => 'nullable',
             'feature_image' => 'nullable|image',

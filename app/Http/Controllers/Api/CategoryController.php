@@ -7,10 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\FilterCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
-
+use Storage;
 
 /**  @OA\Tag(
  *     name="category",
@@ -36,72 +39,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        echo 'test';
-
-         $categories_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/categories");
-         $data = json_decode($categories_json);
-
-      //   print_r($categories);
-
-         foreach($data->categories as $category) {
-           
-
-            $category_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/categories/".$category->id);
-            $category_data = json_decode($category_json);
-
-
-           
-
-            $category = $category_data->category;
-
-            $category_data = array(
-                'title' => $category->title,
-                'slug' => Str::slug($category->title),
-                'standfirst' => $category->feature,
-                'description' => strip_tags($category->description),
-                'status' => 'draft',
-                'created_by' => 1
-            );
-
-            //  Category::create($category_data);
-
-
-            // echo "<pre>";
-            // print_r($category_data);
-            // echo "</pre>";
-
-          
-
-            foreach($category->products as $product) {
-                $product_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/products/".$product->id);
-                $product_data = json_decode($product_json);
-
-                $product = $product_data->product;
-
-                echo "<pre>";
-                print_r($product);
-                echo "</pre>";
-            }
-
-            exit;
-
-
-         }
-
-         
-
-
-
-
-
-
-
-
-
-
-        exit;
         $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
-        ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
+            ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
             ->groupBy('categories.id')
             ->get();
 
@@ -229,20 +168,20 @@ class CategoryController extends Controller
         if ($category) {
             $category->products = Product::Join('product_categories', function ($join) use ($category_id) {
                 $join->on('product_categories.product_id', 'products.id')
-                ->where('product_categories.category_id', $category_id);
+                    ->where('product_categories.category_id', $category_id);
             })->leftJoin('product_variants', function ($join) {
                 $join->on('products.id', 'product_variants.product_id')
-                ->whereNull('product_variants.deleted_at');
+                    ->whereNull('product_variants.deleted_at');
             })->leftJoin('product_images', function ($join) {
                 $join->on('product_images.product_id', 'products.id')
                     ->where('product_images.feature_image', 1);
             })->select($product_data)
-            ->where('products.status', 'published')
+                //->where('products.status', 'published')
                 ->groupBy('products.id')
                 ->groupBy('product_images.id')
                 ->get();
         }
-        
+
         return response()->json(['status' => 'success', 'data' => $category]);
     }
 
@@ -287,10 +226,9 @@ class CategoryController extends Controller
 
             if ($request->has('status') && $request->get('status') != '') {
 
-                if($request->get('status') === 'published') {
+                if ($request->get('status') === 'published') {
                     $category_data['status'] = 'published';
                     $category_data['published_at'] = date('Y-m-d H:i:s');
-
                 }
 
                 $category_data['status'] = $request->get('status');
@@ -307,7 +245,6 @@ class CategoryController extends Controller
 
 
             Category::where('id', $category_id)->update($category_data);
-            
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to update product category.']);
         }
@@ -347,3 +284,4 @@ class CategoryController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Product not exist.']);
     }
 }
+

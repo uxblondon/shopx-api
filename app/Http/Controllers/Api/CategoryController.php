@@ -11,6 +11,7 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\FilterCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 
+
 /**  @OA\Tag(
  *     name="category",
  *     description="All Endpoints of Category"
@@ -35,6 +36,70 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        echo 'test';
+
+         $categories_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/categories");
+         $data = json_decode($categories_json);
+
+      //   print_r($categories);
+
+         foreach($data->categories as $category) {
+           
+
+            $category_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/categories/".$category->id);
+            $category_data = json_decode($category_json);
+
+
+           
+
+            $category = $category_data->category;
+
+            $category_data = array(
+                'title' => $category->title,
+                'slug' => Str::slug($category->title),
+                'standfirst' => $category->feature,
+                'description' => strip_tags($category->description),
+                'status' => 'draft',
+                'created_by' => 1
+            );
+
+            //  Category::create($category_data);
+
+
+            // echo "<pre>";
+            // print_r($category_data);
+            // echo "</pre>";
+
+          
+
+            foreach($category->products as $product) {
+                $product_json = file_get_contents("https://www.trinityhouse.co.uk/api/shop/products/".$product->id);
+                $product_data = json_decode($product_json);
+
+                $product = $product_data->product;
+
+                echo "<pre>";
+                print_r($product);
+                echo "</pre>";
+            }
+
+            exit;
+
+
+         }
+
+         
+
+
+
+
+
+
+
+
+
+
+        exit;
         $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
         ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
             ->groupBy('categories.id')

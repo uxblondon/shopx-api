@@ -239,7 +239,6 @@ class ShippingsTableSeeder extends Seeder
                 "TR",
                 "UA",
                 "MK",
-                "GB",
                 "GG",
                 "JE",
                 "IM",

@@ -22,6 +22,7 @@ Route::group([
     Route::get('categories', 'Api\CategoryController@index');
 
     Route::get('products/{product_id}', 'Api\ProductController@show');
+    Route::get('products/{product_id}/variants', 'Api\ProductController@variants');
     Route::post('products/filter', 'Api\ProductController@filter');
     Route::get('products', 'Api\ProductController@index');
     Route::get('available-products', 'Api\ProductController@available');

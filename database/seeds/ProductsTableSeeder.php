@@ -71,7 +71,7 @@ class ProductsTableSeeder extends Seeder
                 if (trim($product->feature_image) != '') {
                         $fi_content = file_get_contents($product->feature_image);
                         if ($fi_content) {
-                            $fi_location = str_replace('', '', 'products/' . $product->id . '/' . $product->feature_image_name);
+                            $fi_location = str_replace('', '', 'products/' . $new_product->id . '/' . $product->feature_image_name);
                             Storage::disk('s3')->put($fi_location, $fi_content);
 
                             $product_fi_data = array(

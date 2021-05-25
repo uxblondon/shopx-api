@@ -147,8 +147,6 @@ class DeliveryOptionController extends Controller
                     ->where('shipping_rates.max_value', '>=', $total_value)
                     ->get()->toArray();
 
-                  
-
                 if (count($options_by_basket_value) > 0) {
                     foreach ($options_by_basket_value as $option) {
                         $option['cost'] += $total_additional_shipping_cost;
@@ -172,8 +170,6 @@ class DeliveryOptionController extends Controller
                     }
                 }
             }
-
-
 
             return array(
                 'items' => $items,

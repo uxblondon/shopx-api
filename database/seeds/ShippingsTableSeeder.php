@@ -15,6 +15,24 @@ class ShippingsTableSeeder extends Seeder
      */
     public function run()
     {
+
+        // reset shipping info 
+        DB::table('shipping_countries')->delete();
+        DB::table('shipping_rates')->delete();
+        DB::table('shipping_zone_products')->delete();
+        DB::table('product_shipping_options')->delete();
+        DB::table('shipping_options')->delete();
+        DB::table('shipping_package_sizes')->delete();
+        DB::table('shipping_zones')->delete();
+
+        DB::statement('ALTER TABLE shipping_countries AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE shipping_rates AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE shipping_zone_products AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE product_shipping_options AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE shipping_options AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE shipping_package_sizes AUTO_INCREMENT = 1');
+        DB::statement('ALTER TABLE shipping_zones AUTO_INCREMENT = 1');
+
         $products = DB::table('products')->get();
 
         $package_sizes = array(
@@ -31,38 +49,510 @@ class ShippingsTableSeeder extends Seeder
             ShippingPackageSize::create($package_size);
         }
 
-        $shipping_options = array(
-            ['provider' => 'Royal Mail', 'service' => '1st Class', 'speed' => '1 day delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 100],
-            ['provider' => 'Royal Mail', 'service' => '2nd Class', 'speed' => '3 days delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 750],
-            ['provider' => 'Royal Mail', 'service' => 'Special Delivery Guaranteed', 'speed' => 'Next working day delivery', 'has_tracking' => 1, 'tracking_type' => 'Tracked', 'min_weight' => 0, 'max_weight' => 2000],
-            ['provider' => 'Fedex', 'service' => 'Worldwide parcel', 'speed' => '3-5 days delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 20000],
-            ['provider' => 'USPS', 'service' => 'USA parcel', 'speed' => '1-2 weeks delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 20000],
-            ['provider' => 'Parcelforce Worldwide', 'service' => 'Worldwide large parcel', 'speed' => '3-4 weeks delivery', 'has_tracking' => 1, 'tracking_type' => 'Proof of Delivery', 'min_weight' => 0, 'max_weight' => 20000],
+        // $shipping_options = array(
+            // ['provider' => 'Royal Mail', 'service' => '1st Class', 'speed' => '1 day delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 100],
+            //     ['provider' => 'Royal Mail', 'service' => '2nd Class', 'speed' => '3 days delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 750],
+            //     ['provider' => 'Royal Mail', 'service' => 'Special Delivery Guaranteed', 'speed' => 'Next working day delivery', 'has_tracking' => 1, 'tracking_type' => 'Tracked', 'min_weight' => 0, 'max_weight' => 2000],
+            //     ['provider' => 'Fedex', 'service' => 'Worldwide parcel', 'speed' => '3-5 days delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 20000],
+            //     ['provider' => 'USPS', 'service' => 'USA parcel', 'speed' => '1-2 weeks delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 20000],
+            //     ['provider' => 'Parcelforce Worldwide', 'service' => 'Worldwide large parcel', 'speed' => '3-4 weeks delivery', 'has_tracking' => 1, 'tracking_type' => 'Proof of Delivery', 'min_weight' => 0, 'max_weight' => 20000],
+        // );
+
+        //foreach ($shipping_options as $shipping_option) {
+        //}
+
+        $shipping_option = ['provider' => 'Royal Mail', 'service' => '1st Class', 'speed' => '1 day delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 100];
+
+        $shipping_option['available'] = 1;
+        $shipping_option['created_by'] = 1;
+        $shipping_option = ShippingOption::create($shipping_option);
+
+        // product shipping options 
+        $product_shipping_options = [];
+        foreach ($products as $product) {
+            $product_shipping_options[] = array(
+                'product_id' => $product->id,
+                'shipping_option_id' => $shipping_option->id,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            );
+        }
+        DB::table('product_shipping_options')->insert($product_shipping_options);
+
+        // put shipping zone individually 
+
+        //uk shipping info 
+        $zone_data = array(
+            'title' => 'United Kingdom',
+            'available' => 1,
+            'created_by' => 1
         );
 
-        foreach ($shipping_options as $shipping_option) {
-            $shipping_option['available'] = 1;
-            $shipping_option['created_by'] = 1;
-            $shipping_option = ShippingOption::create($shipping_option);
+        $shipping_zone = ShippingZone::create($zone_data);
 
-            // product shipping options 
-            $product_shipping_options = [];
-            foreach ($products as $product) {
-                $product_shipping_options[] = array(
-                    'product_id' => $product->id,
-                    'shipping_option_id' => $shipping_option->id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'created_by' => 1,
-                );
-            }
-            DB::table('product_shipping_options')->insert($product_shipping_options);
+        $zone_countries = ['GB'];
+        foreach ($zone_countries as $country) {
+            $shipping_country_data = [
+                'shipping_zone_id' => $shipping_zone->id,
+                'country_code' => $country,
+                'created_by' => 1,
+            ];
+            ShippingCountry::create($shipping_country_data);
         }
 
+        // uk shipping zone products 
+        $shipping_zone_products = [];
+        foreach ($products as $product) {
+            $shipping_zone_products[] = array(
+                'shipping_zone_id' => $shipping_zone->id,
+                'product_id' => $product->id,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            );
+        }
+        DB::table('shipping_zone_products')->insert($shipping_zone_products);
+
+        $uk_shipping_rate_data = array(
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 0,
+                'max_weight' => 100,
+                'cost' => 0.85,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 0,
+                'max_weight' => 100,
+                'cost' => 1.29,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 101,
+                'max_weight' => 250,
+                'cost' => 1.83,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 251,
+                'max_weight' => 500,
+                'cost' => 2.39,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 501,
+                'max_weight' => 750,
+                'cost' => 3.3,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 0,
+                'max_weight' => 1000,
+                'cost' => 3.85,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 1001,
+                'max_weight' => 2000,
+                'cost' => 5.57,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Medium parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 0,
+                'max_weight' => 1000,
+                'cost' => 6,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Medium parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 1001,
+                'max_weight' => 2000,
+                'cost' => 9.02,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Medium parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 2001,
+                'max_weight' => 5000,
+                'cost' => 15.85,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Medium parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 5001,
+                'max_weight' => 10000,
+                'cost' => 21.90,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+            [
+                'shipping_zone_id' => $shipping_zone->id,
+                'package_size_id' => ShippingPackageSize::where('format', 'Medium parcel')->first()->id,
+                'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+                'cost_based_on' => 'basket_weight',
+                'min_weight' => 10001,
+                'max_weight' => 20000,
+                'cost' => 33.4,
+                'available' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => 1,
+            ],
+        );
+
+        DB::table('shipping_rates')->insert($uk_shipping_rate_data);
 
 
 
-        $zones = array(
-            'Africa' => [
+// europe shipping info 
+$zone_data = array(
+    'title' => 'Europe',
+    'available' => 1,
+    'created_by' => 1
+);
+
+$shipping_zone = ShippingZone::create($zone_data);
+
+$eu_zone_countries = [
+            "AL",
+            "AD",
+            "AZ",
+            "AT",
+            "AM",
+            "BE",
+            "BA",
+            "BG",
+            "BY",
+            "HR",
+            "CY",
+            "CZ",
+            "DK",
+            "EE",
+            "FO",
+            "FI",
+            "AX",
+            "FR",
+            "GE",
+            "DE",
+            "GI",
+            "GR",
+            "VA",
+            "HU",
+            "IS",
+            "IE",
+            "IT",
+            "KZ",
+            "LV",
+            "LI",
+            "LT",
+            "LU",
+            "MT",
+            "MC",
+            "MD",
+            "ME",
+            "NL",
+            "NO",
+            "PL",
+            "PT",
+            "RO",
+            "RU",
+            "SM",
+            "RS",
+            "SK",
+            "SI",
+            "ES",
+            "SJ",
+            "SE",
+            "CH",
+            "TR",
+            "UA",
+            "MK",
+            "GG",
+            "JE",
+            "IM",
+            "AQ", 
+            "BV", 
+            "GS", 
+            "TF", 
+            "HM"
+];
+
+foreach ($eu_zone_countries as $country) {
+    $shipping_country_data = [
+        'shipping_zone_id' => $shipping_zone->id,
+        'country_code' => $country,
+        'created_by' => 1,
+    ];
+    ShippingCountry::create($shipping_country_data);
+}
+
+// eu shipping zone products 
+$shipping_zone_products = [];
+foreach ($products as $product) {
+    $shipping_zone_products[] = array(
+        'shipping_zone_id' => $shipping_zone->id,
+        'product_id' => $product->id,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    );
+}
+DB::table('shipping_zone_products')->insert($shipping_zone_products);
+
+$eu_shipping_rate_data = array(
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 10,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 11,
+        'max_weight' => 20,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 21,
+        'max_weight' => 100,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 3.25,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 4.25,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 5.25,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 6.25,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 5.8,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 5.95,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 7.8,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 9.05,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 751,
+        'max_weight' => 1000,
+        'cost' => 10.20,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1001,
+        'max_weight' => 1250,
+        'cost' => 11.05,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1251,
+        'max_weight' => 1500,
+        'cost' => 12.1,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1501,
+        'max_weight' => 2000,
+        'cost' => 13,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+);
+
+DB::table('shipping_rates')->insert($eu_shipping_rate_data);
+
+
+// world zone 1 shipping info 
+$zone_data = array(
+    'title' => 'World Zone 1',
+    'available' => 1,
+    'created_by' => 1
+);
+
+$shipping_zone = ShippingZone::create($zone_data);
+
+$wz1_zone_countries = [
                 "DZ",
                 "AO",
                 "BW",
@@ -121,12 +611,7 @@ class ShippingsTableSeeder extends Seeder
                 "TZ",
                 "BF",
                 "ZM",
-            ],
-
-            'Antarctica' => ["AQ", "BV", "GS", "TF", "HM"],
-
-            'Asia' => [
-                "AF",
+                 "AF",
                 "AZ",
                 "BH",
                 "BD",
@@ -183,68 +668,20 @@ class ShippingsTableSeeder extends Seeder
                 "YE",
                 "XE",
                 "XD",
-            ],
-
-            'Europe' => [
-                "AL",
-                "AD",
-                "AZ",
-                "AT",
-                "AM",
-                "BE",
-                "BA",
-                "BG",
-                "BY",
-                "HR",
-                "CY",
-                "CZ",
-                "DK",
-                "EE",
-                "FO",
-                "FI",
-                "AX",
-                "FR",
-                "GE",
-                "DE",
-                "GI",
-                "GR",
-                "VA",
-                "HU",
-                "IS",
-                "IE",
-                "IT",
-                "KZ",
-                "LV",
-                "LI",
-                "LT",
-                "LU",
-                "MT",
-                "MC",
-                "MD",
-                "ME",
-                "NL",
-                "NO",
-                "PL",
-                "PT",
-                "RO",
-                "RU",
-                "SM",
-                "RS",
-                "SK",
-                "SI",
-                "ES",
-                "SJ",
-                "SE",
-                "CH",
-                "TR",
-                "UA",
-                "MK",
-                "GG",
-                "JE",
-                "IM",
-            ],
-
-            'North America' => [
+                "AR",
+                "BO",
+                "BR",
+                "CL",
+                "CO",
+                "EC",
+                "FK",
+                "GF",
+                "GY",
+                "PY",
+                "PE",
+                "SR",
+                "UY",
+                "VE",
                 "AG",
                 "BS",
                 "BB",
@@ -286,12 +723,227 @@ class ShippingsTableSeeder extends Seeder
                 "VC",
                 "TT",
                 "TC",
-                "US",
                 "VI",
-            ],
+];
 
-            'Oceania' => [
-                "AS",
+foreach ($wz1_zone_countries as $country) {
+    $shipping_country_data = [
+        'shipping_zone_id' => $shipping_zone->id,
+        'country_code' => $country,
+        'created_by' => 1,
+    ];
+    ShippingCountry::create($shipping_country_data);
+}
+
+// world zone 1 shipping zone products 
+$shipping_zone_products = [];
+foreach ($products as $product) {
+    $shipping_zone_products[] = array(
+        'shipping_zone_id' => $shipping_zone->id,
+        'product_id' => $product->id,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    );
+}
+DB::table('shipping_zone_products')->insert($shipping_zone_products);
+
+$wz1_shipping_rate_data = array(
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 10,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 11,
+        'max_weight' => 20,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 21,
+        'max_weight' => 100,
+        'cost' => 2.55,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 4.2,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 5.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 8,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 10.65,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 7.15,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 8.3,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 12.10,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 14.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 751,
+        'max_weight' => 1000,
+        'cost' => 17.65,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1001,
+        'max_weight' => 1250,
+        'cost' => 19.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1251,
+        'max_weight' => 1500,
+        'cost' => 22.10,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1501,
+        'max_weight' => 2000,
+        'cost' => 23.3,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+);
+
+DB::table('shipping_rates')->insert($wz1_shipping_rate_data);
+
+
+// world zone 2 shipping info 
+$zone_data = array(
+    'title' => 'World Zone 2',
+    'available' => 1,
+    'created_by' => 1
+);
+
+$shipping_zone = ShippingZone::create($zone_data);
+
+$wz2_zone_countries = [
+                        "AS",
                 "AU",
                 "SB",
                 "CK",
@@ -318,140 +970,721 @@ class ShippingsTableSeeder extends Seeder
                 "WF",
                 "WS",
                 "XX",
-            ],
+];
 
-            'South America' => [
-                "AR",
-                "BO",
-                "BR",
-                "CL",
-                "CO",
-                "EC",
-                "FK",
-                "GF",
-                "GY",
-                "PY",
-                "PE",
-                "SR",
-                "UY",
-                "VE",
-            ],
+foreach ($wz2_zone_countries as $country) {
+    $shipping_country_data = [
+        'shipping_zone_id' => $shipping_zone->id,
+        'country_code' => $country,
+        'created_by' => 1,
+    ];
+    ShippingCountry::create($shipping_country_data);
+}
 
-            'Collection' => [],
-            'Domestic' => ['GB']
-        );
+// world zone 2 shipping zone products 
+$shipping_zone_products = [];
+foreach ($products as $product) {
+    $shipping_zone_products[] = array(
+        'shipping_zone_id' => $shipping_zone->id,
+        'product_id' => $product->id,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    );
+}
+DB::table('shipping_zone_products')->insert($shipping_zone_products);
+
+$wz2_shipping_rate_data = array(
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 10,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 11,
+        'max_weight' => 20,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 21,
+        'max_weight' => 100,
+        'cost' => 2.55,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 4.2,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 6.8,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 9.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 13.55,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 8.35,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 9.90,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 14.50,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 17.6,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 751,
+        'max_weight' => 1000,
+        'cost' => 20.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1001,
+        'max_weight' => 1250,
+        'cost' => 23.75,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1251,
+        'max_weight' => 1500,
+        'cost' => 26.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1501,
+        'max_weight' => 2000,
+        'cost' => 28.55,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+);
+
+DB::table('shipping_rates')->insert($wz2_shipping_rate_data);
 
 
-        foreach ($zones as $zone => $countries) {
-            $zone_data = array(
-                'title' => $zone,
-                'available' => 1,
-                'created_by' => 1
-            );
+// world zone 3 shipping info 
+$zone_data = array(
+    'title' => 'World Zone 3',
+    'available' => 1,
+    'created_by' => 1
+);
 
-            $shipping_zone = ShippingZone::create($zone_data);
+$shipping_zone = ShippingZone::create($zone_data);
 
-            if (count($countries) > 0) {
-                foreach ($countries as $country) {
-                    $shipping_country_data = [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'country_code' => $country,
-                        'created_by' => 1,
-                    ];
-                    ShippingCountry::create($shipping_country_data);
-                }
-            }
+$wz3_zone_countries = ['US'];
+
+foreach ($wz3_zone_countries as $country) {
+    $shipping_country_data = [
+        'shipping_zone_id' => $shipping_zone->id,
+        'country_code' => $country,
+        'created_by' => 1,
+    ];
+    ShippingCountry::create($shipping_country_data);
+}
+
+// world zone 3 shipping zone products 
+$shipping_zone_products = [];
+foreach ($products as $product) {
+    $shipping_zone_products[] = array(
+        'shipping_zone_id' => $shipping_zone->id,
+        'product_id' => $product->id,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    );
+}
+DB::table('shipping_zone_products')->insert($shipping_zone_products);
+
+$wz3_shipping_rate_data = array(
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 10,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 11,
+        'max_weight' => 20,
+        'cost' => 1.7,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 21,
+        'max_weight' => 100,
+        'cost' => 2.55,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 4.2,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 5.85,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 8.3,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Large letter')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 11.1,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 0,
+        'max_weight' => 100,
+        'cost' => 9.35,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 101,
+        'max_weight' => 250,
+        'cost' => 10.95,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 251,
+        'max_weight' => 500,
+        'cost' => 16.6,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 501,
+        'max_weight' => 750,
+        'cost' => 19.35,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 751,
+        'max_weight' => 1000,
+        'cost' => 23.0,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1001,
+        'max_weight' => 1250,
+        'cost' => 26.45,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1251,
+        'max_weight' => 1500,
+        'cost' => 29.2,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+    [
+        'shipping_zone_id' => $shipping_zone->id,
+        'package_size_id' => ShippingPackageSize::where('format', 'Small parcel')->first()->id,
+        'shipping_option_id' => ShippingOption::where('provider', 'Royal Mail')->first()->id,
+        'cost_based_on' => 'basket_weight',
+        'min_weight' => 1501,
+        'max_weight' => 2000,
+        'cost' => 30.45,
+        'available' => 1,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_by' => 1,
+    ],
+);
+
+DB::table('shipping_rates')->insert($wz3_shipping_rate_data);
 
 
-            // shipping zone products 
-            $shipping_zone_products = [];
-            foreach ($products as $product) {
-                $shipping_zone_products[] = array(
-                    'shipping_zone_id' => $shipping_zone->id,
-                    'product_id' => $product->id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'created_by' => 1,
-                );
-            }
-            DB::table('shipping_zone_products')->insert($shipping_zone_products);
 
 
-            // shipping rates 
-            $shipping_package_sizes = ShippingPackageSize::where('available', 1)->pluck('id');
-            $shipping_options = ShippingOption::where('available', 1)->pluck('id');
 
 
-            foreach($shipping_package_sizes as $key => $shipping_package_size) {
-
-                $shipping_rate_data = array(
-                    [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[$key],
-                        'cost_based_on' => 'basket_weight',
-                        'min_weight' => 0,
-                        'max_weight' => 100,
-                        'cost' => 8,
-                        'available' => 1,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => 1,
-                    ],
-                    [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[$key],
-                        'cost_based_on' => 'basket_weight',
-                        'min_weight' => 101,
-                        'max_weight' => 250,
-                        'cost' => 12,
-                        'available' => 1,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => 1,
-                    ],
-                    [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[$key],
-                        'cost_based_on' => 'basket_weight',
-                        'min_weight' => 251,
-                        'max_weight' => 1000,
-                        'cost' => 15,
-                        'available' => 1,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => 1,
-                    ],
-                    [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[$key],
-                        'cost_based_on' => 'basket_weight',
-                        'min_weight' => 1001,
-                        'max_weight' => 2000,
-                        'cost' => 20,
-                        'available' => 1,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => 1,
-                    ],
-                    [
-                        'shipping_zone_id' => $shipping_zone->id,
-                        'package_size_id' => $shipping_package_size,
-                        'shipping_option_id' => $shipping_options[$key],
-                        'cost_based_on' => 'basket_weight',
-                        'min_weight' => 2001,
-                        'max_weight' => 20000,
-                        'cost' => 25,
-                        'available' => 1,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'created_by' => 1,
-                    ],
-                );
-    
-                DB::table('shipping_rates')->insert($shipping_rate_data);
-
-            }
 
 
-           
-        }
+
+
+
+
+        // $zones = array(
+        //     'Africa' => [
+        //         "DZ",
+        //         "AO",
+        //         "BW",
+        //         "BI",
+        //         "CM",
+        //         "CV",
+        //         "CF",
+        //         "TD",
+        //         "KM",
+        //         "YT",
+        //         "CG",
+        //         "CD",
+        //         "BJ",
+        //         "GQ",
+        //         "ET",
+        //         "ER",
+        //         "DJ",
+        //         "GA",
+        //         "GM",
+        //         "GH",
+        //         "GN",
+        //         "CI",
+        //         "KE",
+        //         "LS",
+        //         "LR",
+        //         "LY",
+        //         "MG",
+        //         "MW",
+        //         "ML",
+        //         "MR",
+        //         "MU",
+        //         "MA",
+        //         "MZ",
+        //         "NA",
+        //         "NE",
+        //         "NG",
+        //         "GW",
+        //         "RE",
+        //         "RW",
+        //         "SH",
+        //         "ST",
+        //         "SN",
+        //         "SC",
+        //         "SL",
+        //         "SO",
+        //         "ZA",
+        //         "ZW",
+        //         "SS",
+        //         "EH",
+        //         "SD",
+        //         "SZ",
+        //         "TG",
+        //         "TN",
+        //         "UG",
+        //         "EG",
+        //         "TZ",
+        //         "BF",
+        //         "ZM",
+        //     ],
+
+        //     'Antarctica' => ["AQ", "BV", "GS", "TF", "HM"],
+
+        //     'Asia' => [
+        //         "AF",
+        //         "AZ",
+        //         "BH",
+        //         "BD",
+        //         "AM",
+        //         "BT",
+        //         "IO",
+        //         "BN",
+        //         "MM",
+        //         "KH",
+        //         "LK",
+        //         "CN",
+        //         "TW",
+        //         "CX",
+        //         "CC",
+        //         "CY",
+        //         "GE",
+        //         "PS",
+        //         "HK",
+        //         "IN",
+        //         "ID",
+        //         "IR",
+        //         "IQ",
+        //         "IL",
+        //         "JP",
+        //         "KZ",
+        //         "JO",
+        //         "KP",
+        //         "KR",
+        //         "KW",
+        //         "KG",
+        //         "LA",
+        //         "LB",
+        //         "MO",
+        //         "MY",
+        //         "MV",
+        //         "MN",
+        //         "OM",
+        //         "NP",
+        //         "PK",
+        //         "PH",
+        //         "TL",
+        //         "QA",
+        //         "RU",
+        //         "SA",
+        //         "SG",
+        //         "VN",
+        //         "SY",
+        //         "TJ",
+        //         "TH",
+        //         "AE",
+        //         "TR",
+        //         "TM",
+        //         "UZ",
+        //         "YE",
+        //         "XE",
+        //         "XD",
+        //     ],
+
+        //     'Europe' => [
+        //         "AL",
+        //         "AD",
+        //         "AZ",
+        //         "AT",
+        //         "AM",
+        //         "BE",
+        //         "BA",
+        //         "BG",
+        //         "BY",
+        //         "HR",
+        //         "CY",
+        //         "CZ",
+        //         "DK",
+        //         "EE",
+        //         "FO",
+        //         "FI",
+        //         "AX",
+        //         "FR",
+        //         "GE",
+        //         "DE",
+        //         "GI",
+        //         "GR",
+        //         "VA",
+        //         "HU",
+        //         "IS",
+        //         "IE",
+        //         "IT",
+        //         "KZ",
+        //         "LV",
+        //         "LI",
+        //         "LT",
+        //         "LU",
+        //         "MT",
+        //         "MC",
+        //         "MD",
+        //         "ME",
+        //         "NL",
+        //         "NO",
+        //         "PL",
+        //         "PT",
+        //         "RO",
+        //         "RU",
+        //         "SM",
+        //         "RS",
+        //         "SK",
+        //         "SI",
+        //         "ES",
+        //         "SJ",
+        //         "SE",
+        //         "CH",
+        //         "TR",
+        //         "UA",
+        //         "MK",
+        //         "GG",
+        //         "JE",
+        //         "IM",
+        //     ],
+
+        //     'North America' => [
+        //         "AG",
+        //         "BS",
+        //         "BB",
+        //         "BM",
+        //         "BZ",
+        //         "VG",
+        //         "CA",
+        //         "KY",
+        //         "CR",
+        //         "CU",
+        //         "DM",
+        //         "DO",
+        //         "SV",
+        //         "GL",
+        //         "GD",
+        //         "GP",
+        //         "GT",
+        //         "HT",
+        //         "HN",
+        //         "JM",
+        //         "MQ",
+        //         "MX",
+        //         "MS",
+        //         "AN",
+        //         "CW",
+        //         "AW",
+        //         "SX",
+        //         "BQ",
+        //         "NI",
+        //         "UM",
+        //         "PA",
+        //         "PR",
+        //         "BL",
+        //         "KN",
+        //         "AI",
+        //         "LC",
+        //         "MF",
+        //         "PM",
+        //         "VC",
+        //         "TT",
+        //         "TC",
+        //         "US",
+        //         "VI",
+        //     ],
+
+        //     'Oceania' => [
+        //         "AS",
+        //         "AU",
+        //         "SB",
+        //         "CK",
+        //         "FJ",
+        //         "PF",
+        //         "KI",
+        //         "GU",
+        //         "NR",
+        //         "NC",
+        //         "VU",
+        //         "NZ",
+        //         "NU",
+        //         "NF",
+        //         "MP",
+        //         "UM",
+        //         "FM",
+        //         "MH",
+        //         "PW",
+        //         "PG",
+        //         "PN",
+        //         "TK",
+        //         "TO",
+        //         "TV",
+        //         "WF",
+        //         "WS",
+        //         "XX",
+        //     ],
+
+        //     'South America' => [
+        //         "AR",
+        //         "BO",
+        //         "BR",
+        //         "CL",
+        //         "CO",
+        //         "EC",
+        //         "FK",
+        //         "GF",
+        //         "GY",
+        //         "PY",
+        //         "PE",
+        //         "SR",
+        //         "UY",
+        //         "VE",
+        //     ],
+
+        //     'Domestic' => ['GB']
+        // );
+
     }
 }

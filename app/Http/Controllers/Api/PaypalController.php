@@ -14,11 +14,12 @@ class PaypalController extends Controller
 
     public function paymentStatus()
     {
+
         try {
             $input = @file_get_contents("php://input");
             $data = json_decode($input);
             $type = $data->event_type;
-            if ($type === 'PAYMENT.CAPTURE.COMPLETED') {
+            if ($type == 'PAYMENT.CAPTURE.COMPLETED') {
                 $payment = $data->resource;
                 if ($payment->status === 'COMPLETED') {
                     OrderPayment::where('payment_id', $payment->id)
@@ -27,15 +28,18 @@ class PaypalController extends Controller
             }
 
             DB::table('test')->insert(['data' => $input]);
+
         } catch (\Exception $e) {
-            $event = (object) array(
+            $event = array(
                 'event_id' => time(),
                 'type' => 'error',
                 'data' => array('error' => $e->getMessage())
             );
+
+            DB::table('test')->insert(['data' => json_encode($event)]);
         }
 
-        return response()->json(['msg' => 'paypal payment hook'], 200);
+        return response()->json(['msg' => 'paypal payment hook', 'type' => $type, 'id' => $payment->id, 'status' => $payment->status], 200);
     }
 }
 

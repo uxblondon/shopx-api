@@ -63,24 +63,25 @@ class StripeController extends Controller
             $input = @file_get_contents("php://input");
             $data = json_decode($input);
             $type = $data->type;
-           // if ($type == 'payment_intent.succeeded') {
+            if ($type == 'payment_intent.succeeded') {
                 $payment = $data->data->object;
                 $status = $payment->charges->data[0]->status;
                 if ($payment->charges->data[0]->status === 'succeeded') {
                     OrderPayment::where('payment_id', $payment->id)
                     ->update(['payment_status' => $status, 'payment_confirmed' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
                 }
+            }
 
-                DB::table('test')->insert(['data' => $type]);
-         //   }
+            DB::table('test')->insert(['data' => $input]);
 
-            
         } catch (\Exception $e) {
-            $event = (object) array(
+            $event = array(
                 'event_id' => time(),
                 'type' => 'error',
                 'data' => array('error' => $e->getMessage())
             );
+
+            DB::table('test')->insert(['data' => json_encode($event)]);
         }
 
         return response()->json(['msg' => 'stripe payment hook', 'type' => $type, 'id' => $payment->id, 'status' => $status], 200);

@@ -46,7 +46,12 @@ Route::group([
 
     Route::get('orders/sequence', 'Api\OrderController@sequence');
 
-   
+
+
+    Route::get('orders/sequence', 'Api\OrderController@sequence');
+
+    Route::get('stripe-payment-status', 'Api\StripeController@paymentStatus');
+    Route::get('paypal-payment-status', 'Api\PaypalController@paymentStatus');
     
 });
 

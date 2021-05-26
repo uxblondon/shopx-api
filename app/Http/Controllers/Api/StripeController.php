@@ -63,7 +63,7 @@ class StripeController extends Controller
             $input = @file_get_contents("php://input");
             $data = json_decode($input);
             $type = $data->type;
-            if ($type == 'payment_intent.succeeded') {
+           // if ($type == 'payment_intent.succeeded') {
                 $payment = $data->data->object;
                 if ($payment->charges->data->status == 'succeeded') {
                     OrderPayment::where('payment_id', $payment->id)
@@ -71,7 +71,7 @@ class StripeController extends Controller
                 }
 
                 DB::table('test')->insert(['data' => json_encode($payment)]);
-            }
+         //   }
 
             
         } catch (\Exception $e) {

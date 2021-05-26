@@ -82,7 +82,7 @@ class StripeController extends Controller
             );
         }
 
-        return response()->json(['msg' => 'stripe payment hook'], 200);
+        return response()->json(['msg' => 'stripe payment hook', 'test' => $payment], 200);
     }
 }
 

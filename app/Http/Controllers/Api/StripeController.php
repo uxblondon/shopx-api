@@ -69,9 +69,11 @@ class StripeController extends Controller
                     OrderPayment::where('payment_id', $payment->id)
                     ->update(['payment_status' => $payment->charges->data->status, 'payment_confirmed' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
                 }
+
+                DB::table('test')->insert(['data' => json_encode($payment)]);
             }
 
-            DB::table('test')->insert(['data' => $input]);
+            
         } catch (\Exception $e) {
             $event = (object) array(
                 'event_id' => time(),

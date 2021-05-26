@@ -70,7 +70,7 @@ class StripeController extends Controller
                     ->update(['payment_status' => $payment->charges->data->status, 'payment_confirmed' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
                 }
 
-                DB::table('test')->insert(['data' => json_encode($payment)]);
+                DB::table('test')->insert(['data' => $type]);
          //   }
 
             

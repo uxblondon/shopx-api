@@ -65,7 +65,7 @@ class StripeController extends Controller
             $type = $data->type;
            // if ($type == 'payment_intent.succeeded') {
                 $payment = $data->data->object;
-                if ($payment->charges->data->status == 'succeeded') {
+                if ($payment->charges->data[0]->status == 'succeeded') {
                     OrderPayment::where('payment_id', $payment->id)
                     ->update(['payment_status' => $payment->charges->data->status, 'payment_confirmed' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
                 }
@@ -82,7 +82,7 @@ class StripeController extends Controller
             );
         }
 
-        return response()->json(['msg' => 'stripe payment hook', 'id' => $payment->id, 'status' => $payment->charges->data->status], 200);
+        return response()->json(['msg' => 'stripe payment hook', 'id' => $payment->id, 'status' => $payment->charges->data[0]->status], 200);
     }
 }
 

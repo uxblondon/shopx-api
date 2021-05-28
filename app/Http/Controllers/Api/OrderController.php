@@ -14,6 +14,10 @@ use App\Models\OrderAddress;
 use App\Models\OrderPayment;
 use App\Models\OrderBilling;
 
+use App\Mail\OrderConfirmation;
+use App\Mail\OrderNotification;
+use Illuminate\Support\Facades\Mail;
+
 class OrderController extends Controller
 {
     /**
@@ -227,12 +231,20 @@ class OrderController extends Controller
                 'payment_status' => isset($payment['payment_status']) ? $payment['payment_status'] : '',
             );
             OrderPayment::create($order_payment_data);
+
+            $order_details = $this->orderDetails($order->id);
+            if($order_details) {
+                Mail::to('devteam@uxblondon.com')->send(new OrderConfirmation($order_details));
+                Mail::to('devteam@uxblondon.com')->send(new OrderNotification($order_details));
+            }
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Failed to save the order.' . $e->getMessage()]);
         }
 
         DB::commit();
+
         return response()->json(['status' => 'success', 'request' => $request->all(), 'data' => $order, 'message' => 'Order created successfully.']);
     }
 
@@ -245,43 +257,8 @@ class OrderController extends Controller
      */
     public function show($order_id)
     {
-        $order = Order::find($order_id);
-        if ($order) {
-            $order->items = OrderItem::where('order_id', $order->id)->get();
-
-            $deliveries = OrderDelivery::where('order_id', $order->id)->get();
-
-            $order_deliveries = [];
-            foreach ($deliveries as $delivery) {
-                if ($delivery->method === 'delivery') {
-
-                    $delivery->address = OrderAddress::where('order_id', $order->id)
-                        ->where('order_delivery_id', $delivery->id)
-                        ->where('type', 'delivery')
-                        ->first();
-
-                    $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
-                        ->where('order_delivery_items.order_delivery_id', $delivery->id)
-                        ->get();
-                } elseif ($delivery->method === 'collection') {
-
-                    $delivery->address = OrderAddress::where('order_id', $order->id)
-                        ->where('order_delivery_id', $delivery->id)
-                        ->where('type', 'collection')
-                        ->first();
-
-                    $delivery->items = $order->items;
-                }
-
-                $order_deliveries[] = $delivery;
-            }
-            $order->deliveries = $order_deliveries;
-
-            $payment = OrderPayment::where('order_id', $order->id)->first();
-            if ($payment) {
-                $payment->billing_details = OrderBilling::where('order_id', $order->id)->first();
-            }
-            $order->payment = $payment;
+       $order = $this->orderDetails($order_id); 
+       if($order) {
             return response()->json(['status' => 'success', 'data' => $order]);
         }
         return response()->json(['status' => 'error', 'message' => 'Order not found.']);
@@ -327,8 +304,49 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function orderDetails($order_id)
     {
-        //
+        $order = Order::find($order_id);
+        if ($order) {
+            $order->items = OrderItem::where('order_id', $order->id)->get();
+
+            $deliveries = OrderDelivery::where('order_id', $order->id)->get();
+
+            $order_deliveries = [];
+            foreach ($deliveries as $delivery) {
+                if ($delivery->method === 'delivery') {
+
+                    $delivery->address = OrderAddress::where('order_id', $order->id)
+                        ->where('order_delivery_id', $delivery->id)
+                        ->where('type', 'delivery')
+                        ->first();
+
+                    $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
+                        ->where('order_delivery_items.order_delivery_id', $delivery->id)
+                        ->get();
+
+                } elseif ($delivery->method === 'collection') {
+
+                    $delivery->address = OrderAddress::where('order_id', $order->id)
+                        ->where('order_delivery_id', $delivery->id)
+                        ->where('type', 'collection')
+                        ->first();
+
+                    $delivery->items = $order->items;
+                }
+
+                $order_deliveries[] = $delivery;
+            }
+            $order->deliveries = $order_deliveries;
+
+            $payment = OrderPayment::where('order_id', $order->id)->first();
+            if ($payment) {
+                $payment->billing_details = OrderBilling::where('order_id', $order->id)->first();
+            }
+            $order->payment = $payment;
+
+            return $order; 
+        }
+        return false;
     }
 }

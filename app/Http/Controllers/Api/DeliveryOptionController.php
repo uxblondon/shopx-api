@@ -24,13 +24,12 @@ class DeliveryOptionController extends Controller
      */
     public function options(Request $request)
     {
-
-        // total weight to find the appropriate package
-
-        // total items dimensions to find the package size 
-
         $this->address = $request->get('address');
         $items = $request->get('items');
+
+        // get the shipping zone and check all item can be shippied there
+        
+        //
 
 
         $this->getPackages($items);

@@ -16,9 +16,9 @@ class OrderConfirmation extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($order)
     {
-        //
+        $this->order = $order;
     }
 
     /**
@@ -28,6 +28,11 @@ class OrderConfirmation extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->subject('Trinity House Order: '.$this->order->ref)
+        ->from('devteam@uxblondon.com', 'Trinty House')
+        ->view('emails.order-confirmation')
+        ->with([
+            'order' => $this->order
+        ]);
     }
 }

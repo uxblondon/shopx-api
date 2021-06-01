@@ -49,7 +49,7 @@ class OrderController extends Controller
             $order_no = $last_order->id;
         }
 
-        $sequence = 'TH' .strtoupper($shipping_method[0]) . $no_of_items. date('ymd') . str_pad($order_no, 6, '0', STR_PAD_LEFT);
+        $sequence = 'TH' .strtoupper($shipping_method[0]) . $no_of_items.'-'. date('ymd') .'-'. str_pad($order_no, 8, '0', STR_PAD_LEFT);
 
         return $sequence;
     }

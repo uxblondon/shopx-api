@@ -13,18 +13,31 @@ class CollectionTableSeeder extends Seeder
      */
     public function run()
     {
-        $fake = Faker\Factory::create();
-
-        for ($a = 0; $a < 3; $a++) {
-            $collection_point_data = array(
-                'name' => $fake->name,
-                'address_line_1' => $fake->streetName,
-                'city' => $fake->city,
-                'postcode' => $fake->postcode,
+        $collection_points = array(
+            [
+                'name' => 'Trinity House Harwich',
+                'address_line_1' => 'Harwich Quay',
+                'city' => 'Harwich',
+                'postcode' => 'CO12 3JW',
+                'county' => 'Essex',
                 'country_code' => 'GB',
                 'active' => 1,
                 'created_by' => 1,
-            );
+            ],
+            [
+                'name' => 'Trinity House London',
+                'address_line_1' => 'Tower Hill',
+                'city' => 'London',
+                'postcode' => 'EC3N 4DH',
+                'county' => '',
+                'country_code' => 'GB',
+                'active' => 1,
+                'created_by' => 1,
+            ],
+        );
+
+        foreach ($collection_points as $collection_point_data) {
+            
             $collection_point = CollectionPoint::create($collection_point_data);
 
             $collection_rate1 = array(

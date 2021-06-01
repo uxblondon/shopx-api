@@ -61,7 +61,7 @@ class ShippingsTableSeeder extends Seeder
         //foreach ($shipping_options as $shipping_option) {
         //}
 
-        $shipping_option = ['provider' => 'Royal Mail', 'service' => '1st Class', 'speed' => '3 to 5 day delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 100];
+        $shipping_option = ['provider' => 'Royal Mail', 'service' => '1st Class', 'speed' => '3 to 5 day delivery', 'has_tracking' => 0, 'tracking_type' => '', 'min_weight' => 0, 'max_weight' => 20000];
 
         $shipping_option['available'] = 1;
         $shipping_option['created_by'] = 1;

@@ -28,7 +28,7 @@ class OrderConfirmation extends Mailable
      */
     public function build()
     {
-        return $this->subject('Trinity House Order: '.$this->order->ref)
+        return $this->subject('Trinity House Order Confirmation - '.$this->order->ref)
         ->from('devteam@uxblondon.com', 'Trinty House')
         ->view('emails.order-confirmation')
         ->with([

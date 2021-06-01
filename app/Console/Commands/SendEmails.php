@@ -50,10 +50,11 @@ class SendEmails extends Command
     public function handle()
     {
         $orders = Order::where('status', 'confirmed')
-        ->whereNull('email_confirmation_sent_at')
-        ->orWhereNull('email_notification_sent_at')
+        ->where(function($query) {
+            $query->whereNull('email_confirmation_sent_at')->orWhereNull('email_notification_sent_at');
+        })
         ->orderBy('created_at')
-        ->limit(10)
+        ->limit(6)
         ->get();
 
         if($orders->count() > 0) {
@@ -62,24 +63,28 @@ class SendEmails extends Command
                 if($order->email_notification_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
-                        Mail::to('devteam@uxblondon.com')->send(new OrderNotification($order_details));
+                        Mail::to('hasan@uxblondon.com')->send(new OrderNotification($order_details));
                     } catch(\Exception $e) {
 
                     }
+                    Order::where('id', $order->id)->update(['email_notification_sent_at' => date('Y-m-d H:i:s')]);
                 }
 
                 // send confirmation 
-                if($order->email_confirmation_sent_at) {
+                if($order->email_confirmation_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
-                        Mail::to('devteam@uxblondon.com')->send(new OrderConfirmation($order_details));
+                        Mail::to('hasan@uxblondon.com')->send(new OrderConfirmation($order_details));
                     } catch(\Exception $e) {
 
                     }
+                    Order::where('id', $order->id)->update(['email_confirmation_sent_at' => date('Y-m-d H:i:s')]);
                 }
 
                 sleep(2);
             }
+
+            sleep(5);
         }
     }
 

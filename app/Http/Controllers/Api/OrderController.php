@@ -14,10 +14,6 @@ use App\Models\OrderAddress;
 use App\Models\OrderPayment;
 use App\Models\OrderBilling;
 
-use App\Mail\OrderConfirmation;
-use App\Mail\OrderNotification;
-use Illuminate\Support\Facades\Mail;
-
 class OrderController extends Controller
 {
     /**
@@ -53,7 +49,7 @@ class OrderController extends Controller
             $order_no = $last_order->id;
         }
 
-        $sequence = 'TH' . date('ymd') . str_pad($order_no, 6, '0', STR_PAD_LEFT) . strtoupper($shipping_method[0]) . $no_of_items;
+        $sequence = 'TH' .strtoupper($shipping_method[0]) . $no_of_items. date('ymd') . str_pad($order_no, 6, '0', STR_PAD_LEFT);
 
         return $sequence;
     }
@@ -231,12 +227,6 @@ class OrderController extends Controller
                 'payment_status' => isset($payment['payment_status']) ? $payment['payment_status'] : '',
             );
             OrderPayment::create($order_payment_data);
-
-            $order_details = $this->orderDetails($order->id);
-            if($order_details) {
-                Mail::to('devteam@uxblondon.com')->send(new OrderConfirmation($order_details));
-                Mail::to('devteam@uxblondon.com')->send(new OrderNotification($order_details));
-            }
 
         } catch (\Exception $e) {
             DB::rollBack();

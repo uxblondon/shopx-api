@@ -74,6 +74,56 @@ class ProductController extends Controller
         return response()->json(['status' => 'success', 'data' => $products]);
     }
 
+
+    /**
+     * @OA\Get(
+     *      path="/api/products",
+     *      operationId="GetProductList",
+     *      tags={"product"},
+     *      summary="Get list of all products",
+     *      description="Returns list of products",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *       @OA\Response(
+     *          response=400,
+     *          description="Bad request"
+     *        )
+     *     )
+     */
+    public function filterList(Request $request)
+    {
+        $data = [
+            'products.id',
+            'products.title',
+            'products.standfirst',
+            DB::raw('count(product_variants.id) as no_of_variants'),
+            DB::raw('min(product_variants.price) as price_from'),
+            DB::raw('sum(product_variants.stock) as stock'),
+            'product_images.description as feature_image_description',
+            'product_images.location as feature_image_location',
+            'products.status',
+        ];
+
+        $products = Product::leftJoin('product_variants', function ($join) {
+            $join->on('products.id', 'product_variants.product_id')
+                ->whereNull('product_variants.deleted_at');
+        })
+            ->leftJoin('product_images', function ($join) {
+                $join->on('product_images.product_id', 'products.id')
+                    ->where('product_images.feature_image', 1);
+            })
+            ->select($data)
+            ->where('products.title', 'LIKE', '%' . $request->get('search') . '%')
+            ->orWhere('products.id', $request->get('search'))
+            ->groupBy('products.id')
+            ->groupBy('product_images.id')
+            ->get();
+
+        return response()->json(['status' => 'success', 'data' => $products]);
+    }
+
     /**
      * @OA\Post(
      *      path="/api/products/filter",

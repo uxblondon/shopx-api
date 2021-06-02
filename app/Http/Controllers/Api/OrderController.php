@@ -25,13 +25,91 @@ class OrderController extends Controller
     {
         $orders = Order::join('order_payments', 'order_payments.order_id', 'orders.id')
             ->join('order_items', 'order_items.order_id', 'orders.id')
-            ->select(['orders.id', 'orders.name', 'orders.email', DB::raw('count(order_items.id) as no_of_items'), 'orders.created_at', 'order_payments.payment_type', 'order_payments.amount'])
+            ->select(['orders.id', 'orders.ref', 'orders.name', 'orders.email', DB::raw('count(order_items.id) as no_of_items'), 'orders.created_at', 'order_payments.payment_type', 'order_payments.amount'])
             ->orderBy('orders.created_at', 'desc')
             ->groupBy('orders.id')
             ->groupBy('order_payments.id')
             ->get();
 
         return response()->json(['status' => 'success', 'data' => $orders]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function filterList(Request $request)
+    {
+        $orders = Order::join('order_payments', 'order_payments.order_id', 'orders.id')
+            ->join('order_items', 'order_items.order_id', 'orders.id')
+            ->select(['orders.id', 'orders.ref', 'orders.name', 'orders.email', DB::raw('count(order_items.id) as no_of_items'), 'orders.created_at', 'order_payments.payment_type', 'order_payments.amount'])
+            ->where('orders.email', $request->get('search'))
+            ->orWhere('orders.ref', $request->get('search'))
+            ->orderBy('orders.created_at', 'desc')
+            ->groupBy('orders.id')
+            ->groupBy('order_payments.id')
+            ->get();
+
+        return response()->json(['status' => 'success', 'data' => $orders]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function statistics()
+    {
+        $order_days = [];
+        for ($day = 0; $day <= 6; $day++) {
+
+            $date = date('d M Y', strtotime('-' . $day . ' day'));
+            $start = date('Y-m-d 00:00:00', strtotime('-' . $day . ' day'));
+            $end = date('Y-m-d 23:59:59', strtotime('-' . $day . ' day'));
+
+            $stat = [
+                'start' => $start,
+                'end' => $end,
+                'date' => $date,
+                'orders' => Order::where('status', 'confirmed')
+                    ->where('created_at', '>=', $start)
+                    ->where('created_at', '<=', $end)
+                    ->count(),
+                'amount' => Order::join('order_payments', 'orders.id', 'order_payments.order_id')
+                    ->where('orders.status', 'confirmed')->where('orders.created_at', '>=', $start)
+                    ->where('orders.created_at', '<=', $end)
+                    ->sum('amount'),
+            ];
+
+            $order_days[] = $stat;
+        }
+
+        $month_start = date('Y-m-d 00:00:00', strtotime('-1 month'));
+        $month_end = date('Y-m-d 23:59:59');
+
+        $item_orders = Order::join('order_items', 'orders.id', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', 'products.id')
+            ->where('orders.status', 'confirmed')
+            ->where('orders.created_at', '>=', $month_start)
+            ->where('orders.created_at', '<=', $month_end)
+            ->groupBy('order_items.product_id')
+            ->limit(5)
+            ->get(['products.id', 'products.title', DB::raw('count(order_items.product_id) as no_of_orders')])
+            ->toArray();
+
+        $order_items = array(
+            'start' => date('Y-m-d', strtotime('-1 month')),
+            'end' => date('Y-m-d H:i a'),
+            'item_orders' => $item_orders
+        );
+
+        $statistics = array(
+            'order_days' => $order_days,
+            'order_items' => $order_items,
+        );
+
+        return response()->json(['status' => 'success', 'data' => $statistics]);
     }
 
     /**
@@ -49,7 +127,7 @@ class OrderController extends Controller
             $order_no = $last_order->id;
         }
 
-        $sequence = 'TH'. date('ymd').strtoupper($shipping_method[0]) . $no_of_items .'-'. str_pad($order_no, 8, '0', STR_PAD_LEFT);
+        $sequence = 'TH' . date('ymd') . strtoupper($shipping_method[0]) . $no_of_items . '-' . str_pad($order_no, 8, '0', STR_PAD_LEFT);
 
         return $sequence;
     }
@@ -227,7 +305,6 @@ class OrderController extends Controller
                 'payment_status' => isset($payment['payment_status']) ? $payment['payment_status'] : '',
             );
             OrderPayment::create($order_payment_data);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Failed to save the order.' . $e->getMessage()]);
@@ -247,8 +324,8 @@ class OrderController extends Controller
      */
     public function show($order_id)
     {
-       $order = $this->orderDetails($order_id); 
-       if($order) {
+        $order = $this->orderDetails($order_id);
+        if ($order) {
             return response()->json(['status' => 'success', 'data' => $order]);
         }
         return response()->json(['status' => 'error', 'message' => 'Order not found.']);
@@ -314,7 +391,6 @@ class OrderController extends Controller
                     $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
                         ->where('order_delivery_items.order_delivery_id', $delivery->id)
                         ->get();
-
                 } elseif ($delivery->method === 'collection') {
 
                     $delivery->address = OrderAddress::where('order_id', $order->id)
@@ -335,7 +411,7 @@ class OrderController extends Controller
             }
             $order->payment = $payment;
 
-            return $order; 
+            return $order;
         }
         return false;
     }

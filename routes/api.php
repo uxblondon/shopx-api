@@ -28,7 +28,7 @@ Route::group([
     Route::get('products', 'Api\ProductController@index');
     Route::get('available-products', 'Api\ProductController@available');
 
-
+    
     Route::post('orders', 'Api\OrderController@store');
 
 
@@ -142,6 +142,8 @@ Route::group([
     Route::put('categories/{category_id}', 'Api\CategoryController@update');
     Route::post('categories', 'Api\CategoryController@store');
 
+    Route::post('filter-product-list', 'Api\ProductController@filterList');
+
     Route::put('products/{product_id}/shipping', 'Api\ProductController@manageShipping');
     Route::get('products/{product_id}/shipping', 'Api\ProductController@shipping');
 
@@ -161,7 +163,8 @@ Route::group([
     Route::put('products/{product_id}', 'Api\ProductController@update');
     Route::post('products', 'Api\ProductController@store');
 
-
+    Route::post('filter-order-list', 'Api\OrderController@filterList');
+    Route::get('orders/statistics', 'Api\OrderController@statistics');
     Route::delete('orders/{order_id}', 'Api\OrderController@destroy');
     Route::put('orders/{order_id}', 'Api\OrderController@update');
   //  Route::post('orders', 'Api\OrderController@store');

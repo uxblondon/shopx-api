@@ -17,21 +17,14 @@ use Illuminate\Http\Request;
 Route::group([
     'middleware' => 'api',
 ], function () {
-    Route::get('categories/{category_id}', 'Api\CategoryController@show');
-    Route::post('categories/filter', 'Api\CategoryController@filter');
-    Route::get('categories', 'Api\CategoryController@index');
+    Route::get('categories/{category_id}/published', 'Api\CategoryController@publishedInfo');
+    Route::get('published-categories', 'Api\CategoryController@publishedList');
 
-    Route::get('products/{product_id}', 'Api\ProductController@show');
-    Route::get('products/{product_id}/variants', 'Api\ProductController@variants');
-    Route::post('products/filter', 'Api\ProductController@filter');
+    Route::get('products/{product_id}/published', 'Api\ProductController@publishedInfo');
     Route::get('featured-products', 'Api\ProductController@featuredProducts');
-    Route::get('products', 'Api\ProductController@index');
-    Route::get('available-products', 'Api\ProductController@available');
+    Route::get('published-products', 'Api\ProductController@publishedList');
 
-    
     Route::post('orders', 'Api\OrderController@store');
-
-
 
     Route::post('delivery-options', 'Api\DeliveryOptionController@options');
     Route::post('collection-options', 'Api\CollectionOptionController@options');
@@ -138,6 +131,9 @@ Route::group([
     Route::get('available-shipping-zones', 'Api\ShippingZoneController@available');
     Route::get('shipping-zones', 'Api\ShippingZoneController@index');
 
+    Route::get('categories/{category_id}', 'Api\CategoryController@show');
+    Route::post('categories/filter', 'Api\CategoryController@filter');
+    Route::get('categories', 'Api\CategoryController@index');
     Route::delete('categories/{category_id}', 'Api\CategoryController@destroy');
     Route::put('categories/{category_id}', 'Api\CategoryController@update');
     Route::post('categories', 'Api\CategoryController@store');
@@ -159,6 +155,10 @@ Route::group([
     Route::put('products/{product_id}/images/{image_id}', 'Api\ProductImageController@update');
     Route::post('products/{product_id}/images', 'Api\ProductImageController@store');
 
+    Route::get('products/{product_id}/variants', 'Api\ProductController@variants');
+    Route::get('products/{product_id}', 'Api\ProductController@show');
+    Route::post('products/filter', 'Api\ProductController@filter');
+    Route::get('products', 'Api\ProductController@index');
     Route::delete('products/{product_id}', 'Api\ProductController@destroy');
     Route::put('products/{product_id}', 'Api\ProductController@update');
     Route::post('products', 'Api\ProductController@store');

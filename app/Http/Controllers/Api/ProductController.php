@@ -324,6 +324,116 @@ class ProductController extends Controller
      *       ),
      *     )
      */
+    public function publishedInfo($product_id)
+    {
+       // $product = Product::find($product_id);
+        $product = Product::where('id', $product_id)->where('status', 'published')->first();
+
+        if ($product) {
+            $product->categories = ProductCategory::where('product_id', $product->id)
+                ->join('categories', 'categories.id', 'product_categories.category_id')
+                ->get(['categories.id', 'categories.title', 'categories.status']);
+
+            $product->feature_image = ProductImage::where('product_id', $product_id)
+                ->where('feature_image', 1)
+                ->first();
+
+            $product->images = ProductImage::where('product_id', $product_id)
+                ->where('feature_image', 0)
+                ->get();
+
+            $product->price_from = ProductVariant::where('product_id', $product_id)->min('price');
+
+            $variant_types = ProductVariantType::where('product_id', $product_id)
+                ->whereNull('deleted_at')
+                ->orderBy('variant_no', 'asc')
+                ->get(['id', 'product_id', 'variant_no', 'name', 'options'])->toArray();
+
+            $product_variant_type = [];
+            if (count($variant_types) > 0) {
+                foreach ($variant_types as $variant_type) {
+                    $product_variant_type[$variant_type['variant_no']] = $variant_type;
+                }
+            }
+
+            $variants['types'] = (array)$product_variant_type;
+
+            $variants['values'] = ProductVariant::join('products', 'products.id', 'product_variants.product_id')
+                ->leftJoin('product_images', function ($join) {
+                    $join->on('product_images.product_id', 'products.id')
+                        ->where('product_images.feature_image', 1);
+                })
+                ->leftJoin('product_variant_types as variant_1', function ($join) {
+                    $join->on('variant_1.id', 'product_variants.variant_1_id')->whereNull('variant_1.deleted_at');
+                })
+                ->leftJoin('product_variant_types as variant_2', function ($join) {
+                    $join->on('variant_2.id', 'product_variants.variant_2_id')->whereNull('variant_2.deleted_at');
+                })
+                ->leftJoin('product_variant_types as variant_3', function ($join) {
+                    $join->on('variant_3.id', 'product_variants.variant_3_id')->whereNull('variant_3.deleted_at');
+                })
+                ->where('product_variants.product_id', $product_id)
+                ->get([
+                    'product_variants.id',
+                    'product_variants.product_id',
+                    'products.title as title',
+                    'product_images.location as image',
+                    'product_variants.sku',
+                    'product_variants.price',
+                    'product_variants.weight',
+                    'product_variants.length',
+                    'product_variants.width',
+                    'product_variants.height',
+                    'product_variants.shipping_not_required',
+                    'product_variants.separated_shipping_required',
+                    'product_variants.additional_shipping_cost',
+                    'product_variants.collectable',
+                    'product_variants.stock',
+                    'product_variants.variant_1_id',
+                    'variant_1.name as variant_1_name',
+                    'variant_1.options as variant_1_options',
+                    'product_variants.variant_1_value as variant_1_value',
+                    'variant_2.id as variant_2_id',
+                    'variant_2.name as variant_2_name',
+                    'variant_2.options as variant_2_options',
+                    'product_variants.variant_2_value as variant_2_value',
+                    'variant_3.id as variant_3_id',
+                    'variant_3.name as variant_3_name',
+                    'variant_3.options as variant_3_options',
+                    'product_variants.variant_3_value as variant_3_value',
+                ])
+                ->toArray();
+
+            $product->variants = $variants;
+
+            return response()->json(['status' => 'success', 'data' => $product]);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Product not found.']);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/products/{product_id}",
+     *      operationId="Products",
+     *      tags={"product"},
+     *      summary="Get list of filtered products",
+     *      description="Get list of filtered products",
+     *      @OA\Parameter(
+     *          name="product_id",
+     *          description="Product id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *     )
+     */
     public function show($product_id)
     {
         $product = Product::find($product_id);

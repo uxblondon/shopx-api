@@ -48,6 +48,33 @@ class CategoryController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/categories",
+     *      tags={"category"},
+     *      summary="Get list of all categories",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *       @OA\Response(
+     *          response=400,
+     *          description="Bad request"
+     *        )
+     *     )
+     */
+    public function publishedList()
+    {
+        $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
+            ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
+            ->where('categories.status', 'published')
+            ->groupBy('categories.id')
+            ->get();
+
+        return response()->json(['status' => 'success', 'data' => $categories]);
+    }
+
+
+    /**
      * @OA\Post(
      *      path="/api/categories/filter",
      *      tags={"category"},
@@ -123,6 +150,66 @@ class CategoryController extends Controller
         );
 
         $category = Category::create($category_data);
+
+        return response()->json(['status' => 'success', 'data' => $category]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/categories/{product_id}",
+     *      operationId="Products",
+     *      tags={"category"},
+     *      summary="Get list of filtered products",
+     *      description="Get list of filtered products",
+     *      @OA\Parameter(
+     *          name="product_id",
+     *          description="Product id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *     )
+     */
+    public function publishedInfo($category_id)
+    {
+        $product_data = [
+            'products.id',
+            'products.title',
+            'products.standfirst',
+            DB::raw('count(product_variants.id) as no_of_variants'),
+            DB::raw('min(product_variants.price) as price_from'),
+            DB::raw('sum(product_variants.stock) as stock'),
+            'product_images.description as feature_image_description',
+            'product_images.location as feature_image_location',
+            'products.status',
+        ];
+
+      //  $category = Category::where('categories.status', 'published')->where('categories.id', $category_id)->first();
+
+        $category = Category::find($category_id);
+
+        if ($category) {
+            $category->products = Product::Join('product_categories', function ($join) use ($category_id) {
+                $join->on('product_categories.product_id', 'products.id')
+                    ->where('product_categories.category_id', $category_id);
+            })->leftJoin('product_variants', function ($join) {
+                $join->on('products.id', 'product_variants.product_id')
+                    ->whereNull('product_variants.deleted_at');
+            })->leftJoin('product_images', function ($join) {
+                $join->on('product_images.product_id', 'products.id')
+                    ->where('product_images.feature_image', 1);
+            })->select($product_data)
+                ->where('products.status', 'published')
+                ->groupBy('products.id')
+                ->groupBy('product_images.id')
+                ->get();
+        }
 
         return response()->json(['status' => 'success', 'data' => $category]);
     }

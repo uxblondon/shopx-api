@@ -33,7 +33,7 @@ class UpdateCategoryRequest extends FormRequest
             'feature_image' => 'nullable|image',
             'description' => 'nullable',
             'status' => [
-                Rule::in(['draft', 'published']),
+                Rule::in(['draft', 'published', 'unlisted']),
             ],
             'meta_description' => 'nullable',
             'meta_keywords' => 'nullable',

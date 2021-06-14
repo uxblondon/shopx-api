@@ -34,7 +34,7 @@ class StoreProductRequest extends FormRequest
             'categories.*.id' => [
                 'required',
                 'numeric',
-                Rule::in($categories),
+             //   Rule::in($categories),
             ],
             'title' => 'required',
             'standfirst' => 'nullable',

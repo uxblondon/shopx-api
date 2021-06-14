@@ -19,6 +19,7 @@ Route::group([
 ], function () {
     Route::get('categories/{category_id}/published', 'Api\CategoryController@publishedInfo');
     Route::get('published-categories', 'Api\CategoryController@publishedList');
+    Route::get('unlisted', 'Api\CategoryController@unlisted');
 
     Route::get('products/{product_id}/published', 'Api\ProductController@publishedInfo');
     Route::get('featured-products', 'Api\ProductController@featuredProducts');

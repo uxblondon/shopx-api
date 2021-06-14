@@ -47,6 +47,33 @@ class CategoryController extends Controller
         return response()->json(['status' => 'success', 'data' => $categories]);
     }
 
+
+    /**
+     * @OA\Get(
+     *      path="/api/categories",
+     *      tags={"category"},
+     *      summary="Get list of all categories",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful response"
+     *       ),
+     *       @OA\Response(
+     *          response=400,
+     *          description="Bad request"
+     *        )
+     *     )
+     */
+    public function unlisted()
+    {
+        $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
+            ->select(['categories.id', 'categories.title', 'categories.standfirst', DB::raw('count(product_categories.id) as no_of_products'), 'categories.status'])
+            ->where('categories.status', 'unlisted')
+            ->groupBy('categories.id')
+            ->get();
+
+        return response()->json(['status' => 'success', 'data' => $categories]);
+    }
+
     /**
      * @OA\Get(
      *      path="/api/categories",

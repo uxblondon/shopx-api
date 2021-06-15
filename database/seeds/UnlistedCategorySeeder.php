@@ -63,7 +63,7 @@ class UnlistedCategorySeeder extends Seeder
                     if (trim($product->image) != '') {
                         $fi_content = file_get_contents($product->image);
                         if ($fi_content) {
-                            $fi_location = str_replace('', '', 'products/' . $new_product->id . '/' . $product->image);
+                            $fi_location = str_replace('', '', 'products/' . $new_product->id . '/' . $product->image_name);
                             Storage::disk('s3')->put($fi_location, $fi_content);
 
                             $product_fi_data = array(

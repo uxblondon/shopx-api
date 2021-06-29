@@ -219,7 +219,7 @@ class CategoryController extends Controller
 
       //  $category = Category::where('categories.status', 'published')->where('categories.id', $category_id)->first();
 
-        $category = Category::find($category_id);
+        $category = Category::whereIn('categories.status', ['published', 'unlisted'])->where('id', $category_id)->first();
 
         if ($category) {
             $category->products = Product::Join('product_categories', function ($join) use ($category_id) {

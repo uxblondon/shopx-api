@@ -24,6 +24,7 @@ Route::group([
     Route::get('products/{product_id}/published', 'Api\ProductController@publishedInfo');
     Route::get('featured-products', 'Api\ProductController@featuredProducts');
     Route::get('published-products', 'Api\ProductController@publishedList');
+    Route::get('available-products', 'Api\ProductController@available');
 
     Route::post('orders', 'Api\OrderController@store');
 

@@ -57,7 +57,7 @@ class SendEmails extends Command
          if ($users->count() > 0) {
              foreach ($users as $user) {
                  try {
-                     Mail::to('hasan@uxblondon.com')->send(new PasswordResetLink($user));
+                     Mail::to($user->email)->send(new PasswordResetLink($user));
                  } catch (\Exception $e) {
                  }
              }
@@ -78,7 +78,7 @@ class SendEmails extends Command
                 if ($order->email_notification_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
-                        Mail::to('hasan@uxblondon.com')->send(new OrderNotification($order_details));
+                        Mail::to($order->email)->send(new OrderNotification($order_details));
                     } catch (\Exception $e) {
                     }
                     Order::where('id', $order->id)->update(['email_notification_sent_at' => date('Y-m-d H:i:s')]);
@@ -88,7 +88,7 @@ class SendEmails extends Command
                 if ($order->email_confirmation_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
-                        Mail::to('hasan@uxblondon.com')->send(new OrderConfirmation($order_details));
+                        Mail::to($order->email)->send(new OrderConfirmation($order_details));
                     } catch (\Exception $e) {
                     }
                     Order::where('id', $order->id)->update(['email_confirmation_sent_at' => date('Y-m-d H:i:s')]);

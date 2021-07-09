@@ -54,7 +54,7 @@ class SendEmails extends Command
 
          // send user password reset emails 
          $users = User::whereNotNull('password_reset_token')
-         ->whereNotNull('password_reset_email_created_at')
+         ->whereNotNull('password_reset_token_created_at')
          ->get();
 
          if ($users->count() > 0) {

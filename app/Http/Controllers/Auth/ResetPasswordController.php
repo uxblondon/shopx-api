@@ -90,6 +90,7 @@ class ResetPasswordController extends Controller
             User::where('id', $user->id)->update([
                 'password' => Hash::make($request->get('password')),
                 'password_reset_token' => NULL,
+                'password_reset_token_created_at' => NULL,
             ]);
         } catch (\Exception $e) {
             return response()->json([

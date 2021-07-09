@@ -60,7 +60,6 @@ class SendEmails extends Command
                      Mail::to('hasan@uxblondon.com')->send(new PasswordResetLink($user));
                  } catch (\Exception $e) {
                  }
-                 User::where('id', $user->id)->update(['password_reset_token' => NULL]);
              }
          }
 

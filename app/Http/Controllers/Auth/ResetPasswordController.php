@@ -46,9 +46,20 @@ class ResetPasswordController extends Controller
     public function sendResetLinkEmail(PasswordResetLinkRequest $request)
     {
 
+        $user = User::where('email', $request->get('email'))->first();
+
+        if(!$user) {
+            return response()->json(['status' => 'error', 'message' => 'No account found with this email address.']);
+        }
+
+
         try {
             $user = User::where('email', $request->get('email'))->first();
-            User::where('id', $user->id)->update(['password_reset_token' => Str::random(60)]);
+            User::where('id', $user->id)
+            ->update([
+                'password_reset_token' => Str::random(60),
+                'password_reset_token_created_at' => date('Y-m-d H:i:s')
+            ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Failed to send password reset email.']);
         }

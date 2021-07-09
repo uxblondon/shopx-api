@@ -9,8 +9,8 @@
 <body style="-webkit-text-size-adjust:none !important;padding:0;">
 
     <p>Dear <?= $user->name ?>,</p>
-    <p>Please click <a href="<?= 'http://localhost:3000/reset/' . $user->password_reset_token . '/password' ?>">here</a> to reset your password.</p>
-    <p>Or copy this link <a href="<?= 'http://localhost:3000/reset/' . $user->password_reset_token . '/password' ?>"><?= 'http://localhost:3000/reset/' . $user->password_reset_token . '/password' ?></a> into your browser url.</p>
+    <p>Please click <a href="<?= 'http://shopxadmin.s.uxblondon.com/reset/' . $user->password_reset_token . '/password' ?>">here</a> to reset your password.</p>
+    <p>Or copy this link <a href="<?= 'http://shopxadmin.s.uxblondon.com/reset/' . $user->password_reset_token . '/password' ?>"><?= 'http://localhost:3000/reset/' . $user->password_reset_token . '/password' ?></a> into your browser url.</p>
     <p>Best Regards,</p>
     <p>Trinity House Team</p>
 

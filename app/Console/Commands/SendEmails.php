@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderDelivery;
@@ -14,6 +15,7 @@ use App\Models\OrderBilling;
 
 use App\Mail\OrderConfirmation;
 use App\Mail\OrderNotification;
+use App\Mail\PasswordResetLink;
 use Illuminate\Support\Facades\Mail;
 
 class SendEmails extends Command
@@ -49,34 +51,46 @@ class SendEmails extends Command
      */
     public function handle()
     {
-        $orders = Order::where('status', 'confirmed')
-        ->where(function($query) {
-            $query->whereNull('email_confirmation_sent_at')->orWhereNull('email_notification_sent_at');
-        })
-        ->orderBy('created_at')
-        ->limit(6)
-        ->get();
 
-        if($orders->count() > 0) {
-            foreach($orders as $order) { 
+         // send user password reset emails 
+         $users = User::whereNotNull('password_reset_token')->get();
+         if ($users->count() > 0) {
+             foreach ($users as $user) {
+                 try {
+                     Mail::to('hasan@uxblondon.com')->send(new PasswordResetLink($user));
+                 } catch (\Exception $e) {
+                 }
+                 User::where('id', $user->id)->update(['password_reset_token' => NULL]);
+             }
+         }
+
+        // send orders email
+        $orders = Order::where('status', 'confirmed')
+            ->where(function ($query) {
+                $query->whereNull('email_confirmation_sent_at')->orWhereNull('email_notification_sent_at');
+            })
+            ->orderBy('created_at')
+            ->limit(6)
+            ->get();
+
+        if ($orders->count() > 0) {
+            foreach ($orders as $order) {
                 // send notification
-                if($order->email_notification_sent_at == '') {
+                if ($order->email_notification_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
                         Mail::to('hasan@uxblondon.com')->send(new OrderNotification($order_details));
-                    } catch(\Exception $e) {
-
+                    } catch (\Exception $e) {
                     }
                     Order::where('id', $order->id)->update(['email_notification_sent_at' => date('Y-m-d H:i:s')]);
                 }
 
                 // send confirmation 
-                if($order->email_confirmation_sent_at == '') {
+                if ($order->email_confirmation_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
                         Mail::to('hasan@uxblondon.com')->send(new OrderConfirmation($order_details));
-                    } catch(\Exception $e) {
-
+                    } catch (\Exception $e) {
                     }
                     Order::where('id', $order->id)->update(['email_confirmation_sent_at' => date('Y-m-d H:i:s')]);
                 }
@@ -86,6 +100,8 @@ class SendEmails extends Command
 
             sleep(5);
         }
+
+       
     }
 
     /**
@@ -114,7 +130,6 @@ class SendEmails extends Command
                     $delivery->items = OrderDeliveryItem::join('order_items', 'order_items.id', 'order_delivery_items.order_item_id')
                         ->where('order_delivery_items.order_delivery_id', $delivery->id)
                         ->get();
-
                 } elseif ($delivery->method === 'collection') {
 
                     $delivery->address = OrderAddress::where('order_id', $order->id)
@@ -135,9 +150,8 @@ class SendEmails extends Command
             }
             $order->payment = $payment;
 
-            return $order; 
+            return $order;
         }
         return false;
     }
-
 }

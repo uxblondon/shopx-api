@@ -44,6 +44,9 @@ Route::group([
 
     Route::post('stripe-payment-status', 'Api\StripeController@paymentStatus');
     Route::post('paypal-payment-status', 'Api\PaypalController@paymentStatus');
+
+   
+
     
 });
 
@@ -61,6 +64,8 @@ Route::group([
     Route::get('users/{user_id}', 'Auth\UserController@show');
     Route::get('users', 'Auth\UserController@index');
 
+    
+
 });
 
 /* auth routes */
@@ -69,6 +74,8 @@ Route::group([
     'prefix' => 'auth',
 ], function () {
     Route::post('login', 'Auth\AuthController@login');
+    Route::post('send-password-reset-link', 'Auth\ResetPasswordController@sendResetLinkEmail');
+    Route::post('reset/{token}/password', 'Auth\ResetPasswordController@reset');
 });
 
 /* authenticated routes */

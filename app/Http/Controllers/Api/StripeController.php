@@ -18,9 +18,8 @@ class StripeController extends Controller
     public function paymentIntend(Request $request)
     {
         try {
-            \Stripe\Stripe::setApiKey('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');
+            \Stripe\Stripe::setApiKey(env('STRIPE_SK'));
 
-            //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 (live)
             //sk_test_uK2XwHhWYAhvR1Oh6QN0gmww00vlzitu5m (test)
 
             $intent = \Stripe\PaymentIntent::create([

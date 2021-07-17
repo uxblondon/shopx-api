@@ -83,7 +83,7 @@ class SendEmails extends Command
                 if ($order->email_notification_sent_at == '') {
                     try {
                         $order_details = $this->orderDetails($order->id);
-                        Mail::to($order->email)->send(new OrderNotification($order_details));
+                        Mail::to('orders@trinityhouse.co.uk')->send(new OrderNotification($order_details));
                     } catch (\Exception $e) {
                     }
                     Order::where('id', $order->id)->update(['email_notification_sent_at' => date('Y-m-d H:i:s')]);

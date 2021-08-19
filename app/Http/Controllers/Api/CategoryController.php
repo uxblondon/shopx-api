@@ -290,7 +290,7 @@ class CategoryController extends Controller
                 $join->on('product_images.product_id', 'products.id')
                     ->where('product_images.feature_image', 1);
             })->select($product_data)
-                //->where('products.status', 'published')
+                ->where('products.title', 'asc')
                 ->groupBy('products.id')
                 ->groupBy('product_images.id')
                 ->get();

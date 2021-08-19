@@ -527,6 +527,7 @@ class ProductController extends Controller
             $join->on('product_images.product_id', 'products.id')
                 ->where('product_images.feature_image', 1);
         })->where('products.featured', 1)
+        ->orderBy('products.title', 'asc')
         ->get([
             'products.id',
             'products.title',

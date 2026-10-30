@@ -12,7 +12,7 @@ class TrustProxies extends Middleware
      *
      * @var array|string
      */
-    protected $proxies;
+    protected $proxies = '*'; // API is reachable only through the private gateway network.
 
     /**
      * The headers that should be used to detect proxies.

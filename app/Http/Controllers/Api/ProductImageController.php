@@ -24,7 +24,7 @@ class ProductImageController extends Controller
             $image = $request->file('image');
             $location = str_replace('', '', 'products/' . $product_id . '/' . $image->getClientOriginalName());
 
-            Storage::disk('s3')->put($location, file_get_contents($request->file('image')));
+            Storage::disk(config('filesystems.default'))->put($location, file_get_contents($request->file('image')));
 
             $image_data = array(
                 'product_id' => $product_id,
@@ -64,7 +64,7 @@ class ProductImageController extends Controller
             if($request->file('image')) {
                 $image = $request->file('image');
             $location = str_replace('', '', 'products/' . $product_id . '/' . $image->getClientOriginalName());
-            Storage::disk('s3')->put($location, file_get_contents($request->file('image')));
+            Storage::disk(config('filesystems.default'))->put($location, file_get_contents($request->file('image')));
             $image_data['location'] = Storage::url($location);
 
 
@@ -73,7 +73,7 @@ class ProductImageController extends Controller
             ->where('product_id', $product_id)
             ->first();
             if($previous_product_image) {
-                Storage::disk('s3')->delete($previous_product_image->location);
+                Storage::disk(config('filesystems.default'))->delete($previous_product_image->location);
             }
             }
 
@@ -105,7 +105,7 @@ class ProductImageController extends Controller
             $product_image = ProductImage::where('id', $image_id)->where('product_id', $product_id)->first();
 
             if($product_image) {
-                Storage::disk('s3')->delete($product_image->location);
+                Storage::disk(config('filesystems.default'))->delete($product_image->location);
                 $product_image->delete();
             } 
         } catch (\Exception $e) {

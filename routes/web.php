@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Container readiness includes Laravel boot and database connectivity.
+Route::get('/healthz', function () {
+    \Illuminate\Support\Facades\DB::select('SELECT 1');
+    return response()->json(['status' => 'ok']);
+});

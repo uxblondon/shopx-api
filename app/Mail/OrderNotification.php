@@ -11,6 +11,8 @@ class OrderNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $order;
+
     /**
      * Create a new message instance.
      *

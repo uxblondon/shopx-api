@@ -17,6 +17,13 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        $connection = $app['config']->get('database.default');
+        $database = $app['config']->get("database.connections.$connection.database");
+        if (! (($connection === 'sqlite' && $database === ':memory:') ||
+            ($connection === 'mysql' && $database === 'shopx_test'))) {
+            throw new \RuntimeException('Tests require SQLite :memory: or the disposable shopx_test MySQL database.');
+        }
+
         return $app;
     }
 }

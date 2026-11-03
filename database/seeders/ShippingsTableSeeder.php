@@ -1,5 +1,9 @@
 <?php
 
+namespace Database\Seeders;
+
+use Illuminate\Support\Facades\DB;
+
 use App\Models\ShippingCountry;
 use App\Models\ShippingZone;
 use App\Models\ShippingPackageSize;

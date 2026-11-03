@@ -72,8 +72,8 @@ class ProductImageController extends Controller
             $previous_product_image = ProductImage::where('id', $image_id)
             ->where('product_id', $product_id)
             ->first();
-            if($previous_product_image) {
-                Storage::disk(config('filesystems.default'))->delete($previous_product_image->location);
+            if ($previous_product_image && ($oldPath = $this->storagePath($previous_product_image->location)) && $oldPath !== $location) {
+                Storage::disk(config('filesystems.default'))->delete($oldPath);
             }
             }
 
@@ -105,7 +105,9 @@ class ProductImageController extends Controller
             $product_image = ProductImage::where('id', $image_id)->where('product_id', $product_id)->first();
 
             if($product_image) {
-                Storage::disk(config('filesystems.default'))->delete($product_image->location);
+                if ($path = $this->storagePath($product_image->location)) {
+                    Storage::disk(config('filesystems.default'))->delete($path);
+                }
                 $product_image->delete();
             } 
         } catch (\Exception $e) {
@@ -113,5 +115,15 @@ class ProductImageController extends Controller
         }
 
         return response()->json(['status' => 'success', 'message' => 'Product image deleted successfully.']);
+    }
+    // Flysystem expects an object key, while existing database rows store public URLs.
+    private function storagePath($location)
+    {
+        $prefix = rtrim(Storage::url(''), '/').'/';
+        if (str_starts_with($location, $prefix)) {
+            return substr($location, strlen($prefix));
+        }
+
+        return parse_url($location, PHP_URL_SCHEME) ? null : ltrim($location, '/');
     }
 }

@@ -2,14 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "ShopX API",
-        "description": "A simple yet smart RESTful API for e-commerce solution",
-        "contact": {
-            "email": "hasan@uxblondon.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://en.wikipedia.org/wiki/MIT_License"
-        },
+        "description": "E-commerce API",
         "version": "1.0.0"
     },
     "paths": {
@@ -19,7 +12,7 @@
                     "category"
                 ],
                 "summary": "Get list of all categories",
-                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::index",
+                "operationId": "ac9c4d978ea4e5b72915ca9728e5b8b1",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -34,7 +27,41 @@
                     "category"
                 ],
                 "summary": "Store new product",
-                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::store",
+                "operationId": "cca49a87d9b0ebb9a98ad7c154b71737",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/unlisted": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of all categories",
+                "operationId": "10f71cccb9808b8a59d403474d3d91e7",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/published-categories": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of all categories",
+                "operationId": "32255c69cef394ad626552b8d87c58cf",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -51,7 +78,7 @@
                     "category"
                 ],
                 "summary": "Get list of filtered products",
-                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::filter",
+                "operationId": "889ab6492eed9bb1ff9644b99b7ef633",
                 "parameters": [
                     {
                         "name": "id",
@@ -73,17 +100,43 @@
                 }
             }
         },
-        "/api/categories/{product_id}": {
+        "/api/categories/{category_id}/published": {
             "get": {
                 "tags": [
                     "category"
                 ],
                 "summary": "Get list of filtered products",
                 "description": "Get list of filtered products",
-                "operationId": "Products",
+                "operationId": "e21a1b29bbe0fd3414a3ca7a6675a7e5",
                 "parameters": [
                     {
-                        "name": "product_id",
+                        "name": "category_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/api/categories/{category_id}": {
+            "get": {
+                "tags": [
+                    "category"
+                ],
+                "summary": "Get list of filtered products",
+                "description": "Get list of filtered products",
+                "operationId": "36ed25ee990ae18dc1ebab74be9c8d8d",
+                "parameters": [
+                    {
+                        "name": "category_id",
                         "in": "path",
                         "description": "Product id",
                         "required": true,
@@ -103,10 +156,10 @@
                     "category"
                 ],
                 "summary": "Update specified product",
-                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::update",
+                "operationId": "e2f3a7f479b1a008e07576a0a5b15b27",
                 "parameters": [
                     {
-                        "name": "product_id",
+                        "name": "category_id",
                         "in": "path",
                         "description": "Product id",
                         "required": true,
@@ -126,10 +179,10 @@
                     "category"
                 ],
                 "summary": "Delete specified product",
-                "operationId": "App\\Http\\Controllers\\Api\\CategoryController::destroy",
+                "operationId": "b7ca7adcd4bbf5bd4ce2bfa23c568653",
                 "parameters": [
                     {
-                        "name": "product_id",
+                        "name": "category_id",
                         "in": "path",
                         "description": "Product id",
                         "required": true,
@@ -152,7 +205,7 @@
                 ],
                 "summary": "Get list of all products",
                 "description": "Returns list of products",
-                "operationId": "GetProductList",
+                "operationId": "d97d1c3727cbac49708b85f7d11f7d58",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -167,7 +220,25 @@
                     "product"
                 ],
                 "summary": "Store new product",
-                "operationId": "App\\Http\\Controllers\\Api\\ProductController::store",
+                "operationId": "785644b7d7dd38af4b51dafd0fbc1b6d",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                }
+            }
+        },
+        "/api/filter-product-list": {
+            "post": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Get list of all products",
+                "description": "Returns list of products",
+                "operationId": "5b71a09118992439575f78b603231c29",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -184,7 +255,7 @@
                     "product"
                 ],
                 "summary": "Get list of filtered products",
-                "operationId": "App\\Http\\Controllers\\Api\\ProductController::filter",
+                "operationId": "e07d85d135eb226436f6fb9a18e26b43",
                 "parameters": [
                     {
                         "name": "id",
@@ -206,6 +277,32 @@
                 }
             }
         },
+        "/api/products/{product_id}/published": {
+            "get": {
+                "tags": [
+                    "product"
+                ],
+                "summary": "Get list of filtered products",
+                "description": "Get list of filtered products",
+                "operationId": "67756499f9919e3138e5c8ffcce2f0ba",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
         "/api/products/{product_id}": {
             "get": {
                 "tags": [
@@ -213,7 +310,7 @@
                 ],
                 "summary": "Get list of filtered products",
                 "description": "Get list of filtered products",
-                "operationId": "Products",
+                "operationId": "2c70533b1e605c289c402882b21e13d6",
                 "parameters": [
                     {
                         "name": "product_id",
@@ -236,7 +333,7 @@
                     "product"
                 ],
                 "summary": "Update specified product",
-                "operationId": "App\\Http\\Controllers\\Api\\ProductController::update",
+                "operationId": "3c1d588bd966449da352ffd09399fa8d",
                 "parameters": [
                     {
                         "name": "product_id",
@@ -259,7 +356,7 @@
                     "product"
                 ],
                 "summary": "Delete specified product",
-                "operationId": "App\\Http\\Controllers\\Api\\ProductController::destroy",
+                "operationId": "7fb8dd01fd170f3cb739824465785658",
                 "parameters": [
                     {
                         "name": "product_id",
@@ -284,7 +381,7 @@
                     "auth"
                 ],
                 "summary": "Get access token for the API",
-                "operationId": "App\\Http\\Controllers\\Auth\\AuthController::login",
+                "operationId": "535ffeda4b78916efd658b2844ea897a",
                 "parameters": [
                     {
                         "name": "email",
@@ -321,7 +418,7 @@
                     "auth"
                 ],
                 "summary": "Logout from the API",
-                "operationId": "App\\Http\\Controllers\\Auth\\AuthController::logout",
+                "operationId": "46f8a14c8083abb69eed72768aa08629",
                 "responses": {
                     "200": {
                         "description": "Successful response"
@@ -330,6 +427,15 @@
                         "description": "Bad request"
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },

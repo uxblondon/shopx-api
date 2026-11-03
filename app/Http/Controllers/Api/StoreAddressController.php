@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use DB;
 use App\Http\Controllers\Controller;
 use App\Models\StoreAddress;
@@ -11,28 +12,9 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\FilterCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 
-/**  @OA\Tag(
- *     name="category",
- *     description="All Endpoints of Category"
- * )
- */
 class StoreAddressController extends Controller
 {
-    /**
-     * @OA\Get(
-     *      path="/api/categories",
-     *      tags={"category"},
-     *      summary="Get list of all categories",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
+
     public function index()
     {
         $categories = Category::leftJoin('product_categories', 'categories.id', 'product_categories.category_id')
@@ -53,6 +35,11 @@ class StoreAddressController extends Controller
     }
 
 
+    public function available()
+    {
+        return $this->availableCollectionAddresses();
+    }
+
     public function availableCollectionAddresses()
     {
         $addresses = StoreAddress::where('type', 'collection')->where('active', 1)->get([
@@ -62,30 +49,6 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'data' => $addresses]);
     }
 
-    /**
-     * @OA\Post(
-     *      path="/api/categories/filter",
-     *      tags={"category"},
-     *      summary="Get list of filtered products",
-     *      @OA\Parameter(
-     *          name="id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
     public function filter(FilterCategoryRequest $request)
     {
         $title = trim($request->get('title'));
@@ -112,21 +75,6 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'data' => $categories]);
     }
 
-    /**
-     * @OA\Post(
-     *      path="/api/categories",
-     *      tags={"category"},
-     *      summary="Store new product",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
     public function store(Request $request)
     {
         $address_data = array(
@@ -146,28 +94,6 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'data' => $address]);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/api/categories/{product_id}",
-     *      operationId="Products",
-     *      tags={"category"},
-     *      summary="Get list of filtered products",
-     *      description="Get list of filtered products",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
     public function show($category_id)
     {
         $product_data = [
@@ -203,26 +129,6 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'data' => $category]);
     }
 
-    /**
-     * @OA\Put(
-     *      path="/api/categories/{product_id}",
-     *      tags={"category"},
-     *      summary="Update specified product",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
     public function update(UpdateCategoryRequest $request, $category_id)
     {
         try {
@@ -272,26 +178,6 @@ class StoreAddressController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Product category successfully updated.',]);
     }
 
-    /**
-     * @OA\Delete(
-     *      path="/api/categories/{product_id}",
-     *      tags={"category"},
-     *      summary="Delete specified product",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
     public function destroy($product_id)
     {
         $product = Category::find($product_id);

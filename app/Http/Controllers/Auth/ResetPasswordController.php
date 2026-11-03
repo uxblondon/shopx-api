@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\ResetsPasswords;
 use App\Http\Requests\PasswordResetLinkRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Support\Str;
@@ -27,7 +26,6 @@ class ResetPasswordController extends Controller
     |
     */
 
-    use ResetsPasswords;
 
     /**
      * Where to redirect users after resetting their password.

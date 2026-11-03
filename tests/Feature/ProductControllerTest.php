@@ -2,59 +2,54 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-
-use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * 
-     * @return void
-     */
-    public function test_get_list_of_tasks()
+    use RefreshDatabase;
+
+    public function test_product_administration_requires_authentication(): void
     {
-        $this->json('get', 'api/products')
-            ->assertStatus(Response::HTTP_OK)
-            ->assertJsonStructure(
-                [
-                    'data' => [
-                        '*' => [
-                            'fasdf',
-                            'fasdfa'
-                        ]
-                    ]
-                ]
-            );
+        $this->getJson('/api/products')->assertUnauthorized();
+        $this->postJson('/api/products', [])->assertUnauthorized();
     }
 
-    public function test_store_product()
+    public function test_admin_can_create_update_list_and_delete_a_product(): void
     {
-        $product = array(
-            'categroy_id' => $this->faker->randomDigit,
-            'title' => $this->faker->text(20),
-            'slug' => $this->faker->slug(),
-            'feature_image' => $this->faker->imageUrl(640, 480),
-            'standfirst' => $this->faker->text(100),
-            'description' => $this->faker->text(200),
-            'created_by' => 1
-        );
-        $response = $this->json('POST', '/api/products', $product);
-
-        $response->assertStatus(201)
-        ->assertJson($product);
+        $user = User::factory()->create(['admin' => 1]);
+        $token = auth('api')->login($user);
+        $headers = ['Authorization' => 'Bearer '.$token];
+        $category = Category::create(['title' => 'Gifts', 'slug' => 'gifts', 'description' => 'Gifts', 'status' => 'published', 'created_by' => $user->id]);
+        $payload = ['title' => 'Test Gift', 'description' => 'A test gift', 'categories' => [['id' => $category->id]]];
+        $create = $this->postJson('/api/products', $payload, $headers)->assertOk()->assertJsonPath('status', 'success');
+        $id = $create->json('data.id');
+        $this->assertDatabaseHas('product_categories', ['product_id' => $id, 'category_id' => $category->id]);
+        $this->getJson('/api/products', $headers)->assertOk()->assertJsonPath('data.0.title', 'Test Gift');
+        $this->putJson('/api/products/'.$id, array_merge($payload, ['title' => 'Updated Gift', 'status' => 'published']), $headers)
+            ->assertOk()->assertJsonPath('status', 'success');
+        $this->assertDatabaseHas('products', ['id' => $id, 'title' => 'Updated Gift']);
+        $this->deleteJson('/api/products/'.$id, [], $headers)->assertOk()->assertJsonPath('status', 'success');
+        $this->assertSoftDeleted('products', ['id' => $id]);
     }
 
-
-    public function test_valid_product()
+    public function test_invalid_product_returns_the_existing_validation_envelope(): void
     {
-        
-        $response = $this->json('POST', '/api/products', []);
+        $this->actingAs(User::factory()->create(['admin' => 1]), 'api')
+            ->postJson('/api/products', [])->assertUnprocessable()
+            ->assertJsonPath('status', 'error')->assertJsonValidationErrors(['title', 'categories', 'description']);
+    }
 
-        $response->assertStatus(422);
+    public function test_public_catalog_omits_drafts_and_retains_response_fields(): void
+    {
+        foreach (['published', 'draft'] as $status) {
+            Product::create(['title' => $status, 'slug' => $status, 'description' => 'Gift', 'status' => $status, 'created_by' => 1]);
+        }
+        $this->getJson('/api/available-products')->assertOk()->assertJsonPath('status', 'success')
+            ->assertJsonCount(1, 'data')->assertJsonPath('data.0.title', 'published');
+        $this->getJson('/api/published-products')->assertOk()->assertJsonPath('status', 'success')->assertJsonCount(1, 'data');
     }
 }

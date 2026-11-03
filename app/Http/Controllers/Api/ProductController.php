@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use OpenApi\Attributes as OA;
+
 use App\Http\Controllers\Controller;
 
 use DB;
@@ -20,31 +22,27 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\FilterProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 
-/**  @OA\Tag(
- *     name="product",
- *     description="All Endpoints of Product"
- * )
- */
+#[OA\Tag(name: "product", description: "All Endpoints of Product")]
 class ProductController extends Controller
 {
-    /**
-     * @OA\Get(
-     *      path="/api/products",
-     *      operationId="GetProductList",
-     *      tags={"product"},
-     *      summary="Get list of all products",
-     *      description="Returns list of products",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
+    #[OA\Get(
+        path: "/api/products",
+        tags: ["product"],
+        summary: "Get list of all products",
+        description: "Returns list of products",
+        responses: [new OA\Response(response: 200, description: "Successful response"), new OA\Response(response: 400, description: "Bad request")],
+    )]
     public function index()
+    {
+        return $this->productList();
+    }
+
+    public function publishedList()
+    {
+        return $this->productList('published');
+    }
+
+    protected function productList($status = null)
     {
         $data = [
             'products.id',
@@ -66,6 +64,7 @@ class ProductController extends Controller
                 $join->on('product_images.product_id', 'products.id')
                     ->where('product_images.feature_image', 1);
             })
+            ->when($status, fn ($query) => $query->where('products.status', $status))
             ->select($data)
             ->groupBy('products.id')
             ->groupBy('product_images.id')
@@ -75,23 +74,13 @@ class ProductController extends Controller
     }
 
 
-    /**
-     * @OA\Get(
-     *      path="/api/products",
-     *      operationId="GetProductList",
-     *      tags={"product"},
-     *      summary="Get list of all products",
-     *      description="Returns list of products",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
+    #[OA\Post(
+        path: "/api/filter-product-list",
+        tags: ["product"],
+        summary: "Get list of all products",
+        description: "Returns list of products",
+        responses: [new OA\Response(response: 200, description: "Successful response"), new OA\Response(response: 400, description: "Bad request")],
+    )]
     public function filterList(Request $request)
     {
         $data = [
@@ -124,30 +113,13 @@ class ProductController extends Controller
         return response()->json(['status' => 'success', 'data' => $products]);
     }
 
-    /**
-     * @OA\Post(
-     *      path="/api/products/filter",
-     *      tags={"product"},
-     *      summary="Get list of filtered products",
-     *      @OA\Parameter(
-     *          name="id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
+    #[OA\Post(
+        path: "/api/products/filter",
+        tags: ["product"],
+        summary: "Get list of filtered products",
+        parameters: [new OA\Parameter(name: "id", description: "Product id", required: true, in: "path", schema: new OA\Schema(type: "integer"))],
+        responses: [new OA\Response(response: 200, description: "Successful response"), new OA\Response(response: 400, description: "Bad request")],
+    )]
     public function filter(FilterProductRequest $request)
     {
         $category = trim($request->get('category_id'));
@@ -189,21 +161,12 @@ class ProductController extends Controller
     }
 
 
-    /**
-     * @OA\Post(
-     *      path="/api/products",
-     *      tags={"product"},
-     *      summary="Store new product",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *       @OA\Response(
-     *          response=400,
-     *          description="Bad request"
-     *        )
-     *     )
-     */
+    #[OA\Post(
+        path: "/api/products",
+        tags: ["product"],
+        summary: "Store new product",
+        responses: [new OA\Response(response: 200, description: "Successful response"), new OA\Response(response: 400, description: "Bad request")],
+    )]
     public function store(StoreProductRequest $request)
     {
         try {
@@ -302,28 +265,14 @@ class ProductController extends Controller
         ]]);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/api/products/{product_id}",
-     *      operationId="Products",
-     *      tags={"product"},
-     *      summary="Get list of filtered products",
-     *      description="Get list of filtered products",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
+    #[OA\Get(
+        path: "/api/products/{product_id}/published",
+        tags: ["product"],
+        summary: "Get list of filtered products",
+        description: "Get list of filtered products",
+        parameters: [new OA\Parameter(name: "product_id", description: "Product id", required: true, in: "path", schema: new OA\Schema(type: "integer"))],
+        responses: [new OA\Response(response: 200, description: "Successful response")],
+    )]
     public function publishedInfo($product_id)
     {
        // $product = Product::find($product_id);
@@ -412,28 +361,14 @@ class ProductController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Product not found.']);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/api/products/{product_id}",
-     *      operationId="Products",
-     *      tags={"product"},
-     *      summary="Get list of filtered products",
-     *      description="Get list of filtered products",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
+    #[OA\Get(
+        path: "/api/products/{product_id}",
+        tags: ["product"],
+        summary: "Get list of filtered products",
+        description: "Get list of filtered products",
+        parameters: [new OA\Parameter(name: "product_id", description: "Product id", required: true, in: "path", schema: new OA\Schema(type: "integer"))],
+        responses: [new OA\Response(response: 200, description: "Successful response")],
+    )]
     public function show($product_id)
     {
         $product = Product::find($product_id);
@@ -606,26 +541,13 @@ class ProductController extends Controller
         return response()->json(['status' => 'success', 'data' => $variants]);
     }
 
-    /**
-     * @OA\Put(
-     *      path="/api/products/{product_id}",
-     *      tags={"product"},
-     *      summary="Update specified product",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
+    #[OA\Put(
+        path: "/api/products/{product_id}",
+        tags: ["product"],
+        summary: "Update specified product",
+        parameters: [new OA\Parameter(name: "product_id", description: "Product id", required: true, in: "path", schema: new OA\Schema(type: "integer"))],
+        responses: [new OA\Response(response: 200, description: "Successful response")],
+    )]
     public function update(UpdateProductRequest $request, $product_id)
     {
         try {
@@ -645,7 +567,9 @@ class ProductController extends Controller
                 $product_data['description'] = $request->get('description');
             }
 
-            $product_data['featured'] = $request->get('featured');
+            if ($request->has('featured')) {
+                $product_data['featured'] = $request->boolean('featured') ? 1 : 0;
+            }
 
             if ($request->has('status') && $request->get('status') != '') {
 
@@ -687,26 +611,13 @@ class ProductController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Product details successfully updated.',]);
     }
 
-    /**
-     * @OA\Delete(
-     *      path="/api/products/{product_id}",
-     *      tags={"product"},
-     *      summary="Delete specified product",
-     *      @OA\Parameter(
-     *          name="product_id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful response"
-     *       ),
-     *     )
-     */
+    #[OA\Delete(
+        path: "/api/products/{product_id}",
+        tags: ["product"],
+        summary: "Delete specified product",
+        parameters: [new OA\Parameter(name: "product_id", description: "Product id", required: true, in: "path", schema: new OA\Schema(type: "integer"))],
+        responses: [new OA\Response(response: 200, description: "Successful response")],
+    )]
     public function destroy($product_id)
     {
         $product = Product::find($product_id);

@@ -16,6 +16,7 @@ use App\Models\ShippingCountry;
 class DeliveryOptionController extends Controller
 {
     private $packages = [];
+    private $shipping_zone = false;
     private $address = [];
 
     /**
@@ -89,7 +90,7 @@ class DeliveryOptionController extends Controller
     public function splitPackages($items)
     {
         if (count($items) > 1) {
-            $split = array_chunk($items, ceil(count($items) / 2));
+            $split = array_chunk($items, (int) ceil(count($items) / 2));
             foreach ($split as $splited_package) {
                 if (count($splited_package) > 1) {
                     $package = $this->getDeliveryOptions($splited_package);

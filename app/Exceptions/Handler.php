@@ -2,59 +2,34 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array
-     */
-    protected $dontReport = [
-        //
-    ];
+    protected $dontFlash = ['current_password', 'password', 'password_confirmation'];
 
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array
-     */
-    protected $dontFlash = [
-        'password',
-        'password_confirmation',
-    ];
-
-    /**
-     * Report or log an exception.
-     *
-     * @param  \Exception  $exception
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function report(Exception $exception)
+    protected function shouldReturnJson($request, \Throwable $e)
     {
-        parent::report($exception);
+        return $request->is('api/*') || parent::shouldReturnJson($request, $e);
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Exception
-     */
-    public function render($request, Exception $exception)
+    protected function invalidJson($request, ValidationException $exception)
     {
-        return response()->json(
-            [
-                'status' => 'error',
-                'message' => $exception->getMessage(),
-            ], 500
-        );
+        return response()->json([
+            'status' => 'error',
+            'message' => $exception->getMessage(),
+            'errors' => $exception->errors(),
+        ], $exception->status);
+    }
+
+    protected function prepareJsonResponse($request, \Throwable $e)
+    {
+        $response = parent::prepareJsonResponse($request, $e);
+        $data = $response->getData(true);
+        $data['status'] = 'error';
+        $response->setData($data);
+
+        return $response;
     }
 }

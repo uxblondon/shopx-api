@@ -22,7 +22,7 @@ class ShippingRateController extends Controller
             
             $rates = ShippingRate::join('shipping_package_sizes', 'shipping_package_sizes.id', 'shipping_rates.package_size_id')
             ->join('shipping_options', 'shipping_options.id', 'shipping_rates.shipping_option_id')
-            ->where('shipping_rates..shipping_zone_id', $shipping_zone_id)
+            ->where('shipping_rates.shipping_zone_id', $shipping_zone_id)
             ->orderBy('shipping_rates.package_size_id')
             ->orderBy('shipping_rates.shipping_option_id')
             ->get([

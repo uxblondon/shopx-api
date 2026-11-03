@@ -8,7 +8,17 @@ permissions:
   contents: read
   packages: write
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests on MySQL 8.4
+        run: docker compose -p shopx-laravel13-test -f docker/compose.test.yaml run --build --rm tests
+      - name: Clean test containers
+        if: always()
+        run: docker compose -p shopx-laravel13-test -f docker/compose.test.yaml down --volumes
   image:
+    needs: tests
     runs-on: ubuntu-latest
     strategy:
 

@@ -1,5 +1,11 @@
 <?php
 
+namespace Database\Seeders;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductCategory;

@@ -18,9 +18,8 @@ class StripeController extends Controller
     public function paymentIntend(Request $request)
     {
         try {
-            \Stripe\Stripe::setApiKey(env('STRIPE_SK'));
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-            //sk_test_uK2XwHhWYAhvR1Oh6QN0gmww00vlzitu5m (test)
 
             $intent = \Stripe\PaymentIntent::create([
                 'description' => $request->get('order_ref'),
@@ -91,4 +90,3 @@ class StripeController extends Controller
 }
 
 //pk_test_UCJ2MxfKldq5aW6wn788nMan00QrabCR6d
-//sk_test_uK2XwHhWYAhvR1Oh6QN0gmww00vlzitu5m

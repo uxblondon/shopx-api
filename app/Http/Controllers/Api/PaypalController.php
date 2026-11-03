@@ -44,4 +44,3 @@ class PaypalController extends Controller
 }
 
 //pk_test_UCJ2MxfKldq5aW6wn788nMan00QrabCR6d
-//sk_test_uK2XwHhWYAhvR1Oh6QN0gmww00vlzitu5m

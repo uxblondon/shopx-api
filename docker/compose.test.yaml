@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: shopx_test
+      MYSQL_USER: shopx_test
+      MYSQL_PASSWORD: testing-only
+      MYSQL_ROOT_PASSWORD: testing-root-only
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -u"$$MYSQL_USER" "$$MYSQL_DATABASE" -e "SELECT 1" >/dev/null']
+      interval: 2s
+      timeout: 5s
+      retries: 60
+  tests:
+    build:
+      context: ..
+      target: test
+    environment:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_DATABASE: shopx_test
+      DB_USERNAME: shopx_test
+      DB_PASSWORD: testing-only
+    depends_on:
+      mysql:
+        condition: service_healthy

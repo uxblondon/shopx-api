@@ -43,6 +43,8 @@ Route::group([
     Route::get('orders/sequence', 'Api\OrderController@sequence');
 
     Route::post('stripe-payment-status', 'Api\StripeController@paymentStatus');
+    Route::post('paypal/create-order', 'Api\PaypalController@create');
+    Route::post('paypal/{order_id}/capture', 'Api\PaypalController@capture')->whereNumber('order_id');
     Route::post('paypal-payment-status', 'Api\PaypalController@paymentStatus');
 
    

@@ -169,9 +169,6 @@ class OrderController extends Controller
                 'email' => $customer['email'],
             );
 
-            if ($payment['type'] === 'paypal') {
-                $order_data['status'] = 'confirmed';
-            }
 
             $order = Order::create($order_data);
 
@@ -306,8 +303,8 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'payment_type' => $payment['type'],
                 'amount' => $payment['amount'],
-                'payment_id' => $payment['type'] === 'stripe' ? '' : ($payment['payment_id'] ?? ''),
-                'payment_status' => $payment['type'] === 'stripe' ? 'pending' : ($payment['payment_status'] ?? ''),
+                'payment_id' => '',
+                'payment_status' => 'pending',
             );
             OrderPayment::create($order_payment_data);
         } catch (\Illuminate\Validation\ValidationException $e) {

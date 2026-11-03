@@ -6,7 +6,14 @@ return [
         'secret' => env('STRIPE_SK'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
-    'paypal' => ['enabled' => env('PAYPAL_ENABLED', false)],
+    'paypal' => [
+        'enabled' => env('PAYPAL_ENABLED', false),
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'secret' => env('PAYPAL_CLIENT_SECRET'),
+        'merchant_id' => env('PAYPAL_MERCHANT_ID'),
+        'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

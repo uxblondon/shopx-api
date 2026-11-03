@@ -15,6 +15,8 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "stripe/stripe-php": "^7.128",
+        "symfony/http-client": "^7.4",
+        "symfony/mailgun-mailer": "^7.4",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {

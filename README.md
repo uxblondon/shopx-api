@@ -75,7 +75,7 @@ The pre-existing routes `GET /api/orders/sequence`, `DELETE /api/orders/{order_i
 
 ## Transactional email
 
-Set `MAIL_MAILER=smtp`, the provider's SMTP host, port and domain SMTP credentials, plus a verified `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME`. Mailgun's US SMTP host is `smtp.mailgun.org`; use port 587 with STARTTLS. SMTP passwords are separate from API keys. Use a sender belonging to the configured Mailgun domain. `ORDER_NOTIFICATION_EMAIL` selects the shop's administration recipient; customer replies go to the customer's address using Reply-To, while all messages use the configured sender.
+Set `MAIL_MAILER=mailgun`, `MAILGUN_DOMAIN`, `MAILGUN_SECRET` (API key) and `MAILGUN_ENDPOINT=api.mailgun.net` for the US region or `api.eu.mailgun.net` for EU. Symfony's official Mailgun transport and HTTP client are installed through Composer. The API sends over HTTPS; SMTP usernames/passwords are not required. Set a verified `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME`. `ORDER_NOTIFICATION_EMAIL` selects the shop's administration recipient; customer replies go to the customer's address using Reply-To, while all messages use the configured sender. SMTP remains available for other environments using its existing settings.
 
 Set `ADMIN_URL` to the admin site's base URL so password-reset links match the environment. `MAIL_TEST_RECIPIENT` redirects messages from `send:emails` to one test inbox. Keep staging's scheduler stopped until its recipients and backlog have been reviewed. Never run the bulk command on an imported database just to test mail.
 

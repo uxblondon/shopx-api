@@ -4,6 +4,7 @@ return [
     // MAIL_DRIVER is retained for existing stack environment files.
     'default' => env('MAIL_MAILER', env('MAIL_DRIVER', 'smtp')),
     'mailers' => [
+        'mailgun' => ['transport' => 'mailgun', 'client' => ['timeout' => 30]],
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME', env('MAIL_ENCRYPTION') === 'ssl' ? 'smtps' : 'smtp'),

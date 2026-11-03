@@ -1,6 +1,7 @@
 services:
   mysql:
     image: mysql:8.4
+    command: ["--sql-require-primary-key=ON"]
     environment:
       MYSQL_DATABASE: shopx_test
       MYSQL_USER: shopx_test

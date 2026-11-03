@@ -7,8 +7,10 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -36,6 +38,19 @@ class InfrastructureTest extends TestCase
             'api/orders/sequence -> App\\Http\\Controllers\\Api\\OrderController@sequence',
             'api/orders/{order_id} -> App\\Http\\Controllers\\Api\\OrderController@destroy',
         ], $missing);
+    }
+
+    public function test_password_resets_have_a_primary_key_without_changing_email_index_semantics(): void
+    {
+        $primary = collect(Schema::getIndexes('password_resets'))->firstWhere('primary', true);
+        $this->assertNotNull($primary);
+        $this->assertSame(['id'], $primary['columns']);
+
+        DB::table('password_resets')->insert([
+            ['email' => 'duplicate@example.test', 'token' => 'first-token'],
+            ['email' => 'duplicate@example.test', 'token' => 'second-token'],
+        ]);
+        $this->assertSame(2, DB::table('password_resets')->where('email', 'duplicate@example.test')->count());
     }
 
     public function test_namespaced_user_seeder_loads(): void

@@ -83,6 +83,8 @@ Set `ADMIN_URL` to the admin site's base URL so password-reset links match the e
 
 Regression tests use captured messages, not customer inboxes, and cover sender/Reply-To, recipient redirection, failed transport retries, single-order isolation, payment verification, reset links and HTML escaping.
 
+Automatic delivery is separately opt-in: the scheduler runs `send:emails --scheduled`. Configure `MAIL_AUTOMATION_ENABLED=true`, `MAIL_AUTOMATION_MAILER`, `MAIL_AUTOMATION_SINCE` (UTC `Y-m-d H:i:s`), and `MAIL_AUTOMATION_ORDER_AFTER_ID`. Scheduled orders must be newer than both the timestamp and saved order ID; reset requests must be dated on/after the cutoff. On staging a valid `MAIL_TEST_RECIPIENT` is required. `--scheduled --dry-run` reports bounded eligible-message counts without sending or marking records. Preserve the activation cutoff and ID on subsequent deployments. The ordinary default mailer can stay `log` while the scheduled sender explicitly selects Mailgun.
+
 ## Security and license
 
 Report vulnerabilities to [mail@uxblondon.com](mailto:mail@uxblondon.com). Laravel is licensed under the [MIT license](https://opensource.org/licenses/MIT).

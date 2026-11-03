@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('send:emails')->everyMinute()->withoutOverlapping();
+        $schedule->command('send:emails --scheduled')->everyMinute()->withoutOverlapping();
     }
 
     /**

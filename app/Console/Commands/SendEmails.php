@@ -25,7 +25,7 @@ class SendEmails extends Command
      *
      * @var string
      */
-    protected $signature = 'send:emails {--order= : Only process this order and skip password resets}';
+    protected $signature = 'send:emails {--order= : Only process this order and skip password resets} {--scheduled : Use configured automation and backlog cutoff} {--dry-run : Count eligible messages without sending or marking them}';
 
     /**
      * The console command description.
@@ -44,14 +44,37 @@ class SendEmails extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
+    private ?string $automationMailer = null;
+
     public function handle()
     {
-
+        $this->automationMailer = null;
+        $since = null;
+        $afterId = null;
+        if ($this->option('scheduled')) {
+            if (! config('mail.automation.enabled')) {
+                $this->info('Automatic email is disabled.');
+                return self::SUCCESS;
+            }
+            $since = config('mail.automation.since');
+            $afterId = config('mail.automation.order_after_id');
+            $mailer = config('mail.automation.mailer');
+            try {
+                $date = \Carbon\CarbonImmutable::createFromFormat('!Y-m-d H:i:s', (string) $since, 'UTC');
+                if (! $date || $date->format('Y-m-d H:i:s') !== $since || ! ctype_digit((string) $afterId)
+                    || ! config('mail.mailers.'.$mailer)) {
+                    throw new \RuntimeException('Invalid automation settings.');
+                }
+                if (app()->environment('staging') && (! filter_var(config('mail.test_recipient'), FILTER_VALIDATE_EMAIL)
+                    || ! in_array($mailer, ['mailgun', 'array', 'log'], true))) {
+                    throw new \RuntimeException('Staging automation requires a test recipient.');
+                }
+            } catch (\Throwable $error) {
+                $this->error('Automatic email needs a valid UTC cutoff, order boundary, mailer and staging test recipient.');
+                return self::FAILURE;
+            }
+            $this->automationMailer = $mailer;
+        }
         $failed = false;
         $orderId = $this->option('order');
         if ($orderId !== null && (! ctype_digit((string) $orderId) || (int) $orderId < 1)) {
@@ -62,10 +85,20 @@ class SendEmails extends Command
         // A single-order test must never process unrelated password resets.
         if ($orderId === null) {
             $users = User::whereNotNull('password_reset_token')
-                ->whereNotNull('password_reset_token_created_at')->limit(100)->get();
+                ->whereNotNull('password_reset_token_created_at');
+            if ($since !== null) {
+                $users->where('password_reset_token_created_at', '>=', $since);
+            }
+            $users = $users->orderBy('id')->limit(100)->get();
+            if ($this->option('dry-run')) {
+                $this->line('Eligible password-reset messages: '.$users->count());
+            }
             foreach ($users as $user) {
+                if ($this->option('dry-run')) {
+                    continue;
+                }
                 try {
-                    Mail::to($this->recipient($user->email))->send(new PasswordResetLink($user));
+                    $this->sendMessage($user->email, new PasswordResetLink($user));
                     User::where('id', $user->id)->where('password_reset_token', $user->password_reset_token)
                         ->update(['password_reset_token_created_at' => null]);
                 } catch (\Throwable $error) {
@@ -84,14 +117,22 @@ class SendEmails extends Command
             ->where(function ($query) {
                 $query->whereNull('email_confirmation_sent_at')->orWhereNull('email_notification_sent_at');
             });
+        if ($since !== null) {
+            $orders->where('orders.created_at', '>=', $since)->where('orders.id', '>', (int) $afterId);
+        }
         if ($orderId !== null) {
             $orders->where('orders.id', (int) $orderId);
         }
-        foreach ($orders->orderBy('created_at')->limit(6)->get() as $order) {
+        $orders = $orders->orderBy('created_at')->limit(6)->get();
+        if ($this->option('dry-run')) {
+            $this->line('Eligible order messages: '.$orders->sum(fn ($order) => (int) ! $order->email_notification_sent_at + (int) ! $order->email_confirmation_sent_at));
+            return self::SUCCESS;
+        }
+        foreach ($orders as $order) {
             try {
                 $details = $this->orderDetails($order->id);
                 if (! $order->email_notification_sent_at) {
-                    Mail::to($this->recipient(config('mail.order_notification_address')))->send(new OrderNotification($details));
+                    $this->sendMessage(config('mail.order_notification_address'), new OrderNotification($details));
                     $order->update(['email_notification_sent_at' => now()]);
                 }
             } catch (\Throwable $error) {
@@ -101,7 +142,7 @@ class SendEmails extends Command
             try {
                 if (! $order->email_confirmation_sent_at) {
                     $details = $this->orderDetails($order->id);
-                    Mail::to($this->recipient($order->email))->send(new OrderConfirmation($details));
+                    $this->sendMessage($order->email, new OrderConfirmation($details));
                     $order->update(['email_confirmation_sent_at' => now()]);
                 }
             } catch (\Throwable $error) {
@@ -110,6 +151,15 @@ class SendEmails extends Command
             }
         }
         return $failed ? self::FAILURE : self::SUCCESS;
+    }
+
+    private function sendMessage(string $address, \Illuminate\Mail\Mailable $message): void
+    {
+        if ($this->automationMailer !== null) {
+            Mail::mailer($this->automationMailer)->to($this->recipient($address))->send($message);
+        } else {
+            Mail::to($this->recipient($address))->send($message);
+        }
     }
 
     private function recipient(string $address): string

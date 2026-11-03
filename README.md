@@ -73,6 +73,16 @@ Remaining production work includes persistent recovery after navigating away dur
 
 The pre-existing routes `GET /api/orders/sequence`, `DELETE /api/orders/{order_id}`, `POST /api/orders/filter`, and `POST /api/customers/filter` remain unimplemented. The route regression check records this baseline so the upgrade cannot introduce additional missing actions. Several other legacy customer/address actions are placeholders; feature completeness is separate from framework compatibility.
 
+## Transactional email
+
+Set `MAIL_MAILER=smtp`, the provider's SMTP host, port and domain SMTP credentials, plus a verified `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME`. Mailgun's US SMTP host is `smtp.mailgun.org`; use port 587 with STARTTLS. SMTP passwords are separate from API keys. Use a sender belonging to the configured Mailgun domain. `ORDER_NOTIFICATION_EMAIL` selects the shop's administration recipient; customer replies go to the customer's address using Reply-To, while all messages use the configured sender.
+
+Set `ADMIN_URL` to the admin site's base URL so password-reset links match the environment. `MAIL_TEST_RECIPIENT` redirects messages from `send:emails` to one test inbox. Keep staging's scheduler stopped until its recipients and backlog have been reviewed. Never run the bulk command on an imported database just to test mail.
+
+`php artisan send:emails --order=ID` only processes that paid, confirmed order and skips password resets. The default command processes pending reset messages and up to six paid, confirmed orders. Sent timestamps are updated only after the configured transport accepts the message; failures remain pending, are logged without transport secrets, and produce a nonzero exit code. A transport success does not prove inbox delivery. Already marked messages are skipped. The scheduler avoids overlapping scheduled runs. These timestamp checks do not guarantee exactly-once delivery if a process crashes after SMTP acceptance and before the database update.
+
+Regression tests use captured messages, not customer inboxes, and cover sender/Reply-To, recipient redirection, failed transport retries, single-order isolation, payment verification, reset links and HTML escaping.
+
 ## Security and license
 
 Report vulnerabilities to [mail@uxblondon.com](mailto:mail@uxblondon.com). Laravel is licensed under the [MIT license](https://opensource.org/licenses/MIT).

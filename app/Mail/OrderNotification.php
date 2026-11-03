@@ -31,7 +31,7 @@ class OrderNotification extends Mailable
     public function build()
     {
         return $this->subject('Trinity House Order Notification - '.$this->order->ref)
-        ->from($this->order->email, $this->order->name)
+        ->replyTo($this->order->email, $this->order->name)
         ->view('emails.order-notification')
         ->with([
             'order' => $this->order

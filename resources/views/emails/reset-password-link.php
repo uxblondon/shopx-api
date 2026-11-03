@@ -9,9 +9,10 @@
 <!-- password reset email -->
 <body style="-webkit-text-size-adjust:none !important;padding:0;">
 
-    <p>Dear <?= $user->name ?>,</p>
-    <p>Please click <a href="<?= 'https://shopadmin.trinityhouse.co.uk/reset/' . $user->password_reset_token . '/password' ?>">here</a> to reset your password.</p>
-    <p>Or copy this link <a href="<?= 'https://shopadmin.trinityhouse.co.uk/reset/' . $user->password_reset_token . '/password' ?>"><?= 'http://shopxadmin.s.uxblondon.com/reset/' . $user->password_reset_token . '/password' ?></a> into your browser url.</p>
+    <p>Dear <?= e($user->name) ?>,</p>
+    <?php $resetUrl = rtrim(config('mail.admin_url'), '/') . '/reset/' . rawurlencode($user->password_reset_token) . '/password'; ?>
+    <p>Please click <a href="<?= e($resetUrl) ?>">here</a> to reset your password.</p>
+    <p>Or copy this link into your browser: <a href="<?= e($resetUrl) ?>"><?= e($resetUrl) ?></a></p>
     <p>Best Regards,</p>
     <p>Trinity House Team</p>
 

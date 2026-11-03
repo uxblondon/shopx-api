@@ -20,6 +20,9 @@ return [
         'log' => ['transport' => 'log', 'channel' => env('MAIL_LOG_CHANNEL')],
         'array' => ['transport' => 'array'],
     ],
+    'order_notification_address' => env('ORDER_NOTIFICATION_EMAIL', 'orders@trinityhouse.co.uk'),
+    'test_recipient' => env('MAIL_TEST_RECIPIENT'),
+    'admin_url' => env('ADMIN_URL', 'http://shopadmin.localhost:8080'),
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Shop'),

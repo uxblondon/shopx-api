@@ -31,7 +31,6 @@ class PasswordResetLink extends Mailable
     public function build()
     {
         return $this->subject('Reset Password Link')
-        ->from('devteam@uxblondon.com', 'Trinty House')
         ->view('emails.reset-password-link')
         ->with([
             'user' => $this->user,

@@ -56,22 +56,22 @@
         <tbody>
             <tr>
                 <td style="text-align: left; vertical-align: top;">
-                    <div>Order Ref: <?= $order->ref ?></div>
-                    <div>Date: <?= date('d-M-Y H:i a', strtotime($order->created_at)) ?></div>
-                    <div>Name: <?= $order->name ?></div>
-                    <div>Email: <?= $order->email ?></div>
+                    <div>Order Ref: <?= e($order->ref) ?></div>
+                    <div>Date: <?= e(date('d-M-Y H:i a', strtotime($order->created_at))) ?></div>
+                    <div>Name: <?= e($order->name) ?></div>
+                    <div>Email: <?= e($order->email) ?></div>
                 </td>
                 <td style="text-align: left; vertical-align: top;">
-                    <div>Name: <?= $order->payment->billing_details->name ?></div>
-                    <div><?= ($order->payment->billing_details->email !== '' ? 'Email Address: ' . $order->payment->billing_details->email : '') ?></div>
+                    <div>Name: <?= e($order->payment->billing_details->name) ?></div>
+                    <div><?= e(($order->payment->billing_details->email !== '' ? 'Email Address: ' . $order->payment->billing_details->email : '')) ?></div>
                     <div><strong>Billing Address:</strong></div>
-                    <div><?= $order->payment->billing_details->address_line_1 ?></div>
-                    <div><?= $order->payment->billing_details->address_line_2 ?></div>
-                    <div><?= $order->payment->billing_details->city ?></div>
-                    <div><?= $order->payment->billing_details->county ?></div>
-                    <div><?= $order->payment->billing_details->postcode ?></div>
-                    <div><?= $order->payment->billing_details->country_code ?></div>
-                    <div><strong>Total Order Amount:</strong> £<?= $order->payment->amount ?> (<?= $order->payment->payment_type ?>)</div>
+                    <div><?= e($order->payment->billing_details->address_line_1) ?></div>
+                    <div><?= e($order->payment->billing_details->address_line_2) ?></div>
+                    <div><?= e($order->payment->billing_details->city) ?></div>
+                    <div><?= e($order->payment->billing_details->county) ?></div>
+                    <div><?= e($order->payment->billing_details->postcode) ?></div>
+                    <div><?= e($order->payment->billing_details->country_code) ?></div>
+                    <div><strong>Total Order Amount:</strong> £<?= e($order->payment->amount) ?> (<?= e($order->payment->payment_type) ?>)</div>
                 </td>
             </tr>
         </tbody>
@@ -84,26 +84,26 @@
         <table>
             <thead>
                 <tr>
-                    <th colspan="4"><?= $delivery->method === 'collection' ? 'Collection' : 'Delivery' ?> Details</th>
+                    <th colspan="4"><?= e($delivery->method === 'collection' ? 'Collection' : 'Delivery') ?> Details</th>
                 </tr>
             </thead>
 
             <tbody>
                 <tr>
                     <td colspan="2" style="text-align: left;">
-                        <div><strong>Type: </strong><?= $delivery->provider . ' - ' . $delivery->service ?></div>
-                        <div><strong>Cost: </strong> £<?= $delivery->cost ?></div>
+                        <div><strong>Type: </strong><?= e($delivery->provider . ' - ' . $delivery->service) ?></div>
+                        <div><strong>Cost: </strong> £<?= e($delivery->cost) ?></div>
                     </td>
                     <td colspan="2" style="text-align: left;">
-                        <div><strong><?= $delivery->method === 'collection' ? 'Collection' : 'Delivery' ?> Address:</strong></div>
-                        <div><?= $delivery->address->name ?></div>
-                        <div><?= $delivery->address->address_line_1 ?></div>
-                        <div><?= $delivery->address->address_line_2 ?></div>
-                        <div><?= $delivery->address->city ?></div>
-                        <div><?= $delivery->address->county ?></div>
-                        <div><?= $delivery->address->postcode ?></div>
-                        <div><?= $delivery->address->country_code ?></div>
-                        <div><?= $delivery->address->phone ? 'Phone: ' . $delivery->address->phone : '' ?></div>
+                        <div><strong><?= e($delivery->method === 'collection' ? 'Collection' : 'Delivery') ?> Address:</strong></div>
+                        <div><?= e($delivery->address->name) ?></div>
+                        <div><?= e($delivery->address->address_line_1) ?></div>
+                        <div><?= e($delivery->address->address_line_2) ?></div>
+                        <div><?= e($delivery->address->city) ?></div>
+                        <div><?= e($delivery->address->county) ?></div>
+                        <div><?= e($delivery->address->postcode) ?></div>
+                        <div><?= e($delivery->address->country_code) ?></div>
+                        <div><?= e($delivery->address->phone ? 'Phone: ' . $delivery->address->phone : '') ?></div>
                     </td>
                 </tr>
                 <tr>
@@ -114,17 +114,17 @@
                 </tr>
                 <?php foreach ($delivery->items as $key => $order_item) { ?>
                     <tr>
-                        <td><?= $key + 1 ?>
+                        <td><?= e($key + 1) ?>
                         </td>
                         <td style="text-align: left;">
-                            <?= $order_item->title ?>
-                            <?= $order_item->variant_1_value ? '(' . $order_item->variant_1_name . ':' . $order_item->variant_1_value . ')' : '' ?>
-                            <?= $order_item->variant_2_value ? '(' . $order_item->variant_2_name . ':' . $order_item->variant_2_value . ')' : '' ?>
-                            <?= $order_item->variant_3_value ? '(' . $order_item->variant_3_name . ':' . $order_item->variant_3_value . ')' : '' ?>
+                            <?= e($order_item->title) ?>
+                            <?= e($order_item->variant_1_value ? '(' . $order_item->variant_1_name . ':' . $order_item->variant_1_value . ')' : '') ?>
+                            <?= e($order_item->variant_2_value ? '(' . $order_item->variant_2_name . ':' . $order_item->variant_2_value . ')' : '') ?>
+                            <?= e($order_item->variant_3_value ? '(' . $order_item->variant_3_name . ':' . $order_item->variant_3_value . ')' : '') ?>
                         </td>
-                        <td style="text-align: center;"><?= $order_item->quantity ?>
+                        <td style="text-align: center;"><?= e($order_item->quantity) ?>
                         </td>
-                        <td style="text-align: right;"><?= $order_item->price ?>
+                        <td style="text-align: right;"><?= e($order_item->price) ?>
                         </td>
                     </tr>
                 <?php } ?>

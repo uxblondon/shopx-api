@@ -150,6 +150,9 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->input('payment.type') === 'paypal' && ! config('services.paypal.enabled', false)) {
+            return response()->json(['status' => 'error', 'message' => 'PayPal is currently unavailable.'], 422);
+        }
         DB::beginTransaction();
         try {
 
@@ -301,8 +304,8 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'payment_type' => $payment['type'],
                 'amount' => $payment['amount'],
-                'payment_id' => isset($payment['payment_id']) ? $payment['payment_id'] : '',
-                'payment_status' => isset($payment['payment_status']) ? $payment['payment_status'] : '',
+                'payment_id' => $payment['type'] === 'stripe' ? '' : ($payment['payment_id'] ?? ''),
+                'payment_status' => $payment['type'] === 'stripe' ? 'pending' : ($payment['payment_status'] ?? ''),
             );
             OrderPayment::create($order_payment_data);
         } catch (\Exception $e) {

@@ -14,6 +14,9 @@ class PaypalController extends Controller
 
     public function paymentStatus()
     {
+        if (! config('services.paypal.enabled', false)) {
+            return response()->json(['status' => 'error', 'message' => 'PayPal is currently unavailable.'], 503);
+        }
 
         try {
             $input = @file_get_contents("php://input");

@@ -76,13 +76,15 @@ class CheckoutTest extends TestCase
     public function test_stripe_intent_response_remains_compatible_without_a_live_payment(): void
     {
         config(['services.stripe.secret' => 'sk_test_local_fixture']);
+        $order = Order::create(['ref' => 'TEST', 'name' => 'Test Customer', 'email' => 'stripe@example.test']);
+        \App\Models\OrderPayment::create(['order_id' => $order->id, 'payment_type' => 'stripe', 'amount' => 10]);
         $client = Mockery::mock(\Stripe\HttpClient\ClientInterface::class);
         $client->shouldReceive('request')->once()->andReturn([
-            json_encode(['id' => 'pi_fixture', 'object' => 'payment_intent', 'client_secret' => 'fixture_secret']), 200, [],
+            json_encode(['id' => 'pi_fixture', 'object' => 'payment_intent', 'client_secret' => 'fixture_secret', 'status' => 'requires_payment_method', 'currency' => 'gbp', 'amount' => 1000, 'livemode' => false, 'metadata' => ['order_id' => (string) $order->id, 'order_ref' => 'TEST']]), 200, [],
         ]);
         \Stripe\ApiRequestor::setHttpClient($client);
         try {
-            $this->postJson('/api/stripe/payment-intend', ['order_id' => 1, 'order_ref' => 'TEST', 'amount' => 1000])
+            $this->postJson('/api/stripe/payment-intend', ['order_id' => $order->id, 'order_ref' => 'TEST', 'amount' => 1000])
                 ->assertOk()->assertJsonPath('status', 'success')->assertJsonPath('secret', 'fixture_secret');
         } finally {
             \Stripe\ApiRequestor::setHttpClient(new \Stripe\HttpClient\CurlClient());

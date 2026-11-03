@@ -49,7 +49,7 @@ docker compose -p shopx-laravel13-test -f docker/compose.test.yaml down --volume
 
 This uses a separate Compose project, no published ports, and a memory-backed MySQL data directory. Tests refuse to use any database other than SQLite `:memory:` or MySQL `shopx_test`. Never point tests at application data. The test container also checks platform requirements, OpenAPI generation, and route/configuration caching. CI runs these checks before publishing images.
 
-Coverage includes JWT login/refresh/logout, API errors, product administration/catalog, delivery and collection charges, collection order creation and retrieval, uploads/replacement/deletion, email rendering and transport, CORS, and a mocked Stripe PaymentIntent request. No real payments or outbound emails are sent.
+Coverage includes JWT login/refresh/logout, API errors, product administration/catalog, delivery and collection charges, collection order creation and retrieval, uploads/replacement/deletion, email rendering and transport, CORS, and Stripe intent creation, provider confirmation, amount/currency/order matching, signed webhooks, duplicate events, and disabled PayPal. No real payments or outbound emails are sent.
 
 ## Laravel 6 to 13 migration
 
@@ -61,7 +61,11 @@ Existing demo seeders contain demonstration accounts/data and are optional. They
 
 ## Outstanding application issues
 
-This framework upgrade does not redesign checkout or establish production payment verification. Existing checkout handlers accept client-supplied payment details, Stripe confirmation trusts the supplied success status, and Stripe/PayPal webhook handlers lack signature verification and reference a debug `test` table absent from fresh migrations. Resolve these issues and run provider sandbox end-to-end tests before production use. The automated Stripe test mocks the provider; it does not prove a live payment succeeds.
+Stripe confirmation retrieves the PaymentIntent from Stripe and checks its ID, order metadata, GBP amount and received amount against the saved payment. The API stores the intent before returning its client secret. Webhooks require `STRIPE_WEBHOOK_SECRET` and a valid Stripe signature; duplicate events cannot downgrade a confirmed payment. The storefront retains the basket until the API confirms payment and lets the user retry confirmation without charging again.
+
+Set `STRIPE_SK` to the sandbox secret key and configure the matching publishable key in the storefront runtime configuration. Register `POST /api/stripe-payment-status` for `payment_intent.succeeded`, `payment_intent.payment_failed`, `payment_intent.processing`, and `payment_intent.canceled`, then save its signing secret as `STRIPE_WEBHOOK_SECRET`. Missing webhook configuration returns HTTP 503; invalid signatures return HTTP 400. No schema changes are required.
+
+Production checkout still needs server-side calculation of product prices, shipping and order totals: the saved order amount currently comes from client input. Refresh/navigation recovery for an interrupted payment also needs work. PayPal remains disabled by default (`PAYPAL_ENABLED=false`) because its legacy verification is incomplete; do not enable it before implementing and testing provider verification. Automated tests mock Stripe. Separate sandbox API checks exercised successful, declined and authentication-required payments; browser and actual webhook delivery checks are still required.
 
 The pre-existing routes `GET /api/orders/sequence`, `DELETE /api/orders/{order_id}`, `POST /api/orders/filter`, and `POST /api/customers/filter` remain unimplemented. The route regression check records this baseline so the upgrade cannot introduce additional missing actions. Several other legacy customer/address actions are placeholders; feature completeness is separate from framework compatibility.
 

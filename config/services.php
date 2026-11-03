@@ -2,7 +2,11 @@
 
 return [
 
-    'stripe' => ['secret' => env('STRIPE_SK')],
+    'stripe' => [
+        'secret' => env('STRIPE_SK'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+    'paypal' => ['enabled' => env('PAYPAL_ENABLED', false)],
 
     /*
     |--------------------------------------------------------------------------

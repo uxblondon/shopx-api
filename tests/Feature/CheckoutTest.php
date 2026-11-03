@@ -38,27 +38,28 @@ class CheckoutTest extends TestCase
         $id = $create->json('data.id');
         $this->getJson($url)->assertOk()->assertJsonPath('status', 'success')->assertJsonCount(1, 'data');
         $this->putJson($url.'/'.$id, array_merge($rate, ['cost' => 6]))->assertOk()->assertJsonPath('status', 'success');
-        $product = Product::create(['title' => 'Gift', 'slug' => 'gift', 'description' => 'Gift', 'created_by' => $user->id]);
+        $product = Product::create(['title' => 'Gift', 'slug' => 'gift', 'status' => 'published', 'description' => 'Gift', 'created_by' => $user->id]);
+        $variant = ProductVariant::create(['product_id' => $product->id, 'price' => 10, 'width' => 1, 'length' => 1, 'height' => 1, 'weight' => 1, 'created_by' => $user->id]);
         ShippingZoneProduct::create(['product_id' => $product->id, 'shipping_zone_id' => $zone->id, 'created_by' => $user->id]);
         ProductShippingOption::create(['product_id' => $product->id, 'shipping_option_id' => $option->id, 'created_by' => $user->id]);
         $this->postJson('/api/delivery-options', ['address' => ['country' => 'GB'], 'items' => [[
-            'product_id' => $product->id, 'title' => 'Gift', 'width' => 1, 'length' => 1, 'height' => 1, 'weight' => 1,
+            'id' => $variant->id, 'product_id' => $product->id, 'title' => 'Gift', 'width' => 1, 'length' => 1, 'height' => 1, 'weight' => 1,
             'price' => 10, 'quantity' => 1, 'additional_shipping_cost' => 0, 'separated_shipping_required' => 0,
-        ]]])->assertOk()->assertJsonPath('status', 'success')->assertJsonPath('data.0.options.0.cost', 6);
+        ]]])->assertOk()->assertJsonPath('status', 'success')->assertJsonPath('data.0.options.0.cost', '6.00');
     }
 
     public function test_collection_order_is_saved_and_visible_to_administration(): void
     {
-        $product = Product::create(['title' => 'Gift', 'slug' => 'gift', 'description' => 'Gift', 'created_by' => 1]);
+        $product = Product::create(['title' => 'Gift', 'slug' => 'gift', 'status' => 'published', 'description' => 'Gift', 'created_by' => 1]);
         $variant = ProductVariant::create(['product_id' => $product->id, 'price' => 10, 'width' => 1, 'length' => 1, 'height' => 1, 'created_by' => 1]);
         $point = CollectionPoint::create(['name' => 'Test collection', 'address_line_1' => '1 Test Street', 'city' => 'London', 'postcode' => 'SW1A 1AA', 'country_code' => 'GB', 'active' => 1, 'created_by' => 1]);
-        CollectionRate::create(['collection_point_id' => $point->id, 'speed' => 'Next day', 'cost' => 0, 'available' => 1, 'created_by' => 1]);
+        $rate = CollectionRate::create(['collection_point_id' => $point->id, 'speed' => 'Next day', 'cost' => 0, 'available' => 1, 'created_by' => 1]);
         $this->postJson('/api/collection-options', ['collection_point_id' => $point->id])->assertOk()->assertJsonCount(1, 'data');
         $item = array_merge($variant->fresh()->toArray(), ['title' => 'Gift', 'quantity' => 1,
             'variant_1_name' => null, 'variant_2_name' => null, 'variant_3_name' => null]);
         $address = ['name' => 'Test Customer', 'address_line_1' => '1 Test Street', 'city' => 'London', 'postcode' => 'SW1A 1AA', 'country_code' => 'GB', 'country' => 'GB'];
         $payload = ['customer' => ['name' => 'Test Customer', 'email' => 'customer@example.com'], 'basket_items' => [$item],
-            'shipping' => ['method' => 'collection', 'collection_option' => ['speed' => 'Next day', 'cost' => 0], 'collection_address' => $address],
+            'shipping' => ['method' => 'collection', 'collection_option' => $rate->toArray(), 'collection_address' => $point->toArray()],
             'payment' => ['type' => 'stripe', 'amount' => 10, 'billing' => $address]];
         $response = $this->postJson('/api/orders', $payload)->assertOk()->assertJsonPath('status', 'success');
         $id = $response->json('data.id');

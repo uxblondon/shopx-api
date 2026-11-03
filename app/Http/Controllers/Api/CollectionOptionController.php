@@ -2,29 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use DB;
 use App\Http\Controllers\Controller;
-use App\Models\ShippingRate;
-use Illuminate\Http\Request;
-use App\Models\ShippingZone;
-use App\Models\ShippingPackageSize;
-use App\Models\ShippingOption;
-use App\Models\ProductShippingOption;
+use App\Models\CollectionPoint;
 use App\Models\CollectionRate;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CollectionOptionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function options(Request $request)
     {
-        $collection_point_id = $request->get('collection_point_id');
-
-        $collection_rates = CollectionRate::where('collection_point_id', $collection_point_id)->orderBy('cost')->get()->toArray();
-
-        return response()->json(['status' => 'success', 'data' => $collection_rates]);
+        $request->validate(['collection_point_id' => 'required|integer|min:1']);
+        if (! CollectionPoint::where('id', $request->integer('collection_point_id'))->where('active', 1)->exists()) {
+            throw ValidationException::withMessages(['collection_point_id' => 'This collection point is not available.']);
+        }
+        $rates = CollectionRate::where('collection_point_id', $request->integer('collection_point_id'))
+            ->where('available', 1)->orderBy('cost')->get();
+        return response()->json(['status' => 'success', 'data' => $rates]);
     }
 }

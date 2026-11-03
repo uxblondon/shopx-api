@@ -157,9 +157,11 @@ class OrderController extends Controller
         try {
 
             $customer = $request->get('customer');
-            $basket_items = $request->get('basket_items');
-            $shipping = $request->get('shipping');
+            $quote = app(\App\Services\CheckoutPricing::class)->calculate($request->all());
+            $basket_items = $quote['items'];
+            $shipping = $quote['shipping'];
             $payment = $request->get('payment');
+            $payment['amount'] = $quote['total'];
 
             $order_data = array(
                 'ref' => $this->ref($shipping['method'], count($basket_items)),
@@ -308,12 +310,19 @@ class OrderController extends Controller
                 'payment_status' => $payment['type'] === 'stripe' ? 'pending' : ($payment['payment_status'] ?? ''),
             );
             OrderPayment::create($order_payment_data);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Failed to save the order.' . $e->getMessage()]);
+            throw $e;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return response()->json(['status' => 'error', 'message' => 'Unable to save the order. Please try again.'], 503);
         }
 
         DB::commit();
+        $order->setAttribute('subtotal', $quote['subtotal']);
+        $order->setAttribute('shipping_cost', $quote['shipping_cost']);
+        $order->setAttribute('total_amount', $quote['total']);
 
         return response()->json(['status' => 'success', 'request' => $request->all(), 'data' => $order, 'message' => 'Order created successfully.']);
     }

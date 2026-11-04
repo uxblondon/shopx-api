@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CheckoutAttempt;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Services\CheckoutMoney;
@@ -25,11 +26,13 @@ class PaypalController extends Controller
         if (! $order || ! hash_equals((string) $order->ref, $request->input('order_ref'))) {
             return response()->json(['status' => 'error', 'message' => 'Order not found.'], 404);
         }
+        CheckoutAttempt::authorize($request, $order);
         try {
             // Save a durable request ID before making the remote call, including timeout retries.
             DB::transaction(function () use ($order) {
                 $payment = $this->payment($order->id)->lockForUpdate()->first();
-                if (! $payment || $payment->payment_confirmed || $order->status !== 'pending') {
+                $order->refresh();
+                if (! $payment || $payment->payment_confirmed || $order->status !== 'pending' || $order->trashed()) {
                     throw new \DomainException('This order is not awaiting PayPal payment.');
                 }
                 if (! $payment->paypal_request_id) {
@@ -38,8 +41,9 @@ class PaypalController extends Controller
             });
             $id = DB::transaction(function () use ($order) {
                 $payment = $this->payment($order->id)->lockForUpdate()->firstOrFail();
-                if ($payment->payment_confirmed) {
-                    throw new \DomainException('This order is already paid.');
+                $order->refresh();
+                if ($payment->payment_confirmed || $order->status !== 'pending' || $order->trashed()) {
+                    throw new \DomainException('This order is not awaiting PayPal payment.');
                 }
                 if ($payment->paypal_order_id) {
                     return $payment->paypal_order_id;
@@ -78,39 +82,75 @@ class PaypalController extends Controller
             return $this->unavailable();
         }
         $request->validate(['order_ref' => 'required|string', 'paypal_order_id' => ['required', 'string', 'regex:/^[A-Z0-9]{10,64}$/']]);
-        $order = Order::find($order_id);
-        $payment = $this->payment($order_id)->first();
-        if (! $order || ! $payment || ! hash_equals((string) $order->ref, $request->input('order_ref'))
-            || ! $payment->paypal_order_id || ! hash_equals($payment->paypal_order_id, $request->input('paypal_order_id'))) {
-            return response()->json(['status' => 'error', 'message' => 'PayPal payment does not belong to this order.'], 422);
-        }
-        if ($order->status !== 'pending' && ! $payment->payment_confirmed) {
-            return response()->json(['status' => 'error', 'message' => 'This order is not awaiting payment.'], 422);
-        }
-        try {
-            $path = '/v2/checkout/orders/'.$payment->paypal_order_id;
-            $provider = $this->gateway->request('GET', $path);
-            $this->validateOrder($provider, $payment, $order);
-            if (($provider['status'] ?? '') === 'APPROVED') {
-                try {
-                    $this->gateway->request('POST', $path.'/capture', null,
-                        substr(hash('sha256', $payment->paypal_request_id.':capture'), 0, 32));
-                } catch (\Throwable $error) {
-                    // A timeout can happen after capture. Do not start a different payment.
-                }
-                // Capture responses may omit order metadata; verify the full saved provider order.
+        return DB::transaction(function () use ($request, $order_id) {
+            $payment = $this->payment($order_id)->lockForUpdate()->first();
+            $order = Order::find($order_id);
+            if ($order) {CheckoutAttempt::authorize($request, $order);}
+            if (! $order || ! $payment || ! hash_equals((string) $order->ref, $request->input('order_ref'))
+                || ! $payment->paypal_order_id || ! hash_equals($payment->paypal_order_id, $request->input('paypal_order_id'))) {
+                return response()->json(['status' => 'error', 'message' => 'PayPal payment does not belong to this order.'], 422);
+            }
+            if ($order->status !== 'pending' && ! $payment->payment_confirmed) {
+                return response()->json(['status' => 'error', 'message' => 'This order is not awaiting payment.'], 422);
+            }
+            try {
+                $path = '/v2/checkout/orders/'.$payment->paypal_order_id;
                 $provider = $this->gateway->request('GET', $path);
+                $this->validateOrder($provider, $payment, $order);
+                if (($provider['status'] ?? '') === 'APPROVED') {
+                    try {
+                        $this->gateway->request('POST', $path.'/capture', null,
+                            substr(hash('sha256', $payment->paypal_request_id.':capture'), 0, 32));
+                    } catch (\Throwable $error) {
+                        // A timeout can happen after capture. Do not start a different payment.
+                    }
+                    // Capture responses may omit order metadata; verify the full saved provider order.
+                    $provider = $this->gateway->request('GET', $path);
+                }
+                $paid = $this->apply($provider);
+                if (! $paid) {
+                    return response()->json(['status' => 'error', 'message' => 'PayPal has not confirmed payment. Your basket is retained.',
+                        'code' => 'PAYPAL_NOT_COMPLETED'], 409);
+                }
+                return response()->json(['status' => 'success', 'payment_status' => 'COMPLETED']);
+            } catch (\DomainException $error) {
+                return response()->json(['status' => 'error', 'message' => $error->getMessage()], 422);
+            } catch (\Throwable $error) {
+                return $this->unavailable();
             }
-            $paid = $this->apply($provider);
-            if (! $paid) {
-                return response()->json(['status' => 'error', 'message' => 'PayPal has not confirmed payment. Your basket is retained.',
-                    'code' => 'PAYPAL_NOT_COMPLETED'], 409);
+        });
+    }
+
+    public function synchronize(Order $order): ?array
+    {
+        $payment = $this->payment($order->id)->firstOrFail();
+        if (! $payment->paypal_order_id) {
+            return null;
+        }
+        if (! $this->gateway->ready()) {
+            throw new \RuntimeException('PayPal is unavailable.');
+        }
+        $provider = $this->gateway->request('GET', '/v2/checkout/orders/'.$payment->paypal_order_id);
+        $this->validateOrder($provider, $payment, $order);
+        $this->apply($provider);
+        return $provider;
+    }
+
+    public function assertCancellable(?array $provider): void
+    {
+        if ($provider === null) {
+            return;
+        }
+        $captures = $provider['purchase_units'][0]['payments']['captures'] ?? [];
+        foreach ($captures as $capture) {
+            if (($capture['status'] ?? '') !== 'DECLINED') {
+                throw new \DomainException('PayPal is still confirming this payment. Check its status before starting another.');
             }
-            return response()->json(['status' => 'success', 'payment_status' => 'COMPLETED']);
-        } catch (\DomainException $error) {
-            return response()->json(['status' => 'error', 'message' => $error->getMessage()], 422);
-        } catch (\Throwable $error) {
-            return $this->unavailable();
+        }
+        $status = $provider['status'] ?? '';
+        if (! in_array($status, ['CREATED', 'SAVED', 'APPROVED', 'PAYER_ACTION_REQUIRED', 'VOIDED'], true)
+            && ! ($status === 'COMPLETED' && count($captures) === 1 && ($captures[0]['status'] ?? '') === 'DECLINED')) {
+            throw new \DomainException('PayPal cancellation cannot be verified. Check its status before starting another.');
         }
     }
 
@@ -180,7 +220,7 @@ class PaypalController extends Controller
     {
         return DB::transaction(function () use ($provider) {
             $payment = OrderPayment::where('payment_type', 'paypal')->where('paypal_order_id', $provider['id'] ?? '')->lockForUpdate()->first();
-            $order = $payment ? Order::find($payment->order_id) : null;
+            $order = $payment ? Order::withTrashed()->find($payment->order_id) : null;
             if (! $order) {
                 throw new \DomainException('PayPal order not found.');
             }

@@ -28,4 +28,6 @@ class Order extends Model
      * @var array
      */
     protected $guarded = [];
+
+    protected $hidden = ['checkout_token_hash', 'checkout_payload_hash'];
 }

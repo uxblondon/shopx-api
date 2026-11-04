@@ -27,6 +27,8 @@ Route::group([
     Route::get('available-products', 'Api\ProductController@available');
 
     Route::post('orders', 'Api\OrderController@store');
+    Route::post('checkout/recover', 'Api\CheckoutRecoveryController@recover')->middleware('throttle:30,1');
+    Route::post('checkout/cancel', 'Api\CheckoutRecoveryController@cancel')->middleware('throttle:30,1');
 
     Route::post('delivery-options', 'Api\DeliveryOptionController@options');
     Route::post('collection-options', 'Api\CollectionOptionController@options');

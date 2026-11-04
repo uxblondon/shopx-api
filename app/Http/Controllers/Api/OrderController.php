@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CheckoutAttempt;
 
 use DB;
 use Illuminate\Http\Request;
@@ -150,12 +151,32 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        $token = CheckoutAttempt::token($request);
+        $tokenHash = $token ? hash('sha256', $token) : null;
+        $fingerprint = $token ? CheckoutAttempt::fingerprint($request) : null;
+        if ($tokenHash && ($existing = Order::where('checkout_token_hash', $tokenHash)->first())) {
+            return CheckoutAttempt::replay($existing, $fingerprint);
+        }
         if ($request->input('payment.type') === 'paypal' && ! config('services.paypal.enabled', false)) {
             return response()->json(['status' => 'error', 'message' => 'PayPal is currently unavailable.'], 422);
         }
+        if ($tokenHash) {
+            CheckoutAttempt::reserve($tokenHash);
+        }
         DB::beginTransaction();
         try {
-
+            if ($tokenHash) {
+                $attempt = DB::table('checkout_attempts')->where('token_hash', $tokenHash)->lockForUpdate()->first();
+                if ($attempt->state === 'cancelled') {
+                    DB::rollBack();
+                    return response()->json(['status' => 'error', 'message' => 'This checkout was cancelled. Reload before starting another.'], 409);
+                }
+                if ($existing = Order::where('checkout_token_hash', $tokenHash)->first()) {
+                    $response = CheckoutAttempt::replay($existing, $fingerprint);
+                    DB::commit();
+                    return $response;
+                }
+            }
             $customer = $request->get('customer');
             $quote = app(\App\Services\CheckoutPricing::class)->calculate($request->all());
             $basket_items = $quote['items'];
@@ -167,6 +188,8 @@ class OrderController extends Controller
                 'ref' => $this->ref($shipping['method'], count($basket_items)),
                 'name' => $customer['name'],
                 'email' => $customer['email'],
+                'checkout_token_hash' => $tokenHash,
+                'checkout_payload_hash' => $fingerprint,
             );
 
 
@@ -307,11 +330,22 @@ class OrderController extends Controller
                 'payment_status' => 'pending',
             );
             OrderPayment::create($order_payment_data);
+            if ($tokenHash) {
+                DB::table('checkout_attempts')->where('token_hash', $tokenHash)->update([
+                    'state' => 'created', 'order_id' => $order->id, 'updated_at' => now(),
+                ]);
+            }
         } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
             DB::rollBack();
             throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
+            if ($e instanceof \Illuminate\Database\UniqueConstraintViolationException && $tokenHash && ($existing = Order::where('checkout_token_hash', $tokenHash)->first())) {
+                return CheckoutAttempt::replay($existing, $fingerprint);
+            }
             report($e);
             return response()->json(['status' => 'error', 'message' => 'Unable to save the order. Please try again.'], 503);
         }
@@ -321,7 +355,7 @@ class OrderController extends Controller
         $order->setAttribute('shipping_cost', $quote['shipping_cost']);
         $order->setAttribute('total_amount', $quote['total']);
 
-        return response()->json(['status' => 'success', 'request' => $request->all(), 'data' => $order, 'message' => 'Order created successfully.']);
+        return response()->json(['status' => 'success', 'request' => $request->except('checkout_token'), 'data' => $order, 'message' => 'Order created successfully.']);
     }
 
 
@@ -365,6 +399,10 @@ class OrderController extends Controller
 
     public function removePending($order_id, $order_ref)
     {
+        if (Order::where('id', $order_id)->whereNotNull('checkout_token_hash')->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'Recover this checkout before cancelling it.'], 409);
+        }
+
         return Order::where('orders.status', 'pending')
             ->join('order_payments', 'orders.id', 'order_payments.order_id')
             ->where('orders.id', $order_id)

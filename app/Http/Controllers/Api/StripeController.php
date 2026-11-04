@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CheckoutAttempt;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use Illuminate\Http\Request;
@@ -20,11 +21,13 @@ class StripeController extends Controller
         if (! $order || ! hash_equals((string) $order->ref, $request->string('order_ref')->toString())) {
             return response()->json(['status' => 'error', 'message' => 'Order not found.'], 404);
         }
+        CheckoutAttempt::authorize($request, $order);
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
             $intent = DB::transaction(function () use ($order) {
                 $payment = OrderPayment::where('order_id', $order->id)->where('payment_type', 'stripe')->lockForUpdate()->first();
-                if (! $payment || $payment->payment_confirmed || $order->status !== 'pending') {
+                $order->refresh();
+                if (! $payment || $payment->payment_confirmed || $order->status !== 'pending' || $order->trashed()) {
                     throw new \DomainException('This order is not awaiting a card payment.');
                 }
                 $amount = $this->amount($payment);
@@ -46,7 +49,7 @@ class StripeController extends Controller
                 $payment->save();
                 return $intent;
             });
-            return response()->json(['status' => 'success', 'secret' => $intent->client_secret]);
+            return response()->json(['status' => 'success', 'secret' => $intent->client_secret])->header('Cache-Control', 'no-store');
         } catch (\DomainException $error) {
             return response()->json(['status' => 'error', 'message' => $error->getMessage()], 422);
         } catch (\Exception $error) {
@@ -61,6 +64,7 @@ class StripeController extends Controller
         if (! $payment || ! Order::find($order_id) || ! $payment->payment_id || ! hash_equals($payment->payment_id, $request->input('payment_id'))) {
             return response()->json(['status' => 'error', 'message' => 'Payment does not belong to this order.'], 422);
         }
+        CheckoutAttempt::authorize($request, Order::findOrFail($order_id));
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
             $intent = PaymentIntent::retrieve($payment->payment_id);
@@ -101,6 +105,31 @@ class StripeController extends Controller
         }
     }
 
+    public function synchronize(Order $order)
+    {
+        $payment = OrderPayment::where('order_id', $order->id)->where('payment_type', 'stripe')->firstOrFail();
+        if (! $payment->payment_id) {
+            return null;
+        }
+        Stripe::setApiKey(config('services.stripe.secret'));
+        $intent = PaymentIntent::retrieve($payment->payment_id);
+        $this->validateIntent($intent, $payment, $order);
+        $this->applyIntent($intent);
+        return $intent;
+    }
+
+    public function cancelSaved(Order $order): void
+    {
+        $intent = $this->synchronize($order);
+        if ($intent && $intent->status !== 'canceled' && $intent->status !== 'succeeded') {
+            $intent->cancel();
+            $intent = $this->synchronize($order);
+        }
+        if ($intent && $intent->status !== 'canceled') {
+            throw new \DomainException('This card payment cannot be cancelled. Check its status before continuing.');
+        }
+    }
+
     private function amount(OrderPayment $payment): int
     {
         $amount = (int) round((float) $payment->amount * 100);
@@ -133,7 +162,7 @@ class StripeController extends Controller
             if (! $payment) {
                 return;
             }
-            $order = Order::find($payment->order_id);
+            $order = Order::withTrashed()->find($payment->order_id);
             if (! $order) {
                 return;
             }

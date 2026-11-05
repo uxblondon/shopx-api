@@ -28,8 +28,8 @@ class ShippingZoneController extends Controller
                 DB::raw('count(DISTINCT shipping_rates.id) as no_of_rates'),
                 'shipping_zones.available'
             ])
-            ->orderBy('available', 'desc')
-            ->orderBy('title')
+            ->orderBy('shipping_zones.available', 'desc')
+            ->orderBy('shipping_zones.title')
             ->groupBy('shipping_zones.id')
             ->get();
 
@@ -43,7 +43,7 @@ class ShippingZoneController extends Controller
      */
     public function available()
     {
-        $zones = ShippingZone::where('available', 1)->orderBy('available', 'desc')->orderBy('title')->get();
+        $zones = ShippingZone::where('available', 1)->orderBy('shipping_zones.available', 'desc')->orderBy('shipping_zones.title')->get();
 
         return response()->json(['status' => 'success', 'data' => $zones]);
     }
@@ -122,7 +122,7 @@ class ShippingZoneController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone products.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone products.']);
         }
 
         DB::commit();
@@ -207,7 +207,7 @@ class ShippingZoneController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone countries.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone countries.']);
         }
 
         DB::commit();
@@ -272,8 +272,8 @@ class ShippingZoneController extends Controller
                 DB::raw('count(DISTINCT shipping_rates.id) as no_of_rates'),
                 'shipping_zones.available'
             ])
-            ->orderBy('available', 'desc')
-            ->orderBy('title')
+            ->orderBy('shipping_zones.available', 'desc')
+            ->orderBy('shipping_zones.title')
             ->groupBy('shipping_zones.id')
             ->first();
 
@@ -299,7 +299,7 @@ class ShippingZoneController extends Controller
                 'deleted_by' => auth()->user()->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping zone.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete shipping zone.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Shipping zone successfully deleted.']);
     }

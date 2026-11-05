@@ -126,7 +126,7 @@ class PasswordResetTest extends TestCase
 
     public function test_legacy_plaintext_link_has_no_validity_and_existing_login_still_works(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['admin' => 1]);
         $user->forceFill(['password_reset_token' => str_repeat('a', 64), 'password_reset_token_created_at' => now()])->save();
         $this->resetLink($user, str_repeat('a', 64))->assertUnprocessable();
         $this->postJson('/api/auth/login', ['email' => $user->email, 'password' => 'password'])->assertOk();

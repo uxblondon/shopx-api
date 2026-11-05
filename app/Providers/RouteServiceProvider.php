@@ -35,6 +35,11 @@ class RouteServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\RateLimiter::for('password-reset-submit', fn ($request) =>
             \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by('reset-submit:'.$request->ip()));
 
+        \Illuminate\Support\Facades\RateLimiter::for('admin-login', fn ($request) => [
+            \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by('login-ip:'.$request->ip()),
+            \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by('login-account:'.hash('sha256', strtolower(is_string($request->input('email')) ? $request->input('email') : ''))),
+        ]);
+
         parent::boot();
     }
 

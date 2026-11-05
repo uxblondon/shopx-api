@@ -51,6 +51,7 @@ class PasswordReset
                 'password_reset_token_created_at' => null,
                 'password_reset_expires_at' => null,
                 'remember_token' => null,
+                'auth_version' => $user->auth_version + 1,
             ])->save();
             return true;
         });

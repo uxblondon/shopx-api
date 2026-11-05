@@ -31,7 +31,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'password_reset_token', 'password_reset_payload',
+        'password', 'remember_token', 'auth_version', 'password_reset_token', 'password_reset_payload',
         'password_reset_token_created_at', 'password_reset_expires_at',
     ];
 
@@ -42,6 +42,9 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'admin' => 'integer',
+        'disabled' => 'boolean',
+        'auth_version' => 'integer',
         'password_reset_expires_at' => 'datetime',
     ];
 
@@ -62,6 +65,6 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getJWTCustomClaims()
     {
-        return [];
+        return ['av' => (int) $this->auth_version];
     }
 }

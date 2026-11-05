@@ -34,6 +34,7 @@ class UpdateUserRequest extends FormRequest
         $user_id = FormRequest::segment(4);
         return [
             'name' => ['string', 'max:255'],
+            'disabled' => ['boolean'],
             'email' => [
                 'string',
                 'email',

@@ -104,7 +104,7 @@ class ProductVariantTypeController extends Controller
             ->first();
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store variant type.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to store variant type.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Variant type successfully stored.', 'data' => $variant_type]);
     }
@@ -143,7 +143,7 @@ class ProductVariantTypeController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete product variant type.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete product variant type.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Variant type deleted successfully.']);
     }

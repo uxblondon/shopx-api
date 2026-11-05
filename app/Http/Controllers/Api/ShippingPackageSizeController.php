@@ -121,7 +121,7 @@ class ShippingPackageSizeController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping zone countries.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping zone countries.']);
         }
 
         DB::commit();
@@ -202,7 +202,7 @@ class ShippingPackageSizeController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete package size.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete package size.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Package size successfully deleted.']);
     }

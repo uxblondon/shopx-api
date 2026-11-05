@@ -92,7 +92,7 @@ class ShippingOptionController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping option products.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping option products.']);
         }
 
         DB::commit();
@@ -193,7 +193,7 @@ class ShippingOptionController extends Controller
     
             ShippingOption::where('id', $shipping_option_id)->update($shipping_option_data);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update package size.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update package size.']);
         }
 
         $shipping_option = ShippingOption::where('id', $shipping_option_id)->first();
@@ -217,7 +217,7 @@ class ShippingOptionController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete package size.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete package size.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Package size successfully deleted.']);
     }

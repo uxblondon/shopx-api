@@ -16,12 +16,21 @@ class AuthController extends Controller
         path: "/api/auth/login",
         tags: ["auth"],
         summary: "Get access token for the API",
-        parameters: [new OA\Parameter(name: "email", description: "Email Address", required: true, in: "query", schema: new OA\Schema(type: "string")), new OA\Parameter(name: "password", description: "Password", required: true, in: "query", schema: new OA\Schema(type: "string"))],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
+            required: ['email', 'password'], properties: [
+                new OA\Property(property: 'email', type: 'string', format: 'email'),
+                new OA\Property(property: 'password', type: 'string', format: 'password'),
+            ]
+        )),
         responses: [new OA\Response(response: 200, description: "Successful response"), new OA\Response(response: 400, description: "Bad request")],
     )]
     public function login()
     {
-        $credentials = request(['email', 'password']);
+        $credentials = request()->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|max:4096',
+        ]);
+        $credentials += ['admin' => 1, 'disabled' => 0, 'deleted_at' => null];
 
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);

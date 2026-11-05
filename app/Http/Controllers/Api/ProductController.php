@@ -234,7 +234,7 @@ class ProductController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update product shipping.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update product shipping.']);
         }
 
         DB::commit();
@@ -605,7 +605,7 @@ class ProductController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to update product.' . $e->getMessage()]);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update product.']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Product details successfully updated.',]);

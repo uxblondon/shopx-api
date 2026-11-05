@@ -25,7 +25,7 @@ class CollectionRateController extends Controller
             ->toArray();
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage()]);
+            return response()->json(['status' => 'error']);
         }
 
         return response()->json(['status' => 'success', 'data' => $rates]);
@@ -61,7 +61,7 @@ class CollectionRateController extends Controller
             $rate = CollectionRate::create($collection_rate_data);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store collection rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to store collection rate.']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Collection rate successfully stored.', 'data' => $rate]);
@@ -116,7 +116,7 @@ class CollectionRateController extends Controller
                 $rate = CollectionRate::where('id', $collection_rate_id)->first();
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update collection rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update collection rate.']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Collection rate successfully updated.', 'data' => $rate]);
@@ -136,7 +136,7 @@ class CollectionRateController extends Controller
                 'deleted_by' => auth()->user()->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete collection rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete collection rate.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Collection rate successfully deleted.']);
     }

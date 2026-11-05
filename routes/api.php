@@ -56,7 +56,7 @@ Route::group([
 
 /* auth routes */
 Route::group([
-    'middleware' => 'auth:api',
+    'middleware' => ['auth:api', 'admin'],
     'prefix' => 'auth',
 ], function () {
     Route::post('logout', 'Auth\AuthController@logout');
@@ -77,14 +77,14 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth',
 ], function () {
-    Route::post('login', 'Auth\AuthController@login');
+    Route::post('login', 'Auth\AuthController@login')->middleware('throttle:admin-login');
     Route::post('send-password-reset-link', 'Auth\ResetPasswordController@sendResetLinkEmail')->middleware('throttle:password-reset-request');
     Route::post('reset/{token}/password', 'Auth\ResetPasswordController@reset')->middleware('throttle:password-reset-submit');
 });
 
 /* authenticated routes */
 Route::group([
-    'middleware' => 'auth:api',
+    'middleware' => ['auth:api', 'admin'],
 ], function () {
 
     Route::delete('store-addresses/{zone_id}', 'Api\StoreAddressController@destroy');

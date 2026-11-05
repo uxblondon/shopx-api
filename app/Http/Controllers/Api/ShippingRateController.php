@@ -45,7 +45,7 @@ class ShippingRateController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage()]);
+            return response()->json(['status' => 'error']);
         }
 
         return response()->json(['status' => 'success', 'data' => $rates]);
@@ -114,7 +114,7 @@ class ShippingRateController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to store shipping rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to store shipping rate.']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully stored.', 'data' => $shipping_rate]);
@@ -201,7 +201,7 @@ class ShippingRateController extends Controller
                 ]);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to update shipping rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to update shipping rate.']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully updated.', 'data' => $shipping_rate]);
@@ -221,7 +221,7 @@ class ShippingRateController extends Controller
                 'deleted_by' => auth()->user()->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'e' => $e->getMessage(), 'message' => 'Failed to delete shipping rate.']);
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete shipping rate.']);
         }
         return response()->json(['status' => 'success', 'message' => 'Shipping rate successfully deleted.']);
     }

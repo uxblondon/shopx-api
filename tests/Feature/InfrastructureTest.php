@@ -75,20 +75,24 @@ class InfrastructureTest extends TestCase
         $user = User::factory()->create(['admin' => 1]);
         $this->actingAs($user, 'api');
         $product = Product::create(['title' => 'Gift', 'slug' => 'gift', 'description' => 'Gift', 'created_by' => $user->id]);
-        $path = 'products/'.$product->id.'/gift.jpg';
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jS1sAAAAASUVORK5CYII=');
         $upload = $this->post('/api/products/'.$product->id.'/images', [
-            'image' => UploadedFile::fake()->create('gift.jpg', 2, 'image/jpeg'),
+            'image' => UploadedFile::fake()->createWithContent('gift.png', $png),
             'description' => 'Gift image',
         ], ['Accept' => 'application/json'])->assertOk()->assertJsonPath('status', 'success');
+        $path = 'products/'.$product->id.'/'.basename($upload->json('data.location'));
         Storage::disk('public')->assertExists($path);
         $id = $upload->json('data.id');
-        $this->put('/api/products/'.$product->id.'/images/'.$id, [
-            'image' => UploadedFile::fake()->create('gift.jpg', 3, 'image/jpeg'),
+        $replacement = $this->put('/api/products/'.$product->id.'/images/'.$id, [
+            'image' => UploadedFile::fake()->createWithContent('gift.png', $png),
             'description' => 'Updated image',
         ], ['Accept' => 'application/json'])->assertOk()->assertJsonPath('status', 'success');
-        Storage::disk('public')->assertExists($path);
-        $this->deleteJson('/api/products/'.$product->id.'/images/'.$id)->assertOk()->assertJsonPath('status', 'success');
+        $newPath = 'products/'.$product->id.'/'.basename($replacement->json('data.location'));
+        $this->assertNotSame($path, $newPath);
         Storage::disk('public')->assertMissing($path);
+        Storage::disk('public')->assertExists($newPath);
+        $this->deleteJson('/api/products/'.$product->id.'/images/'.$id)->assertOk()->assertJsonPath('status', 'success');
+        Storage::disk('public')->assertMissing($newPath);
         $this->assertDatabaseMissing('product_images', ['id' => $id]);
     }
 

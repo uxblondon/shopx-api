@@ -94,7 +94,7 @@ class UserController extends Controller
         }
 
         if ($request->has('password') || $request->has('email') || $request->boolean('disabled')) {
-            $user_data += ['password_reset_token' => null, 'password_reset_payload' => null,
+            $user_data += ['auth_version' => \Illuminate\Support\Facades\DB::raw('auth_version + 1'), 'password_reset_token' => null, 'password_reset_payload' => null,
                 'password_reset_token_created_at' => null, 'password_reset_expires_at' => null];
         }
 

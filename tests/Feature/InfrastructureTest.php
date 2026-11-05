@@ -95,8 +95,7 @@ class InfrastructureTest extends TestCase
     public function test_password_mail_renders_and_uses_the_symfony_array_transport(): void
     {
         $user = User::factory()->create();
-        $user->password_reset_token = 'testing-token';
-        $mail = new PasswordResetLink($user);
+        $mail = new PasswordResetLink($user, 'testing-token');
         $this->assertStringContainsString('testing-token', $mail->render());
         Mail::to($user->email)->send($mail);
         $transport = Mail::mailer()->getSymfonyTransport();

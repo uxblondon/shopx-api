@@ -84,8 +84,17 @@ class SendEmails extends Command
 
         // A single-order test must never process unrelated password resets.
         if ($orderId === null) {
+            if (! $this->option('dry-run')) {
+                User::where('password_reset_expires_at', '<=', now())->update([
+                    'password_reset_token' => null, 'password_reset_payload' => null,
+                    'password_reset_token_created_at' => null, 'password_reset_expires_at' => null,
+                ]);
+            }
             $users = User::whereNotNull('password_reset_token')
-                ->whereNotNull('password_reset_token_created_at');
+                ->whereNotNull('password_reset_token_created_at')
+                ->whereNotNull('password_reset_payload')
+                ->where('password_reset_expires_at', '>', now())
+                ->where('disabled', 0)->whereNull('deleted_at');
             if ($since !== null) {
                 $users->where('password_reset_token_created_at', '>=', $since);
             }
@@ -98,9 +107,9 @@ class SendEmails extends Command
                     continue;
                 }
                 try {
-                    $this->sendMessage($user->email, new PasswordResetLink($user));
+                    $this->sendMessage($user->email, new PasswordResetLink($user, \Illuminate\Support\Facades\Crypt::decryptString($user->password_reset_payload)));
                     User::where('id', $user->id)->where('password_reset_token', $user->password_reset_token)
-                        ->update(['password_reset_token_created_at' => null]);
+                        ->update(['password_reset_token_created_at' => null, 'password_reset_payload' => null]);
                 } catch (\Throwable $error) {
                     $failed = true;
                     $this->deliveryFailed('password_reset', $user->id, $error);

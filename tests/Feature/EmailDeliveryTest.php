@@ -97,7 +97,8 @@ class EmailDeliveryTest extends TestCase
     {
         $order = $this->order();
         $user = User::factory()->create();
-        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now()])->save();
+        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now(), 'password_reset_expires_at' => now()->addHour(),
+            'password_reset_payload' => \Illuminate\Support\Facades\Crypt::encryptString('fixture-token')])->save();
         config(['mail.test_recipient' => 'tester@example.test']);
         Mail::fake();
         $this->artisan('send:emails', ['--order' => $order->id])->assertExitCode(0);
@@ -110,20 +111,24 @@ class EmailDeliveryTest extends TestCase
     public function test_reset_email_uses_configured_admin_url_and_only_clears_pending_timestamp_after_success(): void
     {
         $user = User::factory()->create();
-        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now()])->save();
-        $html = (new PasswordResetLink($user))->render();
+        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now(), 'password_reset_expires_at' => now()->addHour(),
+            'password_reset_payload' => \Illuminate\Support\Facades\Crypt::encryptString('fixture-token')])->save();
+        $html = (new PasswordResetLink($user, 'fixture-token'))->render();
         $this->assertStringContainsString('https://admin.staging.example.test/reset/fixture-token/password', $html);
         $this->assertStringNotContainsString('shopadmin.trinityhouse.co.uk', $html);
         $this->artisan('send:emails')->assertExitCode(0);
         $this->assertNull($user->fresh()->password_reset_token_created_at);
         $this->assertSame('fixture-token', $user->fresh()->password_reset_token);
+        $this->assertNull($user->fresh()->password_reset_payload);
+        $this->assertNotNull($user->fresh()->password_reset_expires_at);
         $this->assertCount(1, Mail::mailer()->getSymfonyTransport()->messages());
     }
 
     public function test_reset_delivery_failure_preserves_pending_timestamp_for_retry(): void
     {
         $user = User::factory()->create();
-        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now()])->save();
+        $user->forceFill(['password_reset_token' => 'fixture-token', 'password_reset_token_created_at' => now(), 'password_reset_expires_at' => now()->addHour(),
+            'password_reset_payload' => \Illuminate\Support\Facades\Crypt::encryptString('fixture-token')])->save();
         Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('SMTP unavailable'));
         $this->artisan('send:emails')->assertExitCode(1);
         $this->assertNotNull($user->fresh()->password_reset_token_created_at);

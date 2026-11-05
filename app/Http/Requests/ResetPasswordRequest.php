@@ -27,9 +27,9 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'token' => 'required',
+            'token' => 'required|string|regex:/^[a-f0-9]{64}$/',
             'email' => 'required|email',
-            'password' => 'required|min:3',
+            'password' => ['required', 'string', 'confirmed', new \App\Rules\AccountPassword],
         ];
     }
 

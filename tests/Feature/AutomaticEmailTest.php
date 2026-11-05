@@ -65,10 +65,11 @@ class AutomaticEmailTest extends TestCase
 
     public function test_only_new_reset_requests_are_sent_even_for_existing_accounts(): void
     {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-11-03 12:30:00'));
         $old = User::factory()->create(); $new = User::factory()->create();
-        $old->forceFill(['password_reset_token' => 'old-fixture', 'password_reset_token_created_at' => '2026-11-02 12:00:00'])->save();
+        $old->forceFill(['password_reset_token' => 'old-fixture', 'password_reset_token_created_at' => '2026-11-02 12:00:00', 'password_reset_expires_at' => now()->addHour(), 'password_reset_payload' => \Illuminate\Support\Facades\Crypt::encryptString('old-fixture')])->save();
         $new->forceFill(['created_at' => '2026-11-01 12:00:00', 'password_reset_token' => 'new-fixture',
-            'password_reset_token_created_at' => '2026-11-03 12:01:00'])->save();
+            'password_reset_token_created_at' => '2026-11-03 12:01:00', 'password_reset_expires_at' => now()->addHour(), 'password_reset_payload' => \Illuminate\Support\Facades\Crypt::encryptString('new-fixture')])->save();
         $this->enabled(); Mail::fake();
         $this->artisan('send:emails', ['--scheduled' => true])->assertExitCode(0);
         Mail::assertSent(PasswordResetLink::class, fn ($mail) => $mail->user->id === $new->id && $mail->hasTo('tester@example.test'));

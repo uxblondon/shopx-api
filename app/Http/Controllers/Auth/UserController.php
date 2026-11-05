@@ -93,6 +93,11 @@ class UserController extends Controller
             $user_data['disabled'] = $request->get('disabled');
         }
 
+        if ($request->has('password') || $request->has('email') || $request->boolean('disabled')) {
+            $user_data += ['password_reset_token' => null, 'password_reset_payload' => null,
+                'password_reset_token_created_at' => null, 'password_reset_expires_at' => null];
+        }
+
         if(count($user_data) > 0) {
             $update = User::where('id', $user_id)->where('admin', 1)->update($user_data);
 

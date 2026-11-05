@@ -40,7 +40,7 @@ class UpdateUserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users')->ignore($user_id),
             ],
-            'password' => ['string', 'min:6'],
+            'password' => ['string', 'confirmed', new \App\Rules\AccountPassword],
         ];
     }
 

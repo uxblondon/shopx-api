@@ -78,8 +78,8 @@ Route::group([
     'prefix' => 'auth',
 ], function () {
     Route::post('login', 'Auth\AuthController@login');
-    Route::post('send-password-reset-link', 'Auth\ResetPasswordController@sendResetLinkEmail');
-    Route::post('reset/{token}/password', 'Auth\ResetPasswordController@reset');
+    Route::post('send-password-reset-link', 'Auth\ResetPasswordController@sendResetLinkEmail')->middleware('throttle:password-reset-request');
+    Route::post('reset/{token}/password', 'Auth\ResetPasswordController@reset')->middleware('throttle:password-reset-submit');
 });
 
 /* authenticated routes */

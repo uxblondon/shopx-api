@@ -10,9 +10,10 @@
 <body style="-webkit-text-size-adjust:none !important;padding:0;">
 
     <p>Dear <?= e($user->name) ?>,</p>
-    <?php $resetUrl = rtrim(config('mail.admin_url'), '/') . '/reset/' . rawurlencode($user->password_reset_token) . '/password'; ?>
+    <?php $resetUrl = rtrim(config('mail.admin_url'), '/') . '/reset/' . rawurlencode($token) . '/password'; ?>
     <p>Please click <a href="<?= e($resetUrl) ?>">here</a> to reset your password.</p>
     <p>Or copy this link into your browser: <a href="<?= e($resetUrl) ?>"><?= e($resetUrl) ?></a></p>
+    <p>This link expires one hour after it was requested and can be used only once. If you did not request it, you can ignore this email.</p>
     <p>Best Regards,</p>
     <p>Trinity House Team</p>
 

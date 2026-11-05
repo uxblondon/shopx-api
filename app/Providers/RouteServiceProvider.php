@@ -30,7 +30,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        \Illuminate\Support\Facades\RateLimiter::for('password-reset-request', fn ($request) =>
+            \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by('reset-request:'.$request->ip()));
+        \Illuminate\Support\Facades\RateLimiter::for('password-reset-submit', fn ($request) =>
+            \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by('reset-submit:'.$request->ip()));
 
         parent::boot();
     }

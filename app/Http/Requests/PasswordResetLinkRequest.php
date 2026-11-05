@@ -27,7 +27,7 @@ class PasswordResetLinkRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|string|email|max:255'
         ];
     }
 
